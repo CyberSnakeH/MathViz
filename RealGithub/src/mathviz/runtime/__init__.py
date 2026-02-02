@@ -1,0 +1,195 @@
+"""
+MathViz Runtime Package.
+
+This package provides runtime support for compiled MathViz programs,
+including mathematical set operations, Manim integration helpers,
+iterator operations for functional-style data transformations,
+and a comprehensive standard library.
+"""
+
+from mathviz.runtime.math_ops import (
+    set_union,
+    set_intersection,
+    set_difference,
+    is_subset,
+    is_superset,
+    is_element,
+    is_not_element,
+)
+
+from mathviz.runtime.iterators import (
+    # Transformation
+    iter_map,
+    iter_filter,
+    iter_reduce,
+    iter_fold,
+    iter_flat_map,
+    iter_flatten,
+    # Access
+    iter_first,
+    iter_last,
+    iter_nth,
+    iter_find,
+    iter_position,
+    # Predicate
+    iter_any,
+    iter_all,
+    iter_none,
+    iter_count,
+    iter_count_if,
+    # Numeric
+    iter_sum,
+    iter_product,
+    iter_min,
+    iter_max,
+    iter_average,
+    iter_min_by,
+    iter_max_by,
+    # Slicing
+    iter_take,
+    iter_skip,
+    iter_take_while,
+    iter_skip_while,
+    # Ordering
+    iter_sorted,
+    iter_sorted_by,
+    iter_sorted_by_desc,
+    iter_reversed,
+    # Combination
+    iter_zip,
+    iter_enumerate,
+    iter_chain,
+    iter_chunk,
+    iter_unique,
+    # Collection
+    iter_collect_list,
+    iter_collect_set,
+    iter_collect_dict,
+    iter_join,
+    iter_group_by,
+    iter_partition,
+    # Dict-specific
+    dict_keys,
+    dict_values,
+    dict_items,
+    dict_map_values,
+    dict_filter_keys,
+    dict_filter_values,
+)
+
+__all__ = [
+    # Set operations
+    "set_union",
+    "set_intersection",
+    "set_difference",
+    "is_subset",
+    "is_superset",
+    "is_element",
+    "is_not_element",
+    # Iterator operations - Transformation
+    "iter_map",
+    "iter_filter",
+    "iter_reduce",
+    "iter_fold",
+    "iter_flat_map",
+    "iter_flatten",
+    # Iterator operations - Access
+    "iter_first",
+    "iter_last",
+    "iter_nth",
+    "iter_find",
+    "iter_position",
+    # Iterator operations - Predicate
+    "iter_any",
+    "iter_all",
+    "iter_none",
+    "iter_count",
+    "iter_count_if",
+    # Iterator operations - Numeric
+    "iter_sum",
+    "iter_product",
+    "iter_min",
+    "iter_max",
+    "iter_average",
+    "iter_min_by",
+    "iter_max_by",
+    # Iterator operations - Slicing
+    "iter_take",
+    "iter_skip",
+    "iter_take_while",
+    "iter_skip_while",
+    # Iterator operations - Ordering
+    "iter_sorted",
+    "iter_sorted_by",
+    "iter_sorted_by_desc",
+    "iter_reversed",
+    # Iterator operations - Combination
+    "iter_zip",
+    "iter_enumerate",
+    "iter_chain",
+    "iter_chunk",
+    "iter_unique",
+    # Iterator operations - Collection
+    "iter_collect_list",
+    "iter_collect_set",
+    "iter_collect_dict",
+    "iter_join",
+    "iter_group_by",
+    "iter_partition",
+    # Dict-specific operations
+    "dict_keys",
+    "dict_values",
+    "dict_items",
+    "dict_map_values",
+    "dict_filter_keys",
+    "dict_filter_values",
+    # Test framework
+    "test",
+    "run_tests",
+    "assert_true",
+    "assert_false",
+    "assert_eq",
+    "assert_ne",
+    "assert_lt",
+    "assert_le",
+    "assert_gt",
+    "assert_ge",
+    "assert_in",
+    "assert_not_in",
+    "assert_none",
+    "assert_not_none",
+    "assert_approx",
+    "assert_raises",
+    "assert_type",
+    "assert_len",
+    "assert_empty",
+    "assert_not_empty",
+]
+
+# Test framework exports
+from mathviz.runtime.test_runner import (
+    test,
+    run_tests,
+    assert_true,
+    assert_false,
+    assert_eq,
+    assert_ne,
+    assert_lt,
+    assert_le,
+    assert_gt,
+    assert_ge,
+    assert_in,
+    assert_not_in,
+    assert_none,
+    assert_not_none,
+    assert_approx,
+    assert_raises,
+    assert_type,
+    assert_len,
+    assert_empty,
+    assert_not_empty,
+    TestRunner,
+    TestResult,
+    TestSuite,
+    TestStatus,
+)

@@ -1,0 +1,25 @@
+# MathViz Manim Animation Example
+# Creates an animated circle using Manim
+
+from manim import Circle, Square, Create, FadeOut, Transform, BLUE, RED, GREEN
+
+scene CircleAnimation {
+    fn construct(self) {
+        # Create shapes
+        let circle = Circle()
+        circle.set_fill(BLUE, 0.5)
+        circle.set_stroke(BLUE, 2)
+
+        let square = Square()
+        square.set_fill(RED, 0.5)
+
+        # Animate
+        self.play(Create(circle))
+        self.wait(1)
+
+        self.play(Transform(circle, square))
+        self.wait(1)
+
+        self.play(FadeOut(circle))
+    }
+}

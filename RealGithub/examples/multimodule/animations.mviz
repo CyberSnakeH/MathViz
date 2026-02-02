@@ -1,0 +1,57 @@
+// Animations module - provides animation utilities
+// This module uses the geometry and colors modules
+
+use geometry
+use colors
+
+/// Create a circle at specified position with animation
+pub fn animated_circle(x, y, radius, color) {
+    // Would create a Manim Circle mobject
+    let area = geometry.circle_area(radius)
+    return {
+        "type": "circle",
+        "x": x,
+        "y": y,
+        "radius": radius,
+        "color": color,
+        "area": area
+    }
+}
+
+/// Create a line between two points
+pub fn animated_line(x1, y1, x2, y2, color) {
+    let length = geometry.distance(x1, y1, x2, y2)
+    let mid = geometry.midpoint(x1, y1, x2, y2)
+    return {
+        "type": "line",
+        "start": (x1, y1),
+        "end": (x2, y2),
+        "color": color,
+        "length": length,
+        "midpoint": mid
+    }
+}
+
+/// Create a triangle from three vertices
+pub fn animated_triangle(x1, y1, x2, y2, x3, y3, fill_color, stroke_color) {
+    let area = geometry.triangle_area(x1, y1, x2, y2, x3, y3)
+    return {
+        "type": "triangle",
+        "vertices": [(x1, y1), (x2, y2), (x3, y3)],
+        "fill": fill_color,
+        "stroke": stroke_color,
+        "area": area
+    }
+}
+
+/// Get a colorful animation sequence
+pub fn rainbow_sequence(count) {
+    let shapes = []
+    for i in range(count) {
+        let color = colors.random_color()
+        let x = i * 2 - count
+        let shape = animated_circle(x, 0, 1, color)
+        shapes = shapes + [shape]
+    }
+    return shapes
+}

@@ -1,0 +1,37 @@
+# MathViz Venn Diagram Animation
+# Visualizes set operations with Manim
+
+from manim import Scene, Circle, Text, VGroup, Create, FadeIn, Write
+from manim import BLUE, RED, GREEN, WHITE, LEFT, RIGHT, UP, DOWN
+
+scene VennDiagram {
+    fn construct(self) {
+        # Create two overlapping circles
+        let circle_a = Circle(radius=1.5, color=BLUE)
+        circle_a.shift(LEFT * 0.75)
+        circle_a.set_fill(BLUE, opacity=0.3)
+
+        let circle_b = Circle(radius=1.5, color=RED)
+        circle_b.shift(RIGHT * 0.75)
+        circle_b.set_fill(RED, opacity=0.3)
+
+        # Labels
+        let label_a = Text("A", font_size=36)
+        label_a.next_to(circle_a, UP + LEFT)
+
+        let label_b = Text("B", font_size=36)
+        label_b.next_to(circle_b, UP + RIGHT)
+
+        # Set operation labels
+        let union_text = Text("A ∪ B (Union)", font_size=24)
+        union_text.to_edge(DOWN)
+
+        # Animate
+        self.play(Create(circle_a), Create(circle_b))
+        self.play(Write(label_a), Write(label_b))
+        self.wait(1)
+
+        self.play(FadeIn(union_text))
+        self.wait(2)
+    }
+}

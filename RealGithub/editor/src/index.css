@@ -1,0 +1,1248 @@
+/**
+ * MathViz Editor - Global Styles
+ *
+ * Tokyo Night theme with unique UI design elements.
+ * Features glassmorphism, smooth animations, and modern aesthetics.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+ * CSS Variables - Tokyo Night Storm
+ * ============================================================================ */
+
+:root {
+  /* Core Tokyo Night colors */
+  --tn-bg: #1a1b26;
+  --tn-bg-dark: #16161e;
+  --tn-bg-highlight: #292e42;
+  --tn-terminal-black: #414868;
+  --tn-fg: #a9b1d6;
+  --tn-fg-dark: #565f89;
+  --tn-fg-gutter: #3b4261;
+  --tn-dark3: #545c7e;
+  --tn-comment: #565f89;
+  --tn-dark5: #737aa2;
+  --tn-blue0: #3d59a1;
+  --tn-blue: #7aa2f7;
+  --tn-cyan: #7dcfff;
+  --tn-blue1: #2ac3de;
+  --tn-blue2: #0db9d7;
+  --tn-blue5: #89ddff;
+  --tn-blue6: #b4f9f8;
+  --tn-blue7: #394b70;
+  --tn-magenta: #bb9af7;
+  --tn-magenta2: #ff007c;
+  --tn-purple: #9d7cd8;
+  --tn-orange: #ff9e64;
+  --tn-yellow: #e0af68;
+  --tn-green: #9ece6a;
+  --tn-green1: #73daca;
+  --tn-green2: #41a6b5;
+  --tn-teal: #1abc9c;
+  --tn-red: #f7768e;
+  --tn-red1: #db4b4b;
+
+  /* Animation timing */
+  --transition-fast: 100ms;
+  --transition-normal: 150ms;
+  --transition-slow: 250ms;
+  --transition-slower: 350ms;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(122, 162, 247, 0.15);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(31, 35, 53, 0.8);
+  --glass-border: rgba(59, 66, 97, 0.5);
+  --glass-blur: 12px;
+}
+
+/* ============================================================================
+ * Base Styles
+ * ============================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  /* Force LTR text direction globally */
+  direction: ltr;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Ensure LTR text direction */
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: normal;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--tn-bg);
+  color: var(--tn-fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  /* Ensure LTR text direction */
+  direction: ltr;
+  text-align: left;
+}
+
+/* Selection */
+::selection {
+  background: var(--tn-blue0);
+  color: var(--tn-fg);
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--tn-blue);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+ * Scrollbar - Minimal Tokyo Night Style
+ * ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tn-fg-gutter);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tn-dark5);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tn-fg-gutter) transparent;
+}
+
+/* ============================================================================
+ * Typography
+ * ============================================================================ */
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas',
+    'Monaco', monospace;
+  font-feature-settings: 'liga' on, 'calt' on;
+}
+
+/* ============================================================================
+ * Animations
+ * ============================================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-12px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(12px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--tn-blue); }
+  50% { box-shadow: 0 0 20px var(--tn-blue); }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.animate-fade-out {
+  animation: fadeOut var(--transition-normal) ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft var(--transition-normal) ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight var(--transition-normal) ease-out;
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop var(--transition-normal) ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--transition-normal) ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--transition-normal) ease-out;
+}
+
+.animate-bounce-in {
+  animation: bounceIn var(--transition-slow) ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+ * Transitions
+ * ============================================================================ */
+
+.transition-fast {
+  transition-duration: var(--transition-fast);
+  transition-timing-function: ease-out;
+}
+
+.transition-normal {
+  transition-duration: var(--transition-normal);
+  transition-timing-function: ease-out;
+}
+
+.transition-slow {
+  transition-duration: var(--transition-slow);
+  transition-timing-function: ease-out;
+}
+
+.transition-all-normal {
+  transition: all var(--transition-normal) ease-out;
+}
+
+/* ============================================================================
+ * Glassmorphism
+ * ============================================================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.glass-subtle {
+  background: rgba(26, 27, 38, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ============================================================================
+ * Panel Styles
+ * ============================================================================ */
+
+.panel {
+  background: var(--mviz-sidebar-background, #1f2335);
+  border-radius: var(--radius-lg);
+}
+
+.panel-floating {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================================
+ * Activity Bar Styles
+ * ============================================================================ */
+
+.activity-bar {
+  width: 52px;
+  min-width: 52px;
+  background: var(--mviz-activity-bar-background, #1a1b26);
+}
+
+.activity-bar-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 48px;
+  color: var(--mviz-activity-bar-inactive-foreground, #565f89);
+  transition: color var(--transition-normal) ease-out;
+  cursor: pointer;
+}
+
+.activity-bar-item:hover {
+  color: var(--mviz-activity-bar-foreground, #a9b1d6);
+}
+
+.activity-bar-item.active {
+  color: var(--mviz-activity-bar-foreground, #a9b1d6);
+}
+
+.activity-bar-item .active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: var(--mviz-accent, #7aa2f7);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  transition: all var(--transition-normal) ease-out;
+}
+
+.activity-bar-item .tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  padding: 6px 12px;
+  background: var(--mviz-widget-background, #1f2335);
+  border: 1px solid var(--mviz-widget-border, #3b4261);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast) ease-out;
+  z-index: 1000;
+}
+
+.activity-bar-item:hover .tooltip {
+  opacity: 1;
+}
+
+/* ============================================================================
+ * Tab Styles - Rounded Modern Design
+ * ============================================================================ */
+
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  height: 38px;
+  background: var(--mviz-tab-inactive-background, #1f2335);
+  border-bottom: 1px solid var(--mviz-border, #1a1b26);
+  gap: 2px;
+  padding: 4px 4px 0;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  min-width: 100px;
+  max-width: 200px;
+  height: 100%;
+  background: transparent;
+  color: var(--mviz-tab-inactive-foreground, #565f89);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  cursor: pointer;
+  transition: all var(--transition-normal) ease-out;
+  overflow: hidden;
+}
+
+.tab:hover {
+  background: var(--mviz-tab-hover-background, #292e42);
+  color: var(--mviz-foreground, #a9b1d6);
+}
+
+.tab.active {
+  background: var(--mviz-tab-active-background, #1a1b26);
+  color: var(--mviz-tab-active-foreground, #c0caf5);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--mviz-accent, #7aa2f7);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+}
+
+.tab .close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: all var(--transition-fast) ease-out;
+}
+
+.tab:hover .close-btn,
+.tab.active .close-btn {
+  opacity: 1;
+}
+
+.tab .close-btn:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.tab .modified-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mviz-accent, #7aa2f7);
+}
+
+/* ============================================================================
+ * Sidebar Styles
+ * ============================================================================ */
+
+.sidebar {
+  background: var(--mviz-sidebar-background, #1f2335);
+  border-right: 1px solid var(--mviz-sidebar-border, #1a1b26);
+}
+
+.sidebar-section {
+  border-bottom: 1px solid var(--mviz-border, #1a1b26);
+}
+
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mviz-foreground, #a9b1d6);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.sidebar-section-header:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.sidebar-section-header .chevron {
+  transition: transform var(--transition-normal) ease-out;
+}
+
+.sidebar-section-header.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-section-content {
+  overflow: hidden;
+  transition: height var(--transition-normal) ease-out;
+}
+
+/* ============================================================================
+ * File Tree Styles
+ * ============================================================================ */
+
+.file-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 8px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  margin: 1px 4px;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.file-tree-item:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.file-tree-item.selected {
+  background: var(--mviz-list-active-background, #283457);
+}
+
+.file-tree-item .icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.file-tree-item .name {
+  flex: 1;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-tree-indent {
+  width: 12px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--mviz-editor-indent-guide, #292e42);
+  margin-left: 6px;
+}
+
+/* ============================================================================
+ * Status Bar Styles - Two-tone Design
+ * ============================================================================ */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  font-size: 12px;
+  user-select: none;
+}
+
+.status-bar-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  background: var(--mviz-status-bar-remote-background, #7aa2f7);
+  padding-right: 8px;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+}
+
+.status-bar-left > * {
+  color: var(--mviz-status-bar-remote-foreground, #1a1b26);
+}
+
+.status-bar-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  background: var(--mviz-status-bar-background, #1a1b26);
+  padding-left: 16px;
+}
+
+.status-bar-right {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  background: var(--mviz-status-bar-background, #1a1b26);
+}
+
+.status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  height: 100%;
+  cursor: pointer;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.status-bar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+ * Bottom Panel Styles - Pill Tabs
+ * ============================================================================ */
+
+.bottom-panel {
+  background: var(--mviz-panel-background, #1a1b26);
+  border-top: 1px solid var(--mviz-panel-border, #1f2335);
+}
+
+.bottom-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: var(--mviz-sidebar-background, #1f2335);
+  border-bottom: 1px solid var(--mviz-border, #1a1b26);
+}
+
+.bottom-panel-tab {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.7;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast) ease-out;
+}
+
+.bottom-panel-tab:hover {
+  opacity: 1;
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.bottom-panel-tab.active {
+  opacity: 1;
+  background: var(--mviz-accent, #7aa2f7);
+  color: var(--mviz-accent-foreground, #1a1b26);
+}
+
+/* ============================================================================
+ * Input Styles
+ * ============================================================================ */
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: var(--mviz-input-background, #1a1b26);
+  color: var(--mviz-input-foreground, #c0caf5);
+  border: 1px solid var(--mviz-input-border, #3b4261);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast) ease-out;
+}
+
+.input::placeholder {
+  color: var(--mviz-input-placeholder, #565f89);
+}
+
+.input:focus {
+  border-color: var(--mviz-focus-border, #7aa2f7);
+  box-shadow: 0 0 0 2px rgba(122, 162, 247, 0.2);
+}
+
+/* ============================================================================
+ * Button Styles
+ * ============================================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast) ease-out;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--mviz-button-background, #7aa2f7);
+  color: var(--mviz-button-foreground, #1a1b26);
+}
+
+.btn-primary:hover {
+  background: var(--mviz-button-hover-background, #89b4fa);
+}
+
+.btn-secondary {
+  background: var(--mviz-button-secondary-background, #292e42);
+  color: var(--mviz-button-secondary-foreground, #c0caf5);
+}
+
+.btn-secondary:hover {
+  background: var(--mviz-button-secondary-hover-background, #3b4261);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--mviz-foreground, #a9b1d6);
+}
+
+.btn-ghost:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.btn-icon {
+  padding: 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================================
+ * Context Menu Styles
+ * ============================================================================ */
+
+.context-menu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 180px;
+  padding: 4px;
+  background: var(--mviz-widget-background, #1f2335);
+  border: 1px solid var(--mviz-widget-border, #3b4261);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn var(--transition-fast) ease-out;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--mviz-foreground, #a9b1d6);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.context-menu-item:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.context-menu-item .shortcut {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.5;
+}
+
+.context-menu-separator {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--mviz-border, #1a1b26);
+}
+
+/* ============================================================================
+ * Command Palette Styles
+ * ============================================================================ */
+
+.command-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  animation: fadeIn var(--transition-fast) ease-out;
+}
+
+.command-palette {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  max-width: calc(100vw - 32px);
+  background: var(--mviz-widget-background, #1f2335);
+  border: 1px solid var(--mviz-widget-border, #3b4261);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideInFromTop var(--transition-normal) ease-out;
+  z-index: 10000;
+}
+
+.command-palette-input {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 15px;
+  background: transparent;
+  color: var(--mviz-foreground, #c0caf5);
+  border: none;
+  border-bottom: 1px solid var(--mviz-border, #1a1b26);
+  outline: none;
+}
+
+.command-palette-input::placeholder {
+  color: var(--mviz-input-placeholder, #565f89);
+}
+
+.command-palette-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.command-palette-item:hover,
+.command-palette-item.selected {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+.command-palette-item .icon {
+  width: 20px;
+  height: 20px;
+  color: var(--mviz-accent, #7aa2f7);
+}
+
+.command-palette-item .label {
+  flex: 1;
+  font-size: 14px;
+}
+
+.command-palette-item .shortcut {
+  font-size: 12px;
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.5;
+}
+
+/* ============================================================================
+ * Resizer Styles
+ * ============================================================================ */
+
+.resizer {
+  flex-shrink: 0;
+  background: transparent;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.resizer-horizontal {
+  width: 4px;
+  cursor: col-resize;
+}
+
+.resizer-vertical {
+  height: 4px;
+  cursor: row-resize;
+}
+
+.resizer:hover,
+.resizer.dragging {
+  background: var(--mviz-accent, #7aa2f7);
+}
+
+/* ============================================================================
+ * Badge Styles
+ * ============================================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--mviz-badge-background, #7aa2f7);
+  color: var(--mviz-badge-foreground, #1a1b26);
+  border-radius: var(--radius-full);
+}
+
+.badge-error {
+  background: var(--mviz-error-foreground, #f7768e);
+}
+
+.badge-warning {
+  background: var(--mviz-warning-foreground, #e0af68);
+}
+
+.badge-success {
+  background: var(--mviz-git-added, #9ece6a);
+}
+
+/* ============================================================================
+ * Tooltip Styles
+ * ============================================================================ */
+
+.tooltip {
+  position: absolute;
+  z-index: 10000;
+  padding: 6px 10px;
+  font-size: 12px;
+  background: var(--mviz-widget-background, #1f2335);
+  color: var(--mviz-foreground, #a9b1d6);
+  border: 1px solid var(--mviz-widget-border, #3b4261);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fadeIn var(--transition-fast) ease-out;
+}
+
+/* ============================================================================
+ * Spinner Styles
+ * ============================================================================ */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--mviz-border, #1a1b26);
+  border-top-color: var(--mviz-accent, #7aa2f7);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+
+.spinner-lg {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+/* ============================================================================
+ * Progress Bar Styles
+ * ============================================================================ */
+
+.progress-bar {
+  height: 4px;
+  background: var(--mviz-border, #1a1b26);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--mviz-accent, #7aa2f7);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal) ease-out;
+}
+
+.progress-bar-indeterminate .progress-bar-fill {
+  width: 30%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--mviz-accent, #7aa2f7) 0%,
+    var(--mviz-link-hover, #89b4fa) 50%,
+    var(--mviz-accent, #7aa2f7) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* ============================================================================
+ * Monaco Editor Overrides - Tokyo Night
+ * ============================================================================ */
+
+.monaco-editor {
+  --vscode-editor-background: var(--mviz-editor-background, #1a1b26) !important;
+  --vscode-editor-foreground: var(--mviz-editor-foreground, #a9b1d6) !important;
+  /* Force LTR text direction in editor */
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+.monaco-editor *,
+.monaco-editor .view-lines,
+.monaco-editor .inputarea,
+.monaco-editor .lines-content {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.monaco-editor .margin {
+  background-color: var(--mviz-editor-background, #1a1b26) !important;
+}
+
+.monaco-editor .scroll-decoration {
+  display: none !important;
+}
+
+.monaco-editor .cursors-layer > .cursor {
+  background-color: var(--mviz-editor-cursor-foreground, #c0caf5) !important;
+  border-color: var(--mviz-editor-cursor-foreground, #c0caf5) !important;
+}
+
+/* ============================================================================
+ * XTerm.js Overrides - Tokyo Night
+ * ============================================================================ */
+
+.xterm {
+  padding: 12px;
+}
+
+.xterm-viewport {
+  overflow-y: auto !important;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  background: var(--tn-fg-gutter);
+  border-radius: var(--radius-full);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: var(--tn-dark5);
+}
+
+/* ============================================================================
+ * Git Status Colors
+ * ============================================================================ */
+
+.git-added { color: var(--mviz-git-added, #9ece6a); }
+.git-modified { color: var(--mviz-git-modified, #e0af68); }
+.git-deleted { color: var(--mviz-git-deleted, #f7768e); }
+.git-untracked { color: var(--mviz-git-untracked, #73daca); }
+.git-conflicting { color: var(--mviz-git-conflicting, #ff9e64); }
+.git-ignored { color: var(--mviz-git-ignored, #565f89); }
+
+/* ============================================================================
+ * Diff Colors
+ * ============================================================================ */
+
+.diff-added {
+  background: var(--mviz-diff-added-background, #9ece6a20);
+}
+
+.diff-removed {
+  background: var(--mviz-diff-removed-background, #f7768e20);
+}
+
+.diff-modified {
+  background: var(--mviz-diff-modified-background, #e0af6820);
+}
+
+/* ============================================================================
+ * Search Highlight
+ * ============================================================================ */
+
+.search-highlight {
+  background: rgba(224, 175, 104, 0.4);
+  border-radius: 2px;
+}
+
+.search-highlight-current {
+  background: rgba(224, 175, 104, 0.6);
+  box-shadow: 0 0 0 1px var(--tn-yellow);
+  border-radius: 2px;
+}
+
+/* ============================================================================
+ * Utility Classes
+ * ============================================================================ */
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+ * Notification Styles
+ * ============================================================================ */
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--mviz-notification-background, #1f2335);
+  border: 1px solid var(--mviz-notification-border, #3b4261);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  animation: slideInFromRight var(--transition-normal) ease-out;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.notification-message {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast) ease-out;
+}
+
+.notification-close:hover {
+  background: var(--mviz-list-hover-background, #292e42);
+}
+
+/* ============================================================================
+ * Breadcrumb Styles
+ * ============================================================================ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--mviz-breadcrumb-foreground, #565f89);
+  background: var(--mviz-editor-background, #1a1b26);
+  border-bottom: 1px solid var(--mviz-border, #1a1b26);
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: color var(--transition-fast) ease-out;
+}
+
+.breadcrumb-item:hover {
+  color: var(--mviz-breadcrumb-focus-foreground, #c0caf5);
+}
+
+.breadcrumb-separator {
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.3;
+}
+
+/* ============================================================================
+ * Empty State Styles
+ * ============================================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.3;
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: 13px;
+  color: var(--mviz-foreground, #a9b1d6);
+  opacity: 0.6;
+  max-width: 300px;
+}
+
+/* ============================================================================
+ * Print Styles
+ * ============================================================================ */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
