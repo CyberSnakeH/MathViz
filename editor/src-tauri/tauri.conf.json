@@ -30,7 +30,7 @@
     "active": true,
     "category": "DeveloperTool",
     "copyright": "Copyright (c) 2024 MathViz Team",
-    "icon": ["icons/icon.png"],
+    "icon": ["icons/icon.png", "icons/icon.ico"],
     "linux": {
       "deb": {
         "depends": []
