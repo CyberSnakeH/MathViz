@@ -1,0 +1,41 @@
+# MathViz Fibonacci Example
+# Demonstrates functions and loops
+
+# Recursive Fibonacci (inefficient but clear)
+fn fib_recursive(n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+    return fib_recursive(n - 1) + fib_recursive(n - 2)
+}
+
+# Iterative Fibonacci (efficient)
+fn fib_iterative(n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+
+    let prev = 0
+    let curr = 1
+
+    for i in range(2, n + 1) {
+        let next = prev + curr
+        prev = curr
+        curr = next
+    }
+
+    return curr
+}
+
+# Generate first 10 Fibonacci numbers
+let fib_sequence: List[Int] = []
+
+for i in range(10) {
+    fib_sequence.append(fib_iterative(i))
+}
+
+print("First 10 Fibonacci numbers:", fib_sequence)
+
+# Verify with recursive version
+print("fib(10) recursive:", fib_recursive(10))
+print("fib(10) iterative:", fib_iterative(10))

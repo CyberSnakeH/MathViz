@@ -1,0 +1,7 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/1987512680_3789429803_223132457.mp4'
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/2538612922_2574473371_151624741.mp4'
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/2538612922_3958763878_578674303.mp4'
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/2538612922_2574473371_1604174287.mp4'
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/2538612922_917029931_2373750003.mp4'
+file 'file:/home/cybersnake-pc/Documents/MathViz/editor/src-tauri/media/videos/da/720p30/partial_movie_files/AnimateTest/2538612922_2574473371_488594613.mp4'

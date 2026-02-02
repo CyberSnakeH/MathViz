@@ -1,0 +1,36 @@
+// Colors module - provides color utilities for Manim animations
+// This module demonstrates public constants and functions
+
+/// Predefined color values (Manim compatible)
+pub let RED = "#FF0000"
+pub let GREEN = "#00FF00"
+pub let BLUE = "#0000FF"
+pub let YELLOW = "#FFFF00"
+pub let PURPLE = "#800080"
+pub let ORANGE = "#FFA500"
+pub let WHITE = "#FFFFFF"
+pub let BLACK = "#000000"
+
+/// Interpolate between two colors
+pub fn lerp_color(color1, color2, t) {
+    // Linear interpolation between colors
+    // t should be between 0 and 1
+    return color1  // Simplified - real implementation would parse and blend
+}
+
+/// Create a gradient of colors
+pub fn gradient(start_color, end_color, steps) {
+    let colors = []
+    for i in range(steps) {
+        let t = i / (steps - 1)
+        colors = colors + [lerp_color(start_color, end_color, t)]
+    }
+    return colors
+}
+
+/// Get a random color from the palette
+pub fn random_color() {
+    let palette = [RED, GREEN, BLUE, YELLOW, PURPLE, ORANGE]
+    let index = int(random() * len(palette))
+    return palette[index]
+}
