@@ -1,1 +1,0 @@
-"""MathViz Test Suite."""

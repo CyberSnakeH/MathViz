@@ -1,6 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/home/cybersnake-pc/Documents/MathViz/media/videos/circle_animation/480p15/partial_movie_files/CircleAnimation/1584795214_2554307164_223132457.mp4'
-file 'file:/home/cybersnake-pc/Documents/MathViz/media/videos/circle_animation/480p15/partial_movie_files/CircleAnimation/4072820271_1432596116_2378943631.mp4'
-file 'file:/home/cybersnake-pc/Documents/MathViz/media/videos/circle_animation/480p15/partial_movie_files/CircleAnimation/4072820271_2125826628_2307190063.mp4'
-file 'file:/home/cybersnake-pc/Documents/MathViz/media/videos/circle_animation/480p15/partial_movie_files/CircleAnimation/4072820271_1432596116_2652665504.mp4'
-file 'file:/home/cybersnake-pc/Documents/MathViz/media/videos/circle_animation/480p15/partial_movie_files/CircleAnimation/4072820271_2663312397_4129151947.mp4'
