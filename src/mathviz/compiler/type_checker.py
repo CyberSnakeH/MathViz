@@ -3552,8 +3552,14 @@ class TypeChecker(BaseASTVisitor):
         self.symbol_table.enter_scope("for")
         self._in_loop = True
 
-        # Add loop variable to scope
-        self.symbol_table.define(node.variable, element_type)
+        # Add loop variable(s) to scope
+        if isinstance(node.variable, tuple):
+            # Tuple destructuring: for (a, b) in ...
+            # Each variable gets ANY_TYPE since we can't infer tuple element types easily
+            for var in node.variable:
+                self.symbol_table.define(var, ANY_TYPE)
+        else:
+            self.symbol_table.define(node.variable, element_type)
 
         # Type check loop body
         self.visit(node.body)
