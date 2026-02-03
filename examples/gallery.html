@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation Gallery - MathViz</title>
+  <meta name="description" content="MathViz animation examples with code and rendered videos.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .gallery-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+    .gallery-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .gallery-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    @media (max-width: 900px) {
+      .gallery-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    .gallery-code {
+      padding: 1.5rem;
+      border-right: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+    @media (max-width: 900px) {
+      .gallery-code {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+    .gallery-code h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gallery-code h3::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+    }
+    .gallery-code pre {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+    .gallery-video {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+    }
+    .gallery-video h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gallery-video h3::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent-magenta);
+      border-radius: 50%;
+    }
+    .gallery-video video {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .gallery-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .gallery-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .gallery-badge {
+      background: var(--accent-primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .intro-section {
+      margin-bottom: 2rem;
+    }
+    .intro-section p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="../docs/getting-started.html" class="nav-link">Docs</a>
+        <a href="../docs/language-reference.html" class="nav-link">Language</a>
+        <a href="../docs/scenes.html" class="nav-link">Manim</a>
+        <a href="../docs/cli.html" class="nav-link">CLI</a>
+        <a href="index.html" class="nav-link active">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Examples</div>
+        <nav class="sidebar-nav">
+          <a href="index.html" class="sidebar-link">Code Examples</a>
+          <a href="gallery.html" class="sidebar-link active">Animation Gallery</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Animations</div>
+        <nav class="sidebar-nav">
+          <a href="#hello-mathviz" class="sidebar-link">Hello MathViz</a>
+          <a href="#circle-area" class="sidebar-link">Circle Area</a>
+          <a href="#shape-transform" class="sidebar-link">Shape Transform</a>
+          <a href="#function-graph" class="sidebar-link">Function Graph</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="../docs/scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="../docs/cli.html" class="sidebar-link">CLI Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Animation Gallery</h1>
+
+      <div class="intro-section">
+        <p>
+          See MathViz in action! Each example shows the source code alongside its rendered animation.
+          All animations are generated using <strong>Manim</strong> from compiled MathViz code.
+        </p>
+      </div>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Render Your Own</div>
+          <p class="callout-text">
+            Save any example to a <code>.mviz</code> file and run:
+            <code>mathviz run example.mviz --preview</code>
+          </p>
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+
+        <!-- Example 1: Hello MathViz -->
+        <article class="gallery-item" id="hello-mathviz">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Hello MathViz</h2>
+            <span class="gallery-badge">Beginner</span>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-code">
+              <h3>MathViz Code</h3>
+              <pre><code class="language-mviz">scene HelloMathViz {
+    fn construct(self) {
+        let title = Text("Hello, MathViz!")
+        title.scale(1.5)
+
+        play(Write(title))
+        wait(1.0)
+        play(title.animate.set_color(BLUE))
+        wait(0.5)
+        play(FadeOut(title))
+    }
+}</code></pre>
+            </div>
+            <div class="gallery-video">
+              <h3>Rendered Output</h3>
+              <video controls loop muted playsinline>
+                <source src="videos/HelloMathViz.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </article>
+
+        <!-- Example 2: Circle Area -->
+        <article class="gallery-item" id="circle-area">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Circle Area Formula</h2>
+            <span class="gallery-badge">Math</span>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-code">
+              <h3>MathViz Code</h3>
+              <pre><code class="language-mviz">scene CircleArea {
+    fn construct(self) {
+        let circle = Circle(radius: 2.0, color: BLUE)
+        let formula = MathTex("A = \\pi r^2")
+        formula.next_to(circle, DOWN)
+
+        play(Create(circle))
+        play(Write(formula))
+        wait(1.0)
+        play(circle.animate.set_fill(BLUE, opacity: 0.5))
+        wait(0.5)
+        play(FadeOut(circle, formula))
+    }
+}</code></pre>
+            </div>
+            <div class="gallery-video">
+              <h3>Rendered Output</h3>
+              <video controls loop muted playsinline>
+                <source src="videos/CircleArea.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </article>
+
+        <!-- Example 3: Shape Transform -->
+        <article class="gallery-item" id="shape-transform">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Shape Transformation</h2>
+            <span class="gallery-badge">Animation</span>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-code">
+              <h3>MathViz Code</h3>
+              <pre><code class="language-mviz">scene ShapeTransform {
+    fn construct(self) {
+        let square = Square(side_length: 2.0, color: RED)
+        let circle = Circle(radius: 1.0, color: BLUE)
+
+        play(Create(square))
+        wait(0.5)
+        play(Transform(square, circle))
+        wait(0.5)
+        play(circle.animate.scale(2.0))
+        wait(0.5)
+        play(FadeOut(circle))
+    }
+}</code></pre>
+            </div>
+            <div class="gallery-video">
+              <h3>Rendered Output</h3>
+              <video controls loop muted playsinline>
+                <source src="videos/ShapeTransform.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </article>
+
+        <!-- Example 4: Function Graph -->
+        <article class="gallery-item" id="function-graph">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Function Graph</h2>
+            <span class="gallery-badge">Advanced</span>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-code">
+              <h3>MathViz Code</h3>
+              <pre><code class="language-mviz">scene FunctionGraph {
+    fn construct(self) {
+        let axes = Axes(
+            x_range: [-3, 3, 1],
+            y_range: [-2, 2, 1],
+            axis_config: {"color": BLUE}
+        )
+
+        let graph = axes.plot(|x| sin(x), color: YELLOW)
+        let label = MathTex("f(x) = \\sin(x)")
+        label.to_corner(UR)
+
+        play(Create(axes))
+        play(Create(graph), Write(label))
+        wait(1.0)
+        play(FadeOut(axes, graph, label))
+    }
+}</code></pre>
+            </div>
+            <div class="gallery-video">
+              <h3>Rendered Output</h3>
+              <video controls loop muted playsinline>
+                <source src="videos/FunctionGraph.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <h2>Next Steps</h2>
+      <ul>
+        <li><a href="../docs/scenes.html">Scenes & Manim Guide</a> - Learn all Manim integration features</li>
+        <li><a href="index.html">Code Examples</a> - More code snippets</li>
+        <li><a href="../docs/cli.html">CLI Reference</a> - Render options and commands</li>
+      </ul>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>
