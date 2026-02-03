@@ -40,18 +40,19 @@ class DiagnosticSeverity(Enum):
 
     Mirrors Rust's diagnostic levels for familiar developer experience.
     """
-    ERROR = "error"      # Compilation cannot continue
+
+    ERROR = "error"  # Compilation cannot continue
     WARNING = "warning"  # Code compiles but may have issues
-    INFO = "info"        # Informational message
-    HINT = "hint"        # Suggestion for improvement
+    INFO = "info"  # Informational message
+    HINT = "hint"  # Suggestion for improvement
 
     def color_code(self) -> str:
         """Get ANSI color code for terminal output."""
         colors = {
-            DiagnosticSeverity.ERROR: "\033[91m",      # Red
-            DiagnosticSeverity.WARNING: "\033[93m",    # Yellow
-            DiagnosticSeverity.INFO: "\033[96m",       # Cyan
-            DiagnosticSeverity.HINT: "\033[92m",       # Green
+            DiagnosticSeverity.ERROR: "\033[91m",  # Red
+            DiagnosticSeverity.WARNING: "\033[93m",  # Yellow
+            DiagnosticSeverity.INFO: "\033[96m",  # Cyan
+            DiagnosticSeverity.HINT: "\033[92m",  # Green
         }
         return colors.get(self, "")
 
@@ -74,6 +75,7 @@ class SourceSpan:
     Represents a range in the source that should be highlighted
     or annotated in error messages.
     """
+
     start_line: int
     start_col: int
     end_line: int
@@ -134,6 +136,7 @@ class Diagnostic:
         related: List of related diagnostics (e.g., "defined here")
         labels: Additional source spans to highlight
     """
+
     severity: DiagnosticSeverity
     code: str
     message: str
@@ -405,14 +408,16 @@ class DiagnosticEmitter:
         else:
             help_text = f"consider converting `{found}` to `{expected}`"
 
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.ERROR,
-            code="E0002",
-            message=message,
-            location=loc,
-            span=SourceSpan.from_location(loc),
-            help_text=help_text,
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.ERROR,
+                code="E0002",
+                message=message,
+                location=loc,
+                span=SourceSpan.from_location(loc),
+                help_text=help_text,
+            )
+        )
 
     def emit_undefined_function(
         self,
@@ -424,14 +429,16 @@ class DiagnosticEmitter:
         similar = find_similar_names(name, candidates)
         suggestion = f"did you mean `{similar[0]}`?" if similar else None
 
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.ERROR,
-            code="E0003",
-            message=f"cannot find function `{name}` in this scope",
-            location=loc,
-            span=SourceSpan.from_location(loc, len(name)),
-            suggestion=suggestion,
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.ERROR,
+                code="E0003",
+                message=f"cannot find function `{name}` in this scope",
+                location=loc,
+                span=SourceSpan.from_location(loc, len(name)),
+                suggestion=suggestion,
+            )
+        )
 
     def emit_wrong_arg_count(
         self,
@@ -446,14 +453,16 @@ class DiagnosticEmitter:
         else:
             help_text = f"remove {found - expected} argument(s)"
 
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.ERROR,
-            code="E0004",
-            message=f"function `{func_name}` expects {expected} argument(s), found {found}",
-            location=loc,
-            span=SourceSpan.from_location(loc),
-            help_text=help_text,
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.ERROR,
+                code="E0004",
+                message=f"function `{func_name}` expects {expected} argument(s), found {found}",
+                location=loc,
+                span=SourceSpan.from_location(loc),
+                help_text=help_text,
+            )
+        )
 
     def emit_unused_variable(
         self,
@@ -461,14 +470,16 @@ class DiagnosticEmitter:
         loc: SourceLocation,
     ) -> Diagnostic:
         """Emit an unused variable warning."""
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0001",
-            message=f"unused variable: `{name}`",
-            location=loc,
-            span=SourceSpan.from_location(loc, len(name)),
-            suggestion=f"prefix with `_` to silence this warning: `_{name}`",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0001",
+                message=f"unused variable: `{name}`",
+                location=loc,
+                span=SourceSpan.from_location(loc, len(name)),
+                suggestion=f"prefix with `_` to silence this warning: `_{name}`",
+            )
+        )
 
     def emit_unused_function(
         self,
@@ -476,14 +487,16 @@ class DiagnosticEmitter:
         loc: SourceLocation,
     ) -> Diagnostic:
         """Emit an unused function warning."""
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0002",
-            message=f"function `{name}` is never called",
-            location=loc,
-            span=SourceSpan.from_location(loc, len(name)),
-            suggestion="remove the function or add a call to it",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0002",
+                message=f"function `{name}` is never called",
+                location=loc,
+                span=SourceSpan.from_location(loc, len(name)),
+                suggestion="remove the function or add a call to it",
+            )
+        )
 
     def emit_unreachable_code(
         self,
@@ -491,14 +504,16 @@ class DiagnosticEmitter:
         reason: str = "code after this statement is unreachable",
     ) -> Diagnostic:
         """Emit an unreachable code warning."""
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0003",
-            message=reason,
-            location=loc,
-            span=SourceSpan.from_location(loc),
-            suggestion="remove the unreachable code",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0003",
+                message=reason,
+                location=loc,
+                span=SourceSpan.from_location(loc),
+                suggestion="remove the unreachable code",
+            )
+        )
 
     def emit_non_exhaustive_match(
         self,
@@ -512,14 +527,16 @@ class DiagnosticEmitter:
             pattern_str = ", ".join(f"`{p}`" for p in missing_patterns[:-1])
             pattern_str += f" and `{missing_patterns[-1]}`"
 
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0004",
-            message=f"non-exhaustive match: patterns {pattern_str} not covered",
-            location=loc,
-            span=SourceSpan.from_location(loc),
-            help_text="add a wildcard pattern `_` to handle remaining cases",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0004",
+                message=f"non-exhaustive match: patterns {pattern_str} not covered",
+                location=loc,
+                span=SourceSpan.from_location(loc),
+                help_text="add a wildcard pattern `_` to handle remaining cases",
+            )
+        )
 
     def emit_unreachable_pattern(
         self,
@@ -543,14 +560,16 @@ class DiagnosticEmitter:
         loc: SourceLocation,
     ) -> Diagnostic:
         """Emit a redundant pattern warning."""
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0006",
-            message="redundant pattern (already covered by previous patterns)",
-            location=loc,
-            span=SourceSpan.from_location(loc),
-            suggestion="remove this redundant pattern",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0006",
+                message="redundant pattern (already covered by previous patterns)",
+                location=loc,
+                span=SourceSpan.from_location(loc),
+                suggestion="remove this redundant pattern",
+            )
+        )
 
     def emit_unused_import(
         self,
@@ -558,14 +577,16 @@ class DiagnosticEmitter:
         loc: SourceLocation,
     ) -> Diagnostic:
         """Emit an unused import warning."""
-        return self.add(Diagnostic(
-            severity=DiagnosticSeverity.WARNING,
-            code="W0007",
-            message=f"unused import: `{name}`",
-            location=loc,
-            span=SourceSpan.from_location(loc, len(name)),
-            suggestion="remove the unused import",
-        ))
+        return self.add(
+            Diagnostic(
+                severity=DiagnosticSeverity.WARNING,
+                code="W0007",
+                message=f"unused import: `{name}`",
+                location=loc,
+                span=SourceSpan.from_location(loc, len(name)),
+                suggestion="remove the unused import",
+            )
+        )
 
     def emit_shadowing(
         self,

@@ -96,17 +96,17 @@ class LoopPattern(Enum):
     """
 
     UNKNOWN = auto()
-    SIMPLE_MAP = auto()         # arr[i] = f(arr[i])
-    ELEMENT_WISE = auto()       # c[i] = a[i] op b[i]
-    REDUCTION = auto()          # acc = acc op arr[i]
-    STENCIL_1D = auto()         # out[i] = f(arr[i-1], arr[i], arr[i+1])
-    STENCIL_2D = auto()         # out[i,j] = f(neighbors)
-    OUTER_PRODUCT = auto()      # c[i,j] = a[i] * b[j]
-    MATRIX_VECTOR = auto()      # c[i] = sum(A[i,j] * b[j])
-    BROADCAST_SCALAR = auto()   # arr[i] = arr[i] + scalar
-    SCAN = auto()               # arr[i] = arr[i] + arr[i-1] (prefix sum)
-    GATHER = auto()             # out[i] = arr[indices[i]]
-    SCATTER = auto()            # arr[indices[i]] = values[i]
+    SIMPLE_MAP = auto()  # arr[i] = f(arr[i])
+    ELEMENT_WISE = auto()  # c[i] = a[i] op b[i]
+    REDUCTION = auto()  # acc = acc op arr[i]
+    STENCIL_1D = auto()  # out[i] = f(arr[i-1], arr[i], arr[i+1])
+    STENCIL_2D = auto()  # out[i,j] = f(neighbors)
+    OUTER_PRODUCT = auto()  # c[i,j] = a[i] * b[j]
+    MATRIX_VECTOR = auto()  # c[i] = sum(A[i,j] * b[j])
+    BROADCAST_SCALAR = auto()  # arr[i] = arr[i] + scalar
+    SCAN = auto()  # arr[i] = arr[i] + arr[i-1] (prefix sum)
+    GATHER = auto()  # out[i] = arr[indices[i]]
+    SCATTER = auto()  # arr[indices[i]] = values[i]
 
 
 class ReductionType(Enum):
@@ -629,10 +629,7 @@ class LoopVectorizer:
             if isinstance(stmt, CompoundAssignment):
                 target = stmt.target
                 # Simple variable being accumulated
-                if (
-                    isinstance(target, Identifier)
-                    and stmt.operator in COMPOUND_TO_REDUCTION
-                ):
+                if isinstance(target, Identifier) and stmt.operator in COMPOUND_TO_REDUCTION:
                     return True
         return False
 
@@ -675,10 +672,7 @@ class LoopVectorizer:
             # Analyze writes
             if isinstance(stmt, AssignmentStatement):
                 target = stmt.target
-                if (
-                    isinstance(target, IndexExpression)
-                    and isinstance(target.object, Identifier)
-                ):
+                if isinstance(target, IndexExpression) and isinstance(target.object, Identifier):
                     arr_name = target.object.name
                     depends, offsets, _ = index_analyzer.analyze(target.index)
                     if depends:
@@ -693,10 +687,7 @@ class LoopVectorizer:
 
             elif isinstance(stmt, CompoundAssignment):
                 target = stmt.target
-                if (
-                    isinstance(target, IndexExpression)
-                    and isinstance(target.object, Identifier)
-                ):
+                if isinstance(target, IndexExpression) and isinstance(target.object, Identifier):
                     arr_name = target.object.name
                     depends, offsets, _ = index_analyzer.analyze(target.index)
                     if depends:
@@ -734,9 +725,7 @@ class LoopVectorizer:
 
         return False
 
-    def _analyze_body(
-        self, body: Block, loop_var: str
-    ) -> dict[str, object]:
+    def _analyze_body(self, body: Block, loop_var: str) -> dict[str, object]:
         """Analyze the loop body structure."""
         result: dict[str, object] = {
             "has_break_continue": False,
@@ -752,9 +741,7 @@ class LoopVectorizer:
         index_analyzer = IndexPatternAnalyzer([loop_var])
 
         for stmt in body.statements:
-            self._analyze_statement(
-                stmt, loop_var, result, array_info, index_analyzer
-            )
+            self._analyze_statement(stmt, loop_var, result, array_info, index_analyzer)
 
         result["array_info"] = array_info
         return result
@@ -777,9 +764,7 @@ class LoopVectorizer:
         # Handle Block by recursing into its statements
         if isinstance(stmt, Block):
             for inner_stmt in stmt.statements:
-                self._analyze_statement(
-                    inner_stmt, loop_var, result, array_info, index_analyzer
-                )
+                self._analyze_statement(inner_stmt, loop_var, result, array_info, index_analyzer)
             return
 
         if isinstance(stmt, (BreakStatement, ContinueStatement)):
@@ -803,9 +788,7 @@ class LoopVectorizer:
 
         elif isinstance(stmt, IfStatement):
             result["has_conditionals"] = True
-            self._analyze_statement(
-                stmt.then_block, loop_var, result, array_info, index_analyzer
-            )
+            self._analyze_statement(stmt.then_block, loop_var, result, array_info, index_analyzer)
             if stmt.else_block:
                 self._analyze_statement(
                     stmt.else_block, loop_var, result, array_info, index_analyzer
@@ -898,21 +881,21 @@ class LoopVectorizer:
                     return LoopPattern.BROADCAST_SCALAR
 
         # Check for stencil pattern
-        if self._is_stencil_loop(ForStatement(
-            variable=loop_var,
-            iterable=RangeExpression(
-                start=IntegerLiteral(value=0),
-                end=Identifier(name="n"),
-            ),
-            body=body,
-        )):
+        if self._is_stencil_loop(
+            ForStatement(
+                variable=loop_var,
+                iterable=RangeExpression(
+                    start=IntegerLiteral(value=0),
+                    end=Identifier(name="n"),
+                ),
+                body=body,
+            )
+        ):
             return LoopPattern.STENCIL_1D
 
         return LoopPattern.SIMPLE_MAP
 
-    def _is_element_wise_pattern(
-        self, stmt: AssignmentStatement, loop_var: str
-    ) -> bool:
+    def _is_element_wise_pattern(self, stmt: AssignmentStatement, loop_var: str) -> bool:
         """Check if statement is c[i] = a[i] op b[i] pattern."""
         target = stmt.target
         if not isinstance(target, IndexExpression):
@@ -933,9 +916,7 @@ class LoopVectorizer:
 
         return False
 
-    def _is_broadcast_scalar_pattern(
-        self, stmt: AssignmentStatement, loop_var: str
-    ) -> bool:
+    def _is_broadcast_scalar_pattern(self, stmt: AssignmentStatement, loop_var: str) -> bool:
         """Check if statement is arr[i] = arr[i] + scalar pattern."""
         target = stmt.target
         if not isinstance(target, IndexExpression):
@@ -1042,9 +1023,7 @@ class LoopVectorizer:
 
         return (VectorizationStrategy.EXPLICIT_SIMD, None)
 
-    def _transform_broadcast(
-        self, loop: ForStatement
-    ) -> tuple[VectorizationStrategy, str | None]:
+    def _transform_broadcast(self, loop: ForStatement) -> tuple[VectorizationStrategy, str | None]:
         """Transform broadcast loop to NumPy operation."""
         if len(loop.body.statements) != 1:
             return (VectorizationStrategy.NONE, None)
@@ -1080,18 +1059,14 @@ class LoopVectorizer:
 
         return (VectorizationStrategy.EXPLICIT_SIMD, None)
 
-    def _transform_stencil(
-        self, _loop: ForStatement
-    ) -> tuple[VectorizationStrategy, str | None]:
+    def _transform_stencil(self, _loop: ForStatement) -> tuple[VectorizationStrategy, str | None]:
         """Transform stencil loop to Numba @stencil."""
         # Stencil transformation is more complex - generate decorator code
         # This would be implemented with StencilDetector analysis
 
         return (VectorizationStrategy.NUMBA_STENCIL, None)
 
-    def _transform_simple_map(
-        self, loop: ForStatement
-    ) -> tuple[VectorizationStrategy, str | None]:
+    def _transform_simple_map(self, loop: ForStatement) -> tuple[VectorizationStrategy, str | None]:
         """Transform simple map loop to np.vectorize or direct operation."""
         if len(loop.body.statements) != 1:
             return (VectorizationStrategy.EXPLICIT_SIMD, None)
@@ -1330,7 +1305,7 @@ class StencilDetector:
         # The kernel expression would be converted to stencil syntax
         # For now, generate a template
         if info.dimensions == 1:
-            offsets_str = ", ".join(f"arr[{off}]" for off, in info.neighborhood)
+            offsets_str = ", ".join(f"arr[{off}]" for (off,) in info.neighborhood)
             lines.append(f"    # Stencil accessing: {offsets_str}")
             lines.append("    return (arr[-1] + arr[0] + arr[1]) / 3  # Example")
         else:
@@ -1689,9 +1664,7 @@ class VectorizationReport:
 
         return loops
 
-    def _generate_suggestions(
-        self, _loop: ForStatement, result: VectorizationResult
-    ) -> list[str]:
+    def _generate_suggestions(self, _loop: ForStatement, result: VectorizationResult) -> list[str]:
         """Generate optimization suggestions based on analysis."""
         suggestions: list[str] = []
 
@@ -1703,27 +1676,17 @@ class VectorizationReport:
                         "Replace break with np.argmax/argmin for early exit patterns"
                     )
                 elif "continue" in blocker.lower():
-                    suggestions.append(
-                        "Use np.where for conditional processing"
-                    )
+                    suggestions.append("Use np.where for conditional processing")
                 elif "nested" in blocker.lower():
-                    suggestions.append(
-                        "Consider np.einsum for nested array operations"
-                    )
+                    suggestions.append("Consider np.einsum for nested array operations")
                 elif "dependency" in blocker.lower():
-                    suggestions.append(
-                        "Use np.cumsum/cumprod for prefix computations"
-                    )
+                    suggestions.append("Use np.cumsum/cumprod for prefix computations")
 
         if result.pattern == LoopPattern.REDUCTION:
-            suggestions.append(
-                "Consider np.sum, np.prod, np.min, np.max for reductions"
-            )
+            suggestions.append("Consider np.sum, np.prod, np.min, np.max for reductions")
 
         if result.pattern == LoopPattern.STENCIL_1D:
-            suggestions.append(
-                "Use scipy.ndimage.convolve for general convolutions"
-            )
+            suggestions.append("Use scipy.ndimage.convolve for general convolutions")
 
         return suggestions
 

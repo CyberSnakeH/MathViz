@@ -28,6 +28,7 @@ from mathviz.compiler.ast_nodes import (
 @dataclass
 class DocItem:
     """A documented item."""
+
     name: str
     kind: str  # "function", "struct", "trait", "enum", "const", "module"
     doc: str
@@ -42,6 +43,7 @@ class DocItem:
 @dataclass
 class Documentation:
     """Complete documentation for a module."""
+
     name: str
     description: str
     items: List[DocItem] = field(default_factory=list)
@@ -66,7 +68,7 @@ class DocExtractor(BaseASTVisitor):
         if not doc:
             return {"description": "", "params": [], "returns": None, "examples": []}
 
-        lines = doc.strip().split('\n')
+        lines = doc.strip().split("\n")
         description_lines = []
         params = []
         returns = None
@@ -90,7 +92,7 @@ class DocExtractor(BaseASTVisitor):
             elif line.startswith("@"):
                 in_example = False
                 if example_lines:
-                    examples.append('\n'.join(example_lines))
+                    examples.append("\n".join(example_lines))
                     example_lines = []
             elif in_example:
                 example_lines.append(line)
@@ -98,10 +100,10 @@ class DocExtractor(BaseASTVisitor):
                 description_lines.append(line)
 
         if example_lines:
-            examples.append('\n'.join(example_lines))
+            examples.append("\n".join(example_lines))
 
         return {
-            "description": '\n'.join(description_lines).strip(),
+            "description": "\n".join(description_lines).strip(),
             "params": params,
             "returns": returns,
             "examples": examples,
@@ -126,15 +128,17 @@ class DocExtractor(BaseASTVisitor):
 
         signature = f"fn {node.name}({', '.join(params)}){ret_type}"
 
-        self.items.append(DocItem(
-            name=node.name,
-            kind="function",
-            doc=parsed["description"],
-            signature=signature,
-            params=parsed["params"],
-            returns=parsed["returns"],
-            examples=parsed["examples"],
-        ))
+        self.items.append(
+            DocItem(
+                name=node.name,
+                kind="function",
+                doc=parsed["description"],
+                signature=signature,
+                params=parsed["params"],
+                returns=parsed["returns"],
+                examples=parsed["examples"],
+            )
+        )
 
     def visit_struct_def(self, node: StructDef) -> None:
         """Extract documentation from a struct."""
@@ -155,13 +159,15 @@ class DocExtractor(BaseASTVisitor):
 
         signature = f"struct {node.name}{type_params} {{ {', '.join(fields)} }}"
 
-        self.items.append(DocItem(
-            name=node.name,
-            kind="struct",
-            doc=parsed["description"],
-            signature=signature,
-            examples=parsed["examples"],
-        ))
+        self.items.append(
+            DocItem(
+                name=node.name,
+                kind="struct",
+                doc=parsed["description"],
+                signature=signature,
+                examples=parsed["examples"],
+            )
+        )
 
     def visit_trait_def(self, node: TraitDef) -> None:
         """Extract documentation from a trait."""
@@ -174,13 +180,15 @@ class DocExtractor(BaseASTVisitor):
 
         signature = f"trait {node.name}{type_params}"
 
-        self.items.append(DocItem(
-            name=node.name,
-            kind="trait",
-            doc=parsed["description"],
-            signature=signature,
-            examples=parsed["examples"],
-        ))
+        self.items.append(
+            DocItem(
+                name=node.name,
+                kind="trait",
+                doc=parsed["description"],
+                signature=signature,
+                examples=parsed["examples"],
+            )
+        )
 
     def visit_enum_def(self, node: EnumDef) -> None:
         """Extract documentation from an enum."""
@@ -194,13 +202,15 @@ class DocExtractor(BaseASTVisitor):
 
         signature = f"enum {node.name}{type_params} {{ {', '.join(variants)} }}"
 
-        self.items.append(DocItem(
-            name=node.name,
-            kind="enum",
-            doc=parsed["description"],
-            signature=signature,
-            examples=parsed["examples"],
-        ))
+        self.items.append(
+            DocItem(
+                name=node.name,
+                kind="enum",
+                doc=parsed["description"],
+                signature=signature,
+                examples=parsed["examples"],
+            )
+        )
 
     def visit_const_declaration(self, node: ConstDeclaration) -> None:
         """Extract documentation from a constant."""
@@ -208,16 +218,19 @@ class DocExtractor(BaseASTVisitor):
         if node.type_annotation:
             signature += f": {self._type_to_str(node.type_annotation)}"
 
-        self.items.append(DocItem(
-            name=node.name,
-            kind="const",
-            doc="",
-            signature=signature,
-        ))
+        self.items.append(
+            DocItem(
+                name=node.name,
+                kind="const",
+                doc="",
+                signature=signature,
+            )
+        )
 
     def _type_to_str(self, type_ann) -> str:
         """Convert type annotation to string."""
         from mathviz.compiler.ast_nodes import SimpleType, GenericType
+
         if isinstance(type_ann, SimpleType):
             return type_ann.name
         elif isinstance(type_ann, GenericType):
@@ -260,7 +273,7 @@ class MarkdownGenerator:
                     lines.extend(self._render_item(item))
                 lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _render_item(self, item: DocItem) -> List[str]:
         """Render a single documented item."""
@@ -340,12 +353,14 @@ class HTMLGenerator:
                 for item in groups[kind]:
                     html.extend(self._render_item(item))
 
-        html.extend([
-            "</body>",
-            "</html>",
-        ])
+        html.extend(
+            [
+                "</body>",
+                "</html>",
+            ]
+        )
 
-        return '\n'.join(html)
+        return "\n".join(html)
 
     def _get_styles(self) -> str:
         """Get CSS styles."""
@@ -366,41 +381,48 @@ class HTMLGenerator:
         """Render a single documented item."""
         lines = [
             f'<div class="doc-item">',
-            f'<h3><code>{item.name}</code></h3>',
-            f'<pre><code>{self._escape(item.signature)}</code></pre>',
+            f"<h3><code>{item.name}</code></h3>",
+            f"<pre><code>{self._escape(item.signature)}</code></pre>",
         ]
 
         if item.doc:
-            lines.append(f'<p>{self._escape(item.doc)}</p>')
+            lines.append(f"<p>{self._escape(item.doc)}</p>")
 
         if item.params:
             lines.append('<div class="params"><strong>Parameters:</strong><ul>')
             for p in item.params:
-                lines.append(f'<li><span class="param-name">{p["name"]}</span>: {self._escape(p["desc"])}</li>')
-            lines.append('</ul></div>')
+                lines.append(
+                    f'<li><span class="param-name">{p["name"]}</span>: {self._escape(p["desc"])}</li>'
+                )
+            lines.append("</ul></div>")
 
         if item.returns:
-            lines.append(f'<p class="returns"><strong>Returns:</strong> {self._escape(item.returns)}</p>')
+            lines.append(
+                f'<p class="returns"><strong>Returns:</strong> {self._escape(item.returns)}</p>'
+            )
 
         if item.examples:
             lines.append('<div class="examples"><strong>Examples:</strong>')
             for ex in item.examples:
                 lines.append(f'<pre class="example"><code>{self._escape(ex)}</code></pre>')
-            lines.append('</div>')
+            lines.append("</div>")
 
-        lines.append('</div>')
+        lines.append("</div>")
         return lines
 
     def _escape(self, text: str) -> str:
         """Escape HTML special characters."""
-        return (text
-                .replace('&', '&amp;')
-                .replace('<', '&lt;')
-                .replace('>', '&gt;')
-                .replace('"', '&quot;'))
+        return (
+            text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+        )
 
 
-def generate_docs(program: Program, format: str = "markdown", title: str = "API Documentation") -> str:
+def generate_docs(
+    program: Program, format: str = "markdown", title: str = "API Documentation"
+) -> str:
     """
     Generate documentation from a MathViz program.
 

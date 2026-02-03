@@ -21,7 +21,18 @@ KEYWORD_CATEGORIES = {
     "control_flow": ["if", "else", "elif", "for", "while", "match", "break", "continue", "return"],
     "declarations": ["let", "const", "fn", "struct", "enum", "trait", "impl", "class", "scene"],
     "modifiers": ["pub", "async", "await"],
-    "types": ["Int", "Float", "Bool", "String", "List", "Set", "Dict", "Tuple", "Optional", "Result"],
+    "types": [
+        "Int",
+        "Float",
+        "Bool",
+        "String",
+        "List",
+        "Set",
+        "Dict",
+        "Tuple",
+        "Optional",
+        "Result",
+    ],
     "values": ["true", "false", "None", "Some", "Ok", "Err"],
     "operators": ["and", "or", "not", "in"],
     "imports": ["import", "from", "use", "as", "mod"],
@@ -94,7 +105,10 @@ STDLIB_COLLECTIONS = {
     "reverse": ("reverse(list: List[T]) -> List[T]", "Reverse list"),
     "map": ("map(f: (T) -> U, list: List[T]) -> List[U]", "Apply function to each element"),
     "filter": ("filter(f: (T) -> Bool, list: List[T]) -> List[T]", "Filter elements by predicate"),
-    "reduce": ("reduce(f: (T, T) -> T, list: List[T], init: T) -> T", "Reduce list to single value"),
+    "reduce": (
+        "reduce(f: (T, T) -> T, list: List[T], init: T) -> T",
+        "Reduce list to single value",
+    ),
     "zip": ("zip(a: List[T], b: List[U]) -> List[(T, U)]", "Zip two lists together"),
     "enumerate": ("enumerate(list: List[T]) -> List[(Int, T)]", "Add indices to elements"),
     "range": ("range(start: Int, end: Int) -> List[Int]", "Generate integer range"),
@@ -242,12 +256,12 @@ class CompletionProvider:
             (
                 "main",
                 "Main function",
-                'fn main() {\n\t$0\n}',
+                "fn main() {\n\t$0\n}",
             ),
             (
                 "test",
                 "Test function",
-                '@test\nfn test_${1:name}() {\n\t$0\n}',
+                "@test\nfn test_${1:name}() {\n\t$0\n}",
             ),
             (
                 "forrange",
@@ -465,7 +479,9 @@ class CompletionProvider:
 
         return completions
 
-    def get_member_completions(self, base_type: str, symbols: list[Symbol]) -> list[types.CompletionItem]:
+    def get_member_completions(
+        self, base_type: str, symbols: list[Symbol]
+    ) -> list[types.CompletionItem]:
         """
         Get completion items for member access (after a dot).
 
@@ -477,7 +493,11 @@ class CompletionProvider:
             List of completion items for members
         """
         # Filter to methods and fields of the base type
-        members = [s for s in symbols if s.scope == base_type or s.kind in (SymbolKind.METHOD, SymbolKind.FIELD)]
+        members = [
+            s
+            for s in symbols
+            if s.scope == base_type or s.kind in (SymbolKind.METHOD, SymbolKind.FIELD)
+        ]
         return self.get_symbol_completions(members)
 
     def get_all_completions(

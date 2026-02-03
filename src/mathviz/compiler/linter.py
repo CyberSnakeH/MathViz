@@ -118,12 +118,12 @@ class LintCategory(Enum):
     Categories of lint rules for organization and filtering.
     """
 
-    UNUSED = "unused"              # Unused variables, functions, imports
-    UNREACHABLE = "unreachable"    # Dead/unreachable code
-    STYLE = "style"                # Naming conventions, formatting
-    PERFORMANCE = "performance"    # Performance anti-patterns
-    CORRECTNESS = "correctness"    # Likely bugs or errors
-    MATH = "math"                  # Mathematical anti-patterns
+    UNUSED = "unused"  # Unused variables, functions, imports
+    UNREACHABLE = "unreachable"  # Dead/unreachable code
+    STYLE = "style"  # Naming conventions, formatting
+    PERFORMANCE = "performance"  # Performance anti-patterns
+    CORRECTNESS = "correctness"  # Likely bugs or errors
+    MATH = "math"  # Mathematical anti-patterns
 
 
 @dataclass(frozen=True)
@@ -511,9 +511,7 @@ ALL_RULES: dict[str, LintRule] = {
 }
 
 # Also index by name
-RULES_BY_NAME: dict[str, LintRule] = {
-    rule.name: rule for rule in ALL_RULES.values()
-}
+RULES_BY_NAME: dict[str, LintRule] = {rule.name: rule for rule in ALL_RULES.values()}
 
 
 # =============================================================================
@@ -775,13 +773,15 @@ class Linter(BaseASTVisitor):
             else:
                 suggestion_text = rule.suggestion
 
-        self.violations.append(LintViolation(
-            rule=rule,
-            location=location,
-            message=message,
-            suggestion=suggestion_text,
-            related_locations=related_locations or [],
-        ))
+        self.violations.append(
+            LintViolation(
+                rule=rule,
+                location=location,
+                message=message,
+                suggestion=suggestion_text,
+                related_locations=related_locations or [],
+            )
+        )
 
     # =========================================================================
     # Scope Management
@@ -824,8 +824,7 @@ class Linter(BaseASTVisitor):
                         SHADOWING,
                         location,
                         name,
-                        related_locations=[outer_symbol.location]
-                        if outer_symbol.location else [],
+                        related_locations=[outer_symbol.location] if outer_symbol.location else [],
                     )
 
             self._current_scope.symbols[name] = SymbolInfo(
@@ -858,9 +857,11 @@ class Linter(BaseASTVisitor):
             if name in scope.symbols:
                 scope.symbols[name].used = True
                 # Also sync with function params if this is a parameter
-                if (self._current_function and
-                    self._current_function in self._function_params and
-                    name in self._function_params[self._current_function]):
+                if (
+                    self._current_function
+                    and self._current_function in self._function_params
+                    and name in self._function_params[self._current_function]
+                ):
                     self._function_params[self._current_function][name].used = True
                 return
             scope = scope.parent
@@ -1477,13 +1478,22 @@ class Linter(BaseASTVisitor):
         if isinstance(expr, BinaryExpression):
             if expr.operator == BinaryOperator.DIV:
                 return True  # Division always produces float
-            return (self._is_float_expression(expr.left) or
-                    self._is_float_expression(expr.right))
+            return self._is_float_expression(expr.left) or self._is_float_expression(expr.right)
         if isinstance(expr, CallExpression):
             if isinstance(expr.callee, Identifier):
                 # Math functions typically return float
-                float_funcs = {"sqrt", "sin", "cos", "tan", "exp", "log", "log10",
-                               "pow", "abs", "float"}
+                float_funcs = {
+                    "sqrt",
+                    "sin",
+                    "cos",
+                    "tan",
+                    "exp",
+                    "log",
+                    "log10",
+                    "pow",
+                    "abs",
+                    "float",
+                }
                 return expr.callee.name in float_funcs
         return False
 
@@ -1603,7 +1613,9 @@ def lint_source(source: str, config: Optional[LintConfiguration] = None) -> list
     return linter.lint(program)
 
 
-def lint_program(program: Program, config: Optional[LintConfiguration] = None) -> list[LintViolation]:
+def lint_program(
+    program: Program, config: Optional[LintConfiguration] = None
+) -> list[LintViolation]:
     """
     Lint an already-parsed MathViz program.
 

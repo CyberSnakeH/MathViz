@@ -19,7 +19,8 @@ class TestMultiFileCompilation:
         """Test compiling a project with two files."""
         # Create geometry module
         geometry_file = tmp_path / "geometry.mviz"
-        geometry_file.write_text(dedent("""
+        geometry_file.write_text(
+            dedent("""
             pub fn distance(x1, y1, x2, y2) {
                 let dx = x2 - x1
                 let dy = y2 - y1
@@ -29,18 +30,21 @@ class TestMultiFileCompilation:
             pub fn midpoint(x1, y1, x2, y2) {
                 return ((x1 + x2) / 2, (y1 + y2) / 2)
             }
-        """))
+        """)
+        )
 
         # Create main file that uses geometry
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use geometry
 
             fn main() {
                 let d = geometry.distance(0, 0, 3, 4)
                 print(d)
             }
-        """))
+        """)
+        )
 
         # Compile main file
         pipeline = CompilationPipeline(
@@ -63,7 +67,8 @@ class TestMultiFileCompilation:
 
         # Create lib/math.mviz
         math_file = lib_dir / "math.mviz"
-        math_file.write_text(dedent("""
+        math_file.write_text(
+            dedent("""
             pub fn add(a, b) {
                 return a + b
             }
@@ -71,11 +76,13 @@ class TestMultiFileCompilation:
             pub fn multiply(a, b) {
                 return a * b
             }
-        """))
+        """)
+        )
 
         # Create main file
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use lib.math
 
             fn main() {
@@ -83,7 +90,8 @@ class TestMultiFileCompilation:
                 let product = math.multiply(4, 5)
                 print(sum + product)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -100,32 +108,38 @@ class TestMultiFileCompilation:
         """Test that transitive dependencies are handled (a -> b -> c)."""
         # Create core module
         core_file = tmp_path / "core.mviz"
-        core_file.write_text(dedent("""
+        core_file.write_text(
+            dedent("""
             pub fn base_value() {
                 return 42
             }
-        """))
+        """)
+        )
 
         # Create utils module that depends on core
         utils_file = tmp_path / "utils.mviz"
-        utils_file.write_text(dedent("""
+        utils_file.write_text(
+            dedent("""
             use core
 
             pub fn get_doubled() {
                 return core.base_value() * 2
             }
-        """))
+        """)
+        )
 
         # Create main that depends on utils
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use utils
 
             fn main() {
                 let result = utils.get_doubled()
                 print(result)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -141,34 +155,41 @@ class TestMultiFileCompilation:
         """Test diamond dependency pattern (a -> b, a -> c, b -> d, c -> d)."""
         # Create base module d
         d_file = tmp_path / "d.mviz"
-        d_file.write_text(dedent("""
+        d_file.write_text(
+            dedent("""
             pub fn base() {
                 return 1
             }
-        """))
+        """)
+        )
 
         # Create modules b and c that both depend on d
         b_file = tmp_path / "b.mviz"
-        b_file.write_text(dedent("""
+        b_file.write_text(
+            dedent("""
             use d
 
             pub fn from_b() {
                 return d.base() + 10
             }
-        """))
+        """)
+        )
 
         c_file = tmp_path / "c.mviz"
-        c_file.write_text(dedent("""
+        c_file.write_text(
+            dedent("""
             use d
 
             pub fn from_c() {
                 return d.base() + 100
             }
-        """))
+        """)
+        )
 
         # Create main that depends on both b and c
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use b
             use c
 
@@ -176,7 +197,8 @@ class TestMultiFileCompilation:
                 let result = b.from_b() + c.from_c()
                 print(result)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -190,15 +212,18 @@ class TestMultiFileCompilation:
         """Test mixing Python imports with MathViz module imports."""
         # Create a MathViz module
         helpers_file = tmp_path / "helpers.mviz"
-        helpers_file.write_text(dedent("""
+        helpers_file.write_text(
+            dedent("""
             pub fn square(x) {
                 return x * x
             }
-        """))
+        """)
+        )
 
         # Create main with both Python and MathViz imports
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use numpy
             use helpers
 
@@ -207,7 +232,8 @@ class TestMultiFileCompilation:
                 let sq = helpers.square(5)
                 print(sq)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -225,7 +251,8 @@ class TestMultiFileCompilation:
         """Test that only public functions are accessible."""
         # Create module with public and private functions
         module_file = tmp_path / "mymodule.mviz"
-        module_file.write_text(dedent("""
+        module_file.write_text(
+            dedent("""
             pub fn public_func() {
                 return private_helper() * 2
             }
@@ -233,18 +260,21 @@ class TestMultiFileCompilation:
             fn private_helper() {
                 return 21
             }
-        """))
+        """)
+        )
 
         # Create main that uses the module
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use mymodule
 
             fn main() {
                 let result = mymodule.public_func()
                 print(result)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -264,22 +294,26 @@ class TestMultiFileCompilation:
         utils_dir.mkdir()
 
         mod_file = utils_dir / "mod.mviz"
-        mod_file.write_text(dedent("""
+        mod_file.write_text(
+            dedent("""
             pub fn from_directory() {
                 return "I'm from a directory module"
             }
-        """))
+        """)
+        )
 
         # Create main
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use utils
 
             fn main() {
                 let msg = utils.from_directory()
                 print(msg)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -298,32 +332,38 @@ class TestCircularDependencyHandling:
         """Test that direct circular dependencies generate warnings."""
         # Create two modules that depend on each other
         a_file = tmp_path / "a.mviz"
-        a_file.write_text(dedent("""
+        a_file.write_text(
+            dedent("""
             use b
 
             pub fn from_a() {
                 return 1
             }
-        """))
+        """)
+        )
 
         b_file = tmp_path / "b.mviz"
-        b_file.write_text(dedent("""
+        b_file.write_text(
+            dedent("""
             use a
 
             pub fn from_b() {
                 return 2
             }
-        """))
+        """)
+        )
 
         # Create main that uses a
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use a
 
             fn main() {
                 print(a.from_a())
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -349,11 +389,13 @@ class TestModuleSearchPaths:
 
         # Create module in lib directory
         ext_file = lib_dir / "external.mviz"
-        ext_file.write_text(dedent("""
+        ext_file.write_text(
+            dedent("""
             pub fn from_external() {
                 return "external library"
             }
-        """))
+        """)
+        )
 
         # Create src directory
         src_dir = tmp_path / "src"
@@ -361,14 +403,16 @@ class TestModuleSearchPaths:
 
         # Create main in src
         main_file = src_dir / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use external
 
             fn main() {
                 let msg = external.from_external()
                 print(msg)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -388,25 +432,29 @@ class TestGeneratedCodeQuality:
         """Test that generated code is syntactically valid Python."""
         # Create a module
         math_file = tmp_path / "mathlib.mviz"
-        math_file.write_text(dedent("""
+        math_file.write_text(
+            dedent("""
             pub fn factorial(n) {
                 if n <= 1 {
                     return 1
                 }
                 return n * factorial(n - 1)
             }
-        """))
+        """)
+        )
 
         # Create main
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use mathlib
 
             fn main() {
                 let result = mathlib.factorial(5)
                 print(result)
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,
@@ -425,7 +473,8 @@ class TestGeneratedCodeQuality:
     def test_module_functions_are_static_methods(self, tmp_path):
         """Test that module functions are generated as static methods."""
         module_file = tmp_path / "mymod.mviz"
-        module_file.write_text(dedent("""
+        module_file.write_text(
+            dedent("""
             pub fn func1() {
                 return 1
             }
@@ -433,16 +482,19 @@ class TestGeneratedCodeQuality:
             pub fn func2(x) {
                 return x * 2
             }
-        """))
+        """)
+        )
 
         main_file = tmp_path / "main.mviz"
-        main_file.write_text(dedent("""
+        main_file.write_text(
+            dedent("""
             use mymod
 
             fn main() {
                 print(mymod.func1())
             }
-        """))
+        """)
+        )
 
         pipeline = CompilationPipeline(
             optimize=False,

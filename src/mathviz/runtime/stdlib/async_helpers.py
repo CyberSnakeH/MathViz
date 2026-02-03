@@ -9,13 +9,14 @@ import asyncio
 from typing import TypeVar, Callable, Awaitable, List, Tuple, Optional, Any
 from functools import wraps
 
-T = TypeVar('T')
-U = TypeVar('U')
+T = TypeVar("T")
+U = TypeVar("U")
 
 
 # =============================================================================
 # Running Async Code
 # =============================================================================
+
 
 def run(coro: Awaitable[T]) -> T:
     """Run an async function synchronously."""
@@ -32,6 +33,7 @@ def run_until_complete(coro: Awaitable[T]) -> T:
 # Concurrent Execution
 # =============================================================================
 
+
 async def gather(*coros: Awaitable[T]) -> List[T]:
     """Run multiple coroutines concurrently and gather results."""
     return list(await asyncio.gather(*coros))
@@ -47,8 +49,7 @@ async def gather_dict(coros: dict[str, Awaitable[T]]) -> dict[str, T]:
 async def first_completed(*coros: Awaitable[T]) -> T:
     """Return result of first completed coroutine."""
     done, pending = await asyncio.wait(
-        [asyncio.create_task(c) for c in coros],
-        return_when=asyncio.FIRST_COMPLETED
+        [asyncio.create_task(c) for c in coros], return_when=asyncio.FIRST_COMPLETED
     )
     # Cancel pending tasks
     for task in pending:
@@ -84,6 +85,7 @@ async def all_settled(*coros: Awaitable[T]) -> List[Tuple[bool, Any]]:
 # Timing
 # =============================================================================
 
+
 async def sleep(seconds: float) -> None:
     """Async sleep for specified seconds."""
     await asyncio.sleep(seconds)
@@ -111,12 +113,13 @@ async def timeout_or_raise(coro: Awaitable[T], seconds: float) -> T:
 # Retry Logic
 # =============================================================================
 
+
 async def retry(
     coro_factory: Callable[[], Awaitable[T]],
     max_attempts: int = 3,
     delay: float = 1.0,
     backoff: float = 2.0,
-    exceptions: Tuple[type, ...] = (Exception,)
+    exceptions: Tuple[type, ...] = (Exception,),
 ) -> T:
     """
     Retry a coroutine with exponential backoff.
@@ -146,6 +149,7 @@ async def retry(
 # =============================================================================
 # Queues and Channels
 # =============================================================================
+
 
 def create_queue(maxsize: int = 0) -> asyncio.Queue:
     """Create an async queue."""
@@ -183,6 +187,7 @@ def try_receive(queue: asyncio.Queue) -> Optional[T]:
 # Semaphores and Locks
 # =============================================================================
 
+
 def create_lock() -> asyncio.Lock:
     """Create an async lock."""
     return asyncio.Lock()
@@ -202,6 +207,7 @@ def create_event() -> asyncio.Event:
 # Iteration
 # =============================================================================
 
+
 async def async_map(func: Callable[[T], Awaitable[U]], items: List[T]) -> List[U]:
     """Map async function over items concurrently."""
     return await asyncio.gather(*[func(item) for item in items])
@@ -214,9 +220,7 @@ async def async_filter(pred: Callable[[T], Awaitable[bool]], items: List[T]) -> 
 
 
 async def async_reduce(
-    func: Callable[[T, T], Awaitable[T]],
-    items: List[T],
-    initial: Optional[T] = None
+    func: Callable[[T, T], Awaitable[T]], items: List[T], initial: Optional[T] = None
 ) -> T:
     """Reduce items using async function (sequentially)."""
     if not items:
@@ -252,6 +256,7 @@ async def async_for_each_sequential(func: Callable[[T], Awaitable[None]], items:
 # Task Management
 # =============================================================================
 
+
 def create_task(coro: Awaitable[T]) -> asyncio.Task[T]:
     """Create a task from a coroutine."""
     return asyncio.create_task(coro)
@@ -280,6 +285,7 @@ def get_task_result(task: asyncio.Task) -> Any:
 # Decorators
 # =============================================================================
 
+
 def async_cached(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
     """Cache results of async function."""
     cache = {}
@@ -297,6 +303,7 @@ def async_cached(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T
 
 def async_throttle(calls: int, period: float):
     """Limit async function to `calls` invocations per `period` seconds."""
+
     def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         semaphore = asyncio.Semaphore(calls)
 
@@ -304,9 +311,7 @@ def async_throttle(calls: int, period: float):
         async def wrapper(*args, **kwargs):
             async with semaphore:
                 result = await func(*args, **kwargs)
-                asyncio.get_event_loop().call_later(
-                    period, semaphore.release
-                )
+                asyncio.get_event_loop().call_later(period, semaphore.release)
                 try:
                     await semaphore.acquire()
                 except:
@@ -314,4 +319,5 @@ def async_throttle(calls: int, period: float):
                 return result
 
         return wrapper
+
     return decorator

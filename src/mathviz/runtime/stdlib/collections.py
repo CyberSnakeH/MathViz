@@ -8,53 +8,57 @@ from __future__ import annotations
 from typing import TypeVar, List, Set, Dict, Callable, Iterable, Optional, Any, Tuple
 from functools import reduce as _reduce
 
-T = TypeVar('T')
-U = TypeVar('U')
-K = TypeVar('K')
-V = TypeVar('V')
+T = TypeVar("T")
+U = TypeVar("U")
+K = TypeVar("K")
+V = TypeVar("V")
 
 
 # =============================================================================
 # Basic Functions
 # =============================================================================
 
+
 def len(seq: Iterable) -> int:
     """Return length of sequence."""
-    return __builtins__['len'](seq)
+    return __builtins__["len"](seq)
 
 
 def range(*args) -> range:
     """Return range object."""
-    return __builtins__['range'](*args)
+    return __builtins__["range"](*args)
 
 
 def enumerate(seq: Iterable[T], start: int = 0) -> Iterable[Tuple[int, T]]:
     """Enumerate items with index."""
-    return __builtins__['enumerate'](seq, start)
+    return __builtins__["enumerate"](seq, start)
 
 
 def zip(*seqs: Iterable) -> Iterable[Tuple]:
     """Zip multiple sequences together."""
-    return __builtins__['zip'](*seqs)
+    return __builtins__["zip"](*seqs)
 
 
 def reversed(seq: Iterable[T]) -> List[T]:
     """Return reversed list."""
-    return list(__builtins__['reversed'](list(seq)))
+    return list(__builtins__["reversed"](list(seq)))
 
 
-def sorted(seq: Iterable[T], key: Optional[Callable[[T], Any]] = None, reverse: bool = False) -> List[T]:
+def sorted(
+    seq: Iterable[T], key: Optional[Callable[[T], Any]] = None, reverse: bool = False
+) -> List[T]:
     """Return sorted list."""
-    return __builtins__['sorted'](seq, key=key, reverse=reverse)
+    return __builtins__["sorted"](seq, key=key, reverse=reverse)
 
 
 # =============================================================================
 # Aggregation
 # =============================================================================
 
+
 def sum(seq: Iterable[T], start: T = 0) -> T:
     """Sum all elements."""
-    return __builtins__['sum'](seq, start)
+    return __builtins__["sum"](seq, start)
 
 
 def prod(seq: Iterable[T]) -> T:
@@ -67,12 +71,12 @@ def prod(seq: Iterable[T]) -> T:
 
 def all(seq: Iterable[bool]) -> bool:
     """Return True if all elements are truthy."""
-    return __builtins__['all'](seq)
+    return __builtins__["all"](seq)
 
 
 def any(seq: Iterable[bool]) -> bool:
     """Return True if any element is truthy."""
-    return __builtins__['any'](seq)
+    return __builtins__["any"](seq)
 
 
 def none(seq: Iterable[bool]) -> bool:
@@ -84,14 +88,15 @@ def none(seq: Iterable[bool]) -> bool:
 # Transformation
 # =============================================================================
 
+
 def filter(pred: Callable[[T], bool], seq: Iterable[T]) -> List[T]:
     """Filter elements by predicate."""
-    return list(__builtins__['filter'](pred, seq))
+    return list(__builtins__["filter"](pred, seq))
 
 
 def map(func: Callable[[T], U], seq: Iterable[T]) -> List[U]:
     """Map function over elements."""
-    return list(__builtins__['map'](func, seq))
+    return list(__builtins__["map"](func, seq))
 
 
 def reduce(func: Callable[[T, T], T], seq: Iterable[T], initial: Optional[T] = None) -> T:
@@ -121,7 +126,7 @@ def deep_flatten(seq: Iterable) -> List:
     """Recursively flatten all levels."""
     result = []
     for item in seq:
-        if hasattr(item, '__iter__') and not isinstance(item, (str, bytes)):
+        if hasattr(item, "__iter__") and not isinstance(item, (str, bytes)):
             result.extend(deep_flatten(item))
         else:
             result.append(item)
@@ -131,6 +136,7 @@ def deep_flatten(seq: Iterable) -> List:
 # =============================================================================
 # Access
 # =============================================================================
+
 
 def first(seq: Iterable[T], default: Optional[T] = None) -> Optional[T]:
     """Return first element or default."""
@@ -182,6 +188,7 @@ def index_of(seq: Iterable[T], value: T) -> int:
 # =============================================================================
 # Slicing
 # =============================================================================
+
 
 def take(seq: Iterable[T], n: int) -> List[T]:
     """Take first n elements."""
@@ -235,6 +242,7 @@ def slice(seq: Iterable[T], start: int, end: Optional[int] = None, step: int = 1
 # =============================================================================
 # Grouping
 # =============================================================================
+
 
 def chunk(seq: Iterable[T], size: int) -> List[List[T]]:
     """Split into chunks of given size."""
@@ -295,6 +303,7 @@ def frequency(seq: Iterable[T]) -> Dict[T, int]:
 # Combination
 # =============================================================================
 
+
 def zip_with(func: Callable, *seqs: Iterable) -> List:
     """Zip sequences and apply function to each tuple."""
     return [func(*items) for items in zip(*seqs)]
@@ -330,6 +339,7 @@ def cycle(seq: Iterable[T], n: int) -> List[T]:
 # =============================================================================
 # Dictionary Operations
 # =============================================================================
+
 
 def keys(d: Dict[K, V]) -> List[K]:
     """Return list of keys."""

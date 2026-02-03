@@ -409,10 +409,7 @@ class Formatter:
     def _format_import_statement(self, stmt: ImportStatement) -> None:
         """Format an import statement."""
         if stmt.is_from_import:
-            names = ", ".join(
-                f"{name} as {alias}" if alias else name
-                for name, alias in stmt.names
-            )
+            names = ", ".join(f"{name} as {alias}" if alias else name for name, alias in stmt.names)
             self._emit_line(f"from {stmt.module} import {names}")
         else:
             if stmt.alias:
@@ -626,8 +623,7 @@ class Formatter:
             if not expr.pairs:
                 return "{}"
             pairs = ", ".join(
-                f"{self._format_expression(k)}: {self._format_expression(v)}"
-                for k, v in expr.pairs
+                f"{self._format_expression(k)}: {self._format_expression(v)}" for k, v in expr.pairs
             )
             return "{" + pairs + "}"
         elif isinstance(expr, TupleLiteral):
@@ -721,8 +717,7 @@ class Formatter:
     def _format_struct_literal(self, expr: StructLiteral) -> str:
         """Format a struct literal."""
         fields = ", ".join(
-            f"{name}: {self._format_expression(value)}"
-            for name, value in expr.fields
+            f"{name}: {self._format_expression(value)}" for name, value in expr.fields
         )
         return f"{expr.struct_name} {{ {fields} }}"
 

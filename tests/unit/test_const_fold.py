@@ -212,9 +212,7 @@ class TestConstantFolder:
             then_expr=IntegerLiteral(value=1),
             else_expr=IntegerLiteral(value=2),
         )
-        program = Program(statements=(
-            LetStatement(name="x", value=expr),
-        ))
+        program = Program(statements=(LetStatement(name="x", value=expr),))
 
         folder = ConstantFolder()
         result = folder.fold(program)
@@ -232,9 +230,7 @@ class TestConstantFolder:
             then_expr=IntegerLiteral(value=1),
             else_expr=IntegerLiteral(value=2),
         )
-        program = Program(statements=(
-            LetStatement(name="x", value=expr),
-        ))
+        program = Program(statements=(LetStatement(name="x", value=expr),))
 
         folder = ConstantFolder()
         result = folder.fold(program)
@@ -245,11 +241,11 @@ class TestConstantFolder:
 
     def test_fold_in_function(self):
         """Test folding constants inside functions."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() -> Int {
     return 2 + 3
 }
-''')
+""")
         folder = ConstantFolder()
         result = folder.fold(program)
 
@@ -266,10 +262,10 @@ class TestConstantPropagator:
 
     def test_propagate_simple_constant(self):
         """Test propagating a simple constant."""
-        program = parse_program('''
+        program = parse_program("""
 let x = 5
 let y = x + 3
-''')
+""")
         propagator = ConstantPropagator()
         result = propagator.propagate(program)
 
@@ -280,10 +276,10 @@ let y = x + 3
 
     def test_propagate_const_declaration(self):
         """Test propagating from const declarations."""
-        program = parse_program('''
+        program = parse_program("""
 const PI = 3.14159
 let circumference = 2.0 * PI
-''')
+""")
         propagator = ConstantPropagator()
         result = propagator.propagate(program)
 
@@ -293,11 +289,11 @@ let circumference = 2.0 * PI
 
     def test_propagate_chain(self):
         """Test propagating through a chain of constants."""
-        program = parse_program('''
+        program = parse_program("""
 let a = 2
 let b = a * 3
 let c = b + 1
-''')
+""")
         propagator = ConstantPropagator()
         result = propagator.propagate(program)
 
@@ -307,11 +303,11 @@ let c = b + 1
 
     def test_propagate_invalidates_on_reassignment(self):
         """Test that reassignment invalidates constant propagation."""
-        program = parse_program('''
+        program = parse_program("""
 let x = 5
 x = unknown_value
 let y = x + 1
-''')
+""")
         propagator = ConstantPropagator()
         result = propagator.propagate(program)
 
@@ -321,12 +317,12 @@ let y = x + 1
 
     def test_propagate_scoped_in_function(self):
         """Test that propagation is scoped within functions."""
-        program = parse_program('''
+        program = parse_program("""
 const GLOBAL = 10
 fn foo(x: Int) -> Int {
     return x + GLOBAL
 }
-''')
+""")
         propagator = ConstantPropagator()
         result = propagator.propagate(program)
 
@@ -341,12 +337,12 @@ class TestDeadCodeEliminator:
 
     def test_eliminate_after_return(self):
         """Test removing statements after return."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() -> Int {
     return 5
     let x = 10
 }
-''')
+""")
         eliminator = DeadCodeEliminator()
         result = eliminator.eliminate(program)
 
@@ -356,7 +352,7 @@ fn foo() -> Int {
 
     def test_eliminate_if_true_condition(self):
         """Test simplifying if with constant true condition."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() -> Int {
     if true {
         return 1
@@ -364,7 +360,7 @@ fn foo() -> Int {
         return 2
     }
 }
-''')
+""")
         eliminator = DeadCodeEliminator()
         result = eliminator.eliminate(program)
 
@@ -378,7 +374,7 @@ fn foo() -> Int {
 
     def test_eliminate_if_false_condition(self):
         """Test simplifying if with constant false condition."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() -> Int {
     if false {
         return 1
@@ -386,7 +382,7 @@ fn foo() -> Int {
         return 2
     }
 }
-''')
+""")
         eliminator = DeadCodeEliminator()
         result = eliminator.eliminate(program)
 
@@ -398,13 +394,13 @@ fn foo() -> Int {
 
     def test_eliminate_while_false(self):
         """Test removing while with constant false condition."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() {
     while false {
         println("never")
     }
 }
-''')
+""")
         eliminator = DeadCodeEliminator()
         result = eliminator.eliminate(program)
 
@@ -613,39 +609,37 @@ class TestCSEliminator:
 
     def test_eliminate_common_subexpression(self):
         """Test eliminating common subexpressions."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo(x: Int, y: Int) -> Int {
     let a = x + y
     let b = x + y
     return a + b
 }
-''')
+""")
         eliminator = CSEliminator(min_uses=2)
         result = eliminator.optimize(program)
 
         func = result.statements[0]
         # Should have a temp variable for x + y
         assert any(
-            isinstance(s, LetStatement) and s.name.startswith("_cse_")
-            for s in func.body.statements
+            isinstance(s, LetStatement) and s.name.startswith("_cse_") for s in func.body.statements
         )
 
     def test_no_cse_for_single_use(self):
         """Test that single-use expressions are not eliminated."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo(x: Int, y: Int) -> Int {
     let a = x + y
     return a
 }
-''')
+""")
         eliminator = CSEliminator(min_uses=2)
         result = eliminator.optimize(program)
 
         func = result.statements[0]
         # Should not have any CSE temp variables
         assert not any(
-            isinstance(s, LetStatement) and s.name.startswith("_cse_")
-            for s in func.body.statements
+            isinstance(s, LetStatement) and s.name.startswith("_cse_") for s in func.body.statements
         )
 
 
@@ -739,13 +733,13 @@ class TestConstOptimizer:
 
     def test_full_optimization(self):
         """Test full optimization pipeline."""
-        program = parse_program('''
+        program = parse_program("""
 const PI = 3.14159
 fn area(r: Float) -> Float {
     let x = 2.0 * PI
     return x * r * r
 }
-''')
+""")
         optimizer = ConstOptimizer()
         result = optimizer.optimize(program)
 
@@ -754,14 +748,14 @@ fn area(r: Float) -> Float {
 
     def test_optimization_with_dead_code(self):
         """Test optimization removes dead code."""
-        program = parse_program('''
+        program = parse_program("""
 fn foo() -> Int {
     if true {
         return 1
     }
     return 2
 }
-''')
+""")
         optimizer = ConstOptimizer()
         result = optimizer.optimize(program)
 
@@ -811,10 +805,10 @@ class TestConvenienceFunctions:
 
     def test_propagate_constants_function(self):
         """Test propagate_constants convenience function."""
-        program = parse_program('''
+        program = parse_program("""
 let x = 5
 let y = x + 1
-''')
+""")
         result = propagate_constants(program)
         stmt = result.statements[1]
         assert isinstance(stmt.value, IntegerLiteral)
@@ -843,6 +837,7 @@ let y = x + 1
         # Should have the const statement with folded value
         assert len(result.statements) >= 1
         from mathviz.compiler.ast_nodes import ConstDeclaration
+
         stmt = result.statements[0]
         assert isinstance(stmt, ConstDeclaration)
         assert isinstance(stmt.value, IntegerLiteral)
@@ -871,14 +866,14 @@ class TestEdgeCases:
 
     def test_nested_functions(self):
         """Test optimization with nested structures."""
-        program = parse_program('''
+        program = parse_program("""
 fn outer() -> Int {
     fn inner() -> Int {
         return 2 + 3
     }
     return inner()
 }
-''')
+""")
         optimizer = ConstOptimizer()
         # Should not crash
         result = optimizer.optimize(program)
@@ -886,12 +881,12 @@ fn outer() -> Int {
 
     def test_multiple_iterations(self):
         """Test that multiple iterations converge."""
-        program = parse_program('''
+        program = parse_program("""
 let a = 1
 let b = a + 0
 let c = b * 1
 let d = c + 0
-''')
+""")
         optimizer = ConstOptimizer(max_iterations=5)
         result = optimizer.optimize(program)
 

@@ -44,39 +44,47 @@ from mathviz.compiler.codegen import CodeGenerator
 @pytest.fixture
 def tokenize_source():
     """Fixture to tokenize MathViz source code."""
+
     def _tokenize(source: str):
         return tokenize(source)
+
     return _tokenize
 
 
 @pytest.fixture
 def parse(tokenize_source):
     """Fixture to parse MathViz source code into AST."""
+
     def _parse(source: str):
         tokens = tokenize_source(source)
         parser = Parser(tokens)
         return parser.parse()
+
     return _parse
 
 
 @pytest.fixture
 def type_check(parse):
     """Fixture to type check MathViz source code."""
+
     def _type_check(source: str):
         program = parse(source)
         checker = TypeChecker(source)
         errors = checker.check(program)
         return errors, checker
+
     return _type_check
 
 
 @pytest.fixture
 def compile_source(parse):
     """Fixture to compile MathViz source code to Python."""
+
     def _compile(source: str, optimize: bool = False):
         program = parse(source)
         generator = CodeGenerator(optimize=optimize)
         return generator.generate(program)
+
     return _compile
 
 
@@ -155,7 +163,7 @@ let result = match x {
 
     def test_identifier_pattern(self, parse):
         """Parse identifier pattern: n."""
-        program = parse('let result = match x { n -> n * 2 }')
+        program = parse("let result = match x { n -> n * 2 }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, IdentifierPattern)
@@ -172,7 +180,7 @@ let result = match x {
 
     def test_tuple_pattern(self, parse):
         """Parse tuple pattern: (x, y)."""
-        program = parse('let result = match point { (x, y) -> x + y }')
+        program = parse("let result = match point { (x, y) -> x + y }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, TuplePattern)
@@ -182,7 +190,7 @@ let result = match x {
 
     def test_constructor_pattern_some(self, parse):
         """Parse Some(x) pattern."""
-        program = parse('let result = match opt { Some(x) -> x }')
+        program = parse("let result = match opt { Some(x) -> x }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, ConstructorPattern)
@@ -191,7 +199,7 @@ let result = match x {
 
     def test_constructor_pattern_ok(self, parse):
         """Parse Ok(value) pattern."""
-        program = parse('let result = match res { Ok(v) -> v }')
+        program = parse("let result = match res { Ok(v) -> v }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, ConstructorPattern)
@@ -199,7 +207,7 @@ let result = match x {
 
     def test_constructor_pattern_err(self, parse):
         """Parse Err(e) pattern."""
-        program = parse('let result = match res { Err(e) -> e }')
+        program = parse("let result = match res { Err(e) -> e }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, ConstructorPattern)
@@ -557,7 +565,7 @@ class TestPatternMatchingEdgeCases:
 
     def test_single_element_tuple_pattern(self, parse):
         """Single-element tuple pattern: (x,)."""
-        program = parse('let result = match single { (x,) -> x }')
+        program = parse("let result = match single { (x,) -> x }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, TuplePattern)
@@ -565,7 +573,7 @@ class TestPatternMatchingEdgeCases:
 
     def test_nested_tuple_pattern(self, parse):
         """Nested tuple pattern: ((a, b), c)."""
-        program = parse('let result = match nested { ((a, b), c) -> a + b + c }')
+        program = parse("let result = match nested { ((a, b), c) -> a + b + c }")
         match_expr = program.statements[0].value
         arm = match_expr.arms[0]
         assert isinstance(arm.pattern, TuplePattern)

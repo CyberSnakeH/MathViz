@@ -325,14 +325,14 @@ class TestCodeGenAnimate:
 
     def test_animate_in_scene(self, compile_source):
         """Test animate in scene context."""
-        source = '''
+        source = """
 scene TestScene {
     fn construct(self) {
         let c = Circle()
         play(c.animate.scale(2))
     }
 }
-'''
+"""
         code = compile_source(source)
         assert "c.animate.scale(2)" in code
 

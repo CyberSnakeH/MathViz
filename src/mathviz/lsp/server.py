@@ -177,9 +177,7 @@ class MathVizLanguageServer(LanguageServer):
     # Completion
     # =========================================================================
 
-    def _on_completion(
-        self, params: types.CompletionParams
-    ) -> types.CompletionList | None:
+    def _on_completion(self, params: types.CompletionParams) -> types.CompletionList | None:
         """Handle completion request."""
         uri = params.text_document.uri
         position = params.position
@@ -218,9 +216,7 @@ class MathVizLanguageServer(LanguageServer):
     # Go to Definition
     # =========================================================================
 
-    def _on_definition(
-        self, params: types.DefinitionParams
-    ) -> types.Location | None:
+    def _on_definition(self, params: types.DefinitionParams) -> types.Location | None:
         """Handle go-to-definition request."""
         uri = params.text_document.uri
         position = params.position
@@ -235,9 +231,7 @@ class MathVizLanguageServer(LanguageServer):
     # Find References
     # =========================================================================
 
-    def _on_references(
-        self, params: types.ReferenceParams
-    ) -> list[types.Location] | None:
+    def _on_references(self, params: types.ReferenceParams) -> list[types.Location] | None:
         """Handle find-references request."""
         uri = params.text_document.uri
         position = params.position
@@ -247,9 +241,7 @@ class MathVizLanguageServer(LanguageServer):
         if analyzer is None:
             return None
 
-        return analyzer.get_references(
-            position.line, position.character, include_declaration
-        )
+        return analyzer.get_references(position.line, position.character, include_declaration)
 
     # =========================================================================
     # Document Symbols
@@ -271,9 +263,7 @@ class MathVizLanguageServer(LanguageServer):
     # Formatting
     # =========================================================================
 
-    def _on_formatting(
-        self, params: types.DocumentFormattingParams
-    ) -> list[types.TextEdit] | None:
+    def _on_formatting(self, params: types.DocumentFormattingParams) -> list[types.TextEdit] | None:
         """Handle document formatting request."""
         uri = params.text_document.uri
 
@@ -325,9 +315,7 @@ class MathVizLanguageServer(LanguageServer):
     # Rename
     # =========================================================================
 
-    def _on_prepare_rename(
-        self, params: types.PrepareRenameParams
-    ) -> types.Range | None:
+    def _on_prepare_rename(self, params: types.PrepareRenameParams) -> types.Range | None:
         """Handle prepare-rename request (validates the rename is possible)."""
         uri = params.text_document.uri
         position = params.position
@@ -337,9 +325,7 @@ class MathVizLanguageServer(LanguageServer):
             return None
 
         # Get the word at the position
-        word, word_range = analyzer._get_word_at_position(
-            position.line, position.character
-        )
+        word, word_range = analyzer._get_word_at_position(position.line, position.character)
         if not word or word_range is None:
             return None
 
@@ -350,9 +336,7 @@ class MathVizLanguageServer(LanguageServer):
 
         return word_range
 
-    def _on_rename(
-        self, params: types.RenameParams
-    ) -> types.WorkspaceEdit | None:
+    def _on_rename(self, params: types.RenameParams) -> types.WorkspaceEdit | None:
         """Handle rename request."""
         uri = params.text_document.uri
         position = params.position

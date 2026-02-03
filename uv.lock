@@ -516,10 +516,9 @@ wheels = [
 
 [[package]]
 name = "mathviz"
-version = "0.1.0"
+version = "0.1.6"
 source = { editable = "." }
 dependencies = [
-    { name = "manim" },
     { name = "numba" },
     { name = "numpy" },
 ]
@@ -527,12 +526,19 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "lsprotocol" },
+    { name = "manim" },
     { name = "mypy" },
     { name = "pygls" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "watchdog" },
+]
+ci = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
 ]
 dev = [
     { name = "mypy" },
@@ -543,6 +549,9 @@ dev = [
 lsp = [
     { name = "lsprotocol" },
     { name = "pygls" },
+]
+manim = [
+    { name = "manim" },
 ]
 watch = [
     { name = "watchdog" },
@@ -559,23 +568,28 @@ dev = [
 requires-dist = [
     { name = "lsprotocol", marker = "extra == 'all'", specifier = ">=2023.0.0" },
     { name = "lsprotocol", marker = "extra == 'lsp'", specifier = ">=2023.0.0" },
-    { name = "manim", specifier = ">=0.18.0" },
+    { name = "manim", marker = "extra == 'all'", specifier = ">=0.18.0" },
+    { name = "manim", marker = "extra == 'manim'", specifier = ">=0.18.0" },
     { name = "mypy", marker = "extra == 'all'", specifier = ">=1.8.0" },
+    { name = "mypy", marker = "extra == 'ci'", specifier = ">=1.8.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8.0" },
     { name = "numba", specifier = ">=0.60.0" },
     { name = "numpy", specifier = ">=1.26.0" },
     { name = "pygls", marker = "extra == 'all'", specifier = ">=1.2.0" },
     { name = "pygls", marker = "extra == 'lsp'", specifier = ">=1.2.0" },
     { name = "pytest", marker = "extra == 'all'", specifier = ">=8.0.0" },
+    { name = "pytest", marker = "extra == 'ci'", specifier = ">=8.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'all'", specifier = ">=4.1.0" },
+    { name = "pytest-cov", marker = "extra == 'ci'", specifier = ">=4.1.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "ruff", marker = "extra == 'all'", specifier = ">=0.3.0" },
+    { name = "ruff", marker = "extra == 'ci'", specifier = ">=0.3.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
     { name = "watchdog", marker = "extra == 'all'", specifier = ">=4.0.0" },
     { name = "watchdog", marker = "extra == 'watch'", specifier = ">=4.0.0" },
 ]
-provides-extras = ["dev", "watch", "lsp", "all"]
+provides-extras = ["manim", "dev", "ci", "watch", "lsp", "all"]
 
 [package.metadata.requires-dev]
 dev = [

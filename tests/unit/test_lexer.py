@@ -99,10 +99,20 @@ class TestLexerKeywords:
         source = "let fn class scene if else elif for while return import from as in"
         tokens = tokenize(source)
         expected = [
-            TokenType.LET, TokenType.FN, TokenType.CLASS, TokenType.SCENE,
-            TokenType.IF, TokenType.ELSE, TokenType.ELIF, TokenType.FOR,
-            TokenType.WHILE, TokenType.RETURN, TokenType.IMPORT, TokenType.FROM,
-            TokenType.AS, TokenType.IN,
+            TokenType.LET,
+            TokenType.FN,
+            TokenType.CLASS,
+            TokenType.SCENE,
+            TokenType.IF,
+            TokenType.ELSE,
+            TokenType.ELIF,
+            TokenType.FOR,
+            TokenType.WHILE,
+            TokenType.RETURN,
+            TokenType.IMPORT,
+            TokenType.FROM,
+            TokenType.AS,
+            TokenType.IN,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
         assert actual == expected
@@ -112,8 +122,12 @@ class TestLexerKeywords:
         source = "Int Float Bool String List Set Dict"
         tokens = tokenize(source)
         expected = [
-            TokenType.TYPE_INT, TokenType.TYPE_FLOAT, TokenType.TYPE_BOOL,
-            TokenType.TYPE_STRING, TokenType.TYPE_LIST, TokenType.TYPE_SET,
+            TokenType.TYPE_INT,
+            TokenType.TYPE_FLOAT,
+            TokenType.TYPE_BOOL,
+            TokenType.TYPE_STRING,
+            TokenType.TYPE_LIST,
+            TokenType.TYPE_SET,
             TokenType.TYPE_DICT,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
@@ -128,8 +142,13 @@ class TestLexerOperators:
         """Test arithmetic operators."""
         tokens = tokenize("+ - * / // % ^ **")
         expected = [
-            TokenType.PLUS, TokenType.MINUS, TokenType.STAR, TokenType.SLASH,
-            TokenType.DOUBLE_SLASH, TokenType.PERCENT, TokenType.CARET,
+            TokenType.PLUS,
+            TokenType.MINUS,
+            TokenType.STAR,
+            TokenType.SLASH,
+            TokenType.DOUBLE_SLASH,
+            TokenType.PERCENT,
+            TokenType.CARET,
             TokenType.DOUBLE_STAR,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
@@ -139,8 +158,12 @@ class TestLexerOperators:
         """Test comparison operators."""
         tokens = tokenize("== != < > <= >=")
         expected = [
-            TokenType.EQ, TokenType.NE, TokenType.LT, TokenType.GT,
-            TokenType.LE, TokenType.GE,
+            TokenType.EQ,
+            TokenType.NE,
+            TokenType.LT,
+            TokenType.GT,
+            TokenType.LE,
+            TokenType.GE,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
         assert actual == expected
@@ -149,8 +172,11 @@ class TestLexerOperators:
         """Test assignment operators."""
         tokens = tokenize("= += -= *= /=")
         expected = [
-            TokenType.ASSIGN, TokenType.PLUS_ASSIGN, TokenType.MINUS_ASSIGN,
-            TokenType.STAR_ASSIGN, TokenType.SLASH_ASSIGN,
+            TokenType.ASSIGN,
+            TokenType.PLUS_ASSIGN,
+            TokenType.MINUS_ASSIGN,
+            TokenType.STAR_ASSIGN,
+            TokenType.SLASH_ASSIGN,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
         assert actual == expected
@@ -170,8 +196,10 @@ class TestLexerMathSymbols:
         """Test set relation operators."""
         tokens = tokenize("⊆ ⊇ ⊂ ⊃")
         expected = [
-            TokenType.SUBSET, TokenType.SUPERSET,
-            TokenType.PROPER_SUBSET, TokenType.PROPER_SUPERSET,
+            TokenType.SUBSET,
+            TokenType.SUPERSET,
+            TokenType.PROPER_SUBSET,
+            TokenType.PROPER_SUPERSET,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
         assert actual == expected
@@ -226,8 +254,12 @@ class TestLexerDelimiters:
         """Test punctuation marks."""
         tokens = tokenize(", . : ; -> =>")
         expected = [
-            TokenType.COMMA, TokenType.DOT, TokenType.COLON,
-            TokenType.SEMICOLON, TokenType.THIN_ARROW, TokenType.FAT_ARROW,
+            TokenType.COMMA,
+            TokenType.DOT,
+            TokenType.COLON,
+            TokenType.SEMICOLON,
+            TokenType.THIN_ARROW,
+            TokenType.FAT_ARROW,
         ]
         actual = [t.type for t in tokens if t.type != TokenType.EOF]
         assert actual == expected

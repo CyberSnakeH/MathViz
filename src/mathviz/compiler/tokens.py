@@ -25,11 +25,11 @@ class TokenType(Enum):
     BOOLEAN = auto()
 
     # F-string tokens
-    FSTRING_START = auto()      # f" or f'
-    FSTRING_PART = auto()       # literal parts between {}
-    FSTRING_EXPR_START = auto() # {
-    FSTRING_EXPR_END = auto()   # }
-    FSTRING_END = auto()        # closing quote
+    FSTRING_START = auto()  # f" or f'
+    FSTRING_PART = auto()  # literal parts between {}
+    FSTRING_EXPR_START = auto()  # {
+    FSTRING_EXPR_END = auto()  # }
+    FSTRING_END = auto()  # closing quote
 
     # Identifiers
     IDENTIFIER = auto()
@@ -63,41 +63,41 @@ class TokenType(Enum):
     PASS = auto()
 
     # Pattern matching
-    MATCH = auto()      # match keyword
-    WHERE = auto()      # where for guards
-    UNDERSCORE = auto() # _ wildcard
+    MATCH = auto()  # match keyword
+    WHERE = auto()  # where for guards
+    UNDERSCORE = auto()  # _ wildcard
 
     # I/O and formatting
-    PRINT = auto()         # print()
-    PRINTLN = auto()       # println() with newline
+    PRINT = auto()  # print()
+    PRINTLN = auto()  # println() with newline
     # Note: read_file, write_file are NOT keywords - they are regular functions
 
     # Manim (SCENE already defined above in keywords)
-    ANIMATE = auto()       # animation block
-    PLAY = auto()          # play animation
-    WAIT = auto()          # wait/pause
+    ANIMATE = auto()  # animation block
+    PLAY = auto()  # play animation
+    WAIT = auto()  # wait/pause
 
     # Module system
-    USE = auto()           # use/import module
-    MOD = auto()           # module definition
-    PUB = auto()           # public visibility
+    USE = auto()  # use/import module
+    MOD = auto()  # module definition
+    PUB = auto()  # public visibility
 
     # OOP constructs
-    STRUCT = auto()        # struct keyword for lightweight data types
-    IMPL = auto()          # impl keyword for implementation blocks
-    TRAIT = auto()         # trait keyword for interfaces
-    ENUM = auto()          # enum keyword for algebraic data types
-    SELF = auto()          # self keyword for method receiver
+    STRUCT = auto()  # struct keyword for lightweight data types
+    IMPL = auto()  # impl keyword for implementation blocks
+    TRAIT = auto()  # trait keyword for interfaces
+    ENUM = auto()  # enum keyword for algebraic data types
+    SELF = auto()  # self keyword for method receiver
 
     # Decorators
-    JIT = auto()            # @jit decorator for Numba optimization
-    NJIT = auto()           # @njit decorator (nopython=True by default)
-    VECTORIZE = auto()      # @vectorize for ufuncs
-    PARALLEL = auto()       # parallel execution hint
+    JIT = auto()  # @jit decorator for Numba optimization
+    NJIT = auto()  # @njit decorator (nopython=True by default)
+    VECTORIZE = auto()  # @vectorize for ufuncs
+    PARALLEL = auto()  # parallel execution hint
 
     # Async/await
-    ASYNC = auto()          # async keyword for async functions
-    AWAIT = auto()          # await keyword for awaiting futures
+    ASYNC = auto()  # async keyword for async functions
+    AWAIT = auto()  # await keyword for awaiting futures
 
     # Type keywords
     TYPE_INT = auto()
@@ -112,86 +112,86 @@ class TokenType(Enum):
     TYPE_RESULT = auto()
 
     # Optional and Result constructors
-    SOME = auto()           # Some(value)
-    OK = auto()             # Ok(value)
-    ERR = auto()            # Err(error)
+    SOME = auto()  # Some(value)
+    OK = auto()  # Ok(value)
+    ERR = auto()  # Err(error)
 
     # Question mark operator (for ? unwrap/propagate)
-    QUESTION = auto()       # ?
+    QUESTION = auto()  # ?
 
     # Arithmetic operators
-    PLUS = auto()          # +
-    MINUS = auto()         # -
-    STAR = auto()          # *
-    SLASH = auto()         # /
+    PLUS = auto()  # +
+    MINUS = auto()  # -
+    STAR = auto()  # *
+    SLASH = auto()  # /
     DOUBLE_SLASH = auto()  # //
-    PERCENT = auto()       # %
-    CARET = auto()         # ^ (exponentiation in MathViz)
-    DOUBLE_STAR = auto()   # ** (also exponentiation)
+    PERCENT = auto()  # %
+    CARET = auto()  # ^ (exponentiation in MathViz)
+    DOUBLE_STAR = auto()  # ** (also exponentiation)
 
     # Comparison operators
-    EQ = auto()            # ==
-    NE = auto()            # !=
-    LT = auto()            # <
-    GT = auto()            # >
-    LE = auto()            # <=
-    GE = auto()            # >=
+    EQ = auto()  # ==
+    NE = auto()  # !=
+    LT = auto()  # <
+    GT = auto()  # >
+    LE = auto()  # <=
+    GE = auto()  # >=
 
     # Assignment
-    ASSIGN = auto()        # =
-    PLUS_ASSIGN = auto()   # +=
+    ASSIGN = auto()  # =
+    PLUS_ASSIGN = auto()  # +=
     MINUS_ASSIGN = auto()  # -=
-    STAR_ASSIGN = auto()   # *=
+    STAR_ASSIGN = auto()  # *=
     SLASH_ASSIGN = auto()  # /=
 
     # Mathematical set operators (Unicode)
-    ELEMENT_OF = auto()       # ∈
-    NOT_ELEMENT_OF = auto()   # ∉
-    SUBSET = auto()           # ⊆
-    SUPERSET = auto()         # ⊇
-    PROPER_SUBSET = auto()    # ⊂
+    ELEMENT_OF = auto()  # ∈
+    NOT_ELEMENT_OF = auto()  # ∉
+    SUBSET = auto()  # ⊆
+    SUPERSET = auto()  # ⊇
+    PROPER_SUBSET = auto()  # ⊂
     PROPER_SUPERSET = auto()  # ⊃
-    UNION = auto()            # ∪
-    INTERSECTION = auto()     # ∩
-    SET_DIFF = auto()         # ∖ or \
-    EMPTY_SET = auto()        # ∅
+    UNION = auto()  # ∪
+    INTERSECTION = auto()  # ∩
+    SET_DIFF = auto()  # ∖ or \
+    EMPTY_SET = auto()  # ∅
 
     # Other mathematical symbols
-    INFINITY = auto()         # ∞
-    APPROX = auto()           # ≈
-    NOT_EQUAL_MATH = auto()   # ≠
-    LE_MATH = auto()          # ≤
-    GE_MATH = auto()          # ≥
-    FORALL = auto()           # ∀
-    EXISTS = auto()           # ∃
-    ARROW = auto()            # →
-    DOUBLE_ARROW = auto()     # ⇒
-    MAPS_TO = auto()          # ↦
-    PI = auto()               # π
-    SQRT = auto()             # √
-    SUM = auto()              # ∑
-    PRODUCT = auto()          # ∏
-    INTEGRAL = auto()         # ∫
+    INFINITY = auto()  # ∞
+    APPROX = auto()  # ≈
+    NOT_EQUAL_MATH = auto()  # ≠
+    LE_MATH = auto()  # ≤
+    GE_MATH = auto()  # ≥
+    FORALL = auto()  # ∀
+    EXISTS = auto()  # ∃
+    ARROW = auto()  # →
+    DOUBLE_ARROW = auto()  # ⇒
+    MAPS_TO = auto()  # ↦
+    PI = auto()  # π
+    SQRT = auto()  # √
+    SUM = auto()  # ∑
+    PRODUCT = auto()  # ∏
+    INTEGRAL = auto()  # ∫
 
     # Delimiters
-    LPAREN = auto()        # (
-    RPAREN = auto()        # )
-    LBRACE = auto()        # {
-    RBRACE = auto()        # }
-    LBRACKET = auto()      # [
-    RBRACKET = auto()      # ]
+    LPAREN = auto()  # (
+    RPAREN = auto()  # )
+    LBRACE = auto()  # {
+    RBRACE = auto()  # }
+    LBRACKET = auto()  # [
+    RBRACKET = auto()  # ]
 
     # Punctuation
-    COMMA = auto()         # ,
-    DOT = auto()           # .
-    COLON = auto()         # :
+    COMMA = auto()  # ,
+    DOT = auto()  # .
+    COLON = auto()  # :
     DOUBLE_COLON = auto()  # :: (enum variant access)
-    SEMICOLON = auto()     # ;
-    THIN_ARROW = auto()    # ->
-    FAT_ARROW = auto()     # =>
-    AT = auto()            # @ (decorator)
-    PIPE = auto()          # | (for pipe lambdas)
-    ELLIPSIS = auto()      # ... (spread/rest operator)
+    SEMICOLON = auto()  # ;
+    THIN_ARROW = auto()  # ->
+    FAT_ARROW = auto()  # =>
+    AT = auto()  # @ (decorator)
+    PIPE = auto()  # | (for pipe lambdas)
+    ELLIPSIS = auto()  # ... (spread/rest operator)
 
     # Special
     NEWLINE = auto()
@@ -201,7 +201,7 @@ class TokenType(Enum):
     DOC_COMMENT = auto()  # /// or /** */
 
     # Test framework attributes
-    TEST = auto()          # @test
+    TEST = auto()  # @test
     SHOULD_PANIC = auto()  # @should_panic
 
 
@@ -281,22 +281,22 @@ KEYWORDS: dict[str, TokenType] = {
     # Note: "test" and "should_panic" are NOT keywords
     # They are handled as identifiers in attribute parsing (@test, @should_panic)
     # LaTeX-style math operators (without backslash)
-    "cup": TokenType.UNION,              # ∪ union
-    "cap": TokenType.INTERSECTION,       # ∩ intersection
-    "notin": TokenType.NOT_ELEMENT_OF,   # ∉ not element of
-    "subseteq": TokenType.SUBSET,        # ⊆ subset or equal
-    "supseteq": TokenType.SUPERSET,      # ⊇ superset or equal
-    "subset": TokenType.PROPER_SUBSET,   # ⊂ proper subset
-    "supset": TokenType.PROPER_SUPERSET, # ⊃ proper superset
-    "setminus": TokenType.SET_DIFF,      # ∖ set difference
-    "emptyset": TokenType.EMPTY_SET,     # ∅ empty set
-    "infty": TokenType.INFINITY,         # ∞ infinity
-    "neq": TokenType.NOT_EQUAL_MATH,     # ≠ not equal
-    "leq": TokenType.LE_MATH,            # ≤ less or equal
-    "geq": TokenType.GE_MATH,            # ≥ greater or equal
-    "forall": TokenType.FORALL,          # ∀ for all
-    "exists": TokenType.EXISTS,          # ∃ exists
-    "pi": TokenType.PI,                  # π pi
+    "cup": TokenType.UNION,  # ∪ union
+    "cap": TokenType.INTERSECTION,  # ∩ intersection
+    "notin": TokenType.NOT_ELEMENT_OF,  # ∉ not element of
+    "subseteq": TokenType.SUBSET,  # ⊆ subset or equal
+    "supseteq": TokenType.SUPERSET,  # ⊇ superset or equal
+    "subset": TokenType.PROPER_SUBSET,  # ⊂ proper subset
+    "supset": TokenType.PROPER_SUPERSET,  # ⊃ proper superset
+    "setminus": TokenType.SET_DIFF,  # ∖ set difference
+    "emptyset": TokenType.EMPTY_SET,  # ∅ empty set
+    "infty": TokenType.INFINITY,  # ∞ infinity
+    "neq": TokenType.NOT_EQUAL_MATH,  # ≠ not equal
+    "leq": TokenType.LE_MATH,  # ≤ less or equal
+    "geq": TokenType.GE_MATH,  # ≥ greater or equal
+    "forall": TokenType.FORALL,  # ∀ for all
+    "exists": TokenType.EXISTS,  # ∃ exists
+    "pi": TokenType.PI,  # π pi
     # Note: sqrt, sin, cos, etc. are NOT keywords - they are functions converted to np.sqrt(), etc.
     # This allows them to be used naturally: sqrt(x) -> np.sqrt(x)
     # Note: 'in' is already a keyword for iteration AND element membership (∈)

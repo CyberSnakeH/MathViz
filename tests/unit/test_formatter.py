@@ -151,7 +151,7 @@ class TestFunctionFormatting:
 
     def test_format_function_no_params(self):
         """Format function with no parameters."""
-        source = "fn hello() { println(\"Hello\") }"
+        source = 'fn hello() { println("Hello") }'
         result = format_source(source)
         assert "fn hello()" in result
 

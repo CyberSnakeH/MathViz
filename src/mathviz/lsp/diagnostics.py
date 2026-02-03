@@ -5,7 +5,6 @@ This module converts compiler errors, type errors, and lint warnings
 into LSP-compatible diagnostic messages for display in editors.
 """
 
-
 from lsprotocol import types
 
 from mathviz.compiler.lexer import Lexer
@@ -96,9 +95,7 @@ class DiagnosticProvider:
 
         return self._diagnostics
 
-    def _add_mathviz_error(
-        self, error: MathVizError, severity: types.DiagnosticSeverity
-    ) -> None:
+    def _add_mathviz_error(self, error: MathVizError, severity: types.DiagnosticSeverity) -> None:
         """
         Add a MathViz compiler error as an LSP diagnostic.
 

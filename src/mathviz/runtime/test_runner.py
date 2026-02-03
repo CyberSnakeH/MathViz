@@ -19,6 +19,7 @@ import sys
 
 class TestStatus(Enum):
     """Test result status."""
+
     PASSED = "passed"
     FAILED = "failed"
     SKIPPED = "skipped"
@@ -28,6 +29,7 @@ class TestStatus(Enum):
 @dataclass
 class TestResult:
     """Result of a single test."""
+
     name: str
     status: TestStatus
     duration: float  # seconds
@@ -39,6 +41,7 @@ class TestResult:
 @dataclass
 class TestSuite:
     """Collection of test results."""
+
     name: str
     results: List[TestResult] = field(default_factory=list)
     duration: float = 0.0
@@ -72,8 +75,10 @@ class TestSuite:
 # Assertions
 # =============================================================================
 
+
 class AssertionError(Exception):
     """Raised when an assertion fails."""
+
     pass
 
 
@@ -92,73 +97,55 @@ def assert_false(condition: bool, message: str = "") -> None:
 def assert_eq(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual equals expected."""
     if actual != expected:
-        raise AssertionError(
-            message or f"Expected {expected!r}, got {actual!r}"
-        )
+        raise AssertionError(message or f"Expected {expected!r}, got {actual!r}")
 
 
 def assert_ne(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual does not equal expected."""
     if actual == expected:
-        raise AssertionError(
-            message or f"Expected {actual!r} to not equal {expected!r}"
-        )
+        raise AssertionError(message or f"Expected {actual!r} to not equal {expected!r}")
 
 
 def assert_lt(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual < expected."""
     if not actual < expected:
-        raise AssertionError(
-            message or f"Expected {actual!r} < {expected!r}"
-        )
+        raise AssertionError(message or f"Expected {actual!r} < {expected!r}")
 
 
 def assert_le(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual <= expected."""
     if not actual <= expected:
-        raise AssertionError(
-            message or f"Expected {actual!r} <= {expected!r}"
-        )
+        raise AssertionError(message or f"Expected {actual!r} <= {expected!r}")
 
 
 def assert_gt(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual > expected."""
     if not actual > expected:
-        raise AssertionError(
-            message or f"Expected {actual!r} > {expected!r}"
-        )
+        raise AssertionError(message or f"Expected {actual!r} > {expected!r}")
 
 
 def assert_ge(actual: Any, expected: Any, message: str = "") -> None:
     """Assert that actual >= expected."""
     if not actual >= expected:
-        raise AssertionError(
-            message or f"Expected {actual!r} >= {expected!r}"
-        )
+        raise AssertionError(message or f"Expected {actual!r} >= {expected!r}")
 
 
 def assert_in(item: Any, container: Any, message: str = "") -> None:
     """Assert that item is in container."""
     if item not in container:
-        raise AssertionError(
-            message or f"Expected {item!r} to be in {container!r}"
-        )
+        raise AssertionError(message or f"Expected {item!r} to be in {container!r}")
 
 
 def assert_not_in(item: Any, container: Any, message: str = "") -> None:
     """Assert that item is not in container."""
     if item in container:
-        raise AssertionError(
-            message or f"Expected {item!r} to not be in {container!r}"
-        )
+        raise AssertionError(message or f"Expected {item!r} to not be in {container!r}")
 
 
 def assert_none(value: Any, message: str = "") -> None:
     """Assert that value is None."""
     if value is not None:
-        raise AssertionError(
-            message or f"Expected None, got {value!r}"
-        )
+        raise AssertionError(message or f"Expected None, got {value!r}")
 
 
 def assert_not_none(value: Any, message: str = "") -> None:
@@ -167,12 +154,12 @@ def assert_not_none(value: Any, message: str = "") -> None:
         raise AssertionError(message or "Expected non-None value")
 
 
-def assert_approx(actual: float, expected: float, tolerance: float = 1e-9, message: str = "") -> None:
+def assert_approx(
+    actual: float, expected: float, tolerance: float = 1e-9, message: str = ""
+) -> None:
     """Assert that actual is approximately equal to expected."""
     if abs(actual - expected) > tolerance:
-        raise AssertionError(
-            message or f"Expected {expected} ± {tolerance}, got {actual}"
-        )
+        raise AssertionError(message or f"Expected {expected} ± {tolerance}, got {actual}")
 
 
 def assert_raises(exception_type: type, func: Callable, *args, **kwargs) -> None:
@@ -182,9 +169,7 @@ def assert_raises(exception_type: type, func: Callable, *args, **kwargs) -> None
     except exception_type:
         return
     except Exception as e:
-        raise AssertionError(
-            f"Expected {exception_type.__name__}, got {type(e).__name__}: {e}"
-        )
+        raise AssertionError(f"Expected {exception_type.__name__}, got {type(e).__name__}: {e}")
     raise AssertionError(f"Expected {exception_type.__name__} to be raised")
 
 
@@ -200,17 +185,13 @@ def assert_len(container: Any, expected_len: int, message: str = "") -> None:
     """Assert that container has expected length."""
     actual_len = len(container)
     if actual_len != expected_len:
-        raise AssertionError(
-            message or f"Expected length {expected_len}, got {actual_len}"
-        )
+        raise AssertionError(message or f"Expected length {expected_len}, got {actual_len}")
 
 
 def assert_empty(container: Any, message: str = "") -> None:
     """Assert that container is empty."""
     if len(container) != 0:
-        raise AssertionError(
-            message or f"Expected empty container, got {len(container)} items"
-        )
+        raise AssertionError(message or f"Expected empty container, got {len(container)} items")
 
 
 def assert_not_empty(container: Any, message: str = "") -> None:
@@ -222,6 +203,7 @@ def assert_not_empty(container: Any, message: str = "") -> None:
 # =============================================================================
 # Test Runner
 # =============================================================================
+
 
 class TestRunner:
     """Runs tests and collects results."""
@@ -334,7 +316,7 @@ class TestRunner:
             TestStatus.PASSED: "\033[32m",  # Green
             TestStatus.FAILED: "\033[31m",  # Red
             TestStatus.SKIPPED: "\033[33m",  # Yellow
-            TestStatus.ERROR: "\033[31m",   # Red
+            TestStatus.ERROR: "\033[31m",  # Red
         }
         reset = "\033[0m"
 
@@ -351,8 +333,10 @@ class TestRunner:
         """Print test suite summary."""
         print()
         print("=" * 60)
-        print(f"Tests: {suite.total}, Passed: {suite.passed}, Failed: {suite.failed}, "
-              f"Skipped: {suite.skipped}, Errors: {suite.errors}")
+        print(
+            f"Tests: {suite.total}, Passed: {suite.passed}, Failed: {suite.failed}, "
+            f"Skipped: {suite.skipped}, Errors: {suite.errors}"
+        )
         print(f"Duration: {suite.duration:.2f}s")
 
         if suite.success:
@@ -379,8 +363,15 @@ def run_tests(test_module: Any, verbose: bool = True) -> TestSuite:
     return runner.run()
 
 
-def test(func: Optional[Callable] = None, *, should_panic: bool = False, skip: bool = False, skip_reason: str = ""):
+def test(
+    func: Optional[Callable] = None,
+    *,
+    should_panic: bool = False,
+    skip: bool = False,
+    skip_reason: str = "",
+):
     """Decorator to mark a function as a test."""
+
     def decorator(f: Callable) -> Callable:
         f._test_options = {
             "should_panic": should_panic,

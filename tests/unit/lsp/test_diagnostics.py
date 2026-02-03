@@ -101,14 +101,13 @@ fn test() {
         diagnostics = get_diagnostics_for_document(source, "test://test.mviz")
 
         # Find unused variable warning if present
-        unused_warnings = [
-            d for d in diagnostics if "unused" in d.message.lower()
-        ]
+        unused_warnings = [d for d in diagnostics if "unused" in d.message.lower()]
 
         for warning in unused_warnings:
             # May have Unnecessary tag
             if warning.tags:
                 from lsprotocol.types import DiagnosticTag
+
                 # Check if Unnecessary tag is present
                 assert DiagnosticTag.Unnecessary in warning.tags or True
 

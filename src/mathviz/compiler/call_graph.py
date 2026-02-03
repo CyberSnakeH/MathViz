@@ -285,9 +285,7 @@ class CallGraph:
         # Check if we processed all nodes
         if len(result) != len(self.nodes):
             cycles = self.find_cycles()
-            cycle_desc = ", ".join(
-                " -> ".join(cycle) for cycle in cycles
-            )
+            cycle_desc = ", ".join(" -> ".join(cycle) for cycle in cycles)
             raise CallGraphError(
                 f"Cannot compute topological sort: graph contains cycles ({cycle_desc})",
                 cycles=cycles,
@@ -472,10 +470,7 @@ class CallGraph:
         return visited
 
     def __repr__(self) -> str:
-        return (
-            f"CallGraph(nodes={len(self.nodes)}, "
-            f"edges={len(self.edges)})"
-        )
+        return f"CallGraph(nodes={len(self.nodes)}, edges={len(self.edges)})"
 
     def __str__(self) -> str:
         lines = ["CallGraph:"]
@@ -592,9 +587,7 @@ class CallGraphBuilder(BaseASTVisitor):
 
                     self._function_scope_stack.pop()
                     self._current_function = (
-                        self._function_scope_stack[-1]
-                        if self._function_scope_stack
-                        else None
+                        self._function_scope_stack[-1] if self._function_scope_stack else None
                     )
                 else:
                     self.visit(stmt)
@@ -617,9 +610,7 @@ class CallGraphBuilder(BaseASTVisitor):
 
                     self._function_scope_stack.pop()
                     self._current_function = (
-                        self._function_scope_stack[-1]
-                        if self._function_scope_stack
-                        else None
+                        self._function_scope_stack[-1] if self._function_scope_stack else None
                     )
                 else:
                     self.visit(stmt)
@@ -641,9 +632,7 @@ class CallGraphBuilder(BaseASTVisitor):
 
                 self._function_scope_stack.pop()
                 self._current_function = (
-                    self._function_scope_stack[-1]
-                    if self._function_scope_stack
-                    else None
+                    self._function_scope_stack[-1] if self._function_scope_stack else None
                 )
             else:
                 self.visit(stmt)

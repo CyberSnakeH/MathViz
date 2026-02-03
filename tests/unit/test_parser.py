@@ -119,7 +119,7 @@ class TestParserFunctionDef:
 
     def test_function_with_default_params(self, parse):
         """Test function with default parameter values."""
-        ast = parse("fn greet(name: String = \"World\") { return name }")
+        ast = parse('fn greet(name: String = "World") { return name }')
         stmt = ast.statements[0]
         assert stmt.parameters[0].default_value is not None
 

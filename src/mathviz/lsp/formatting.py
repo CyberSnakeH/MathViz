@@ -5,7 +5,6 @@ This module provides document formatting functionality by wrapping
 the existing MathViz formatter for LSP integration.
 """
 
-
 from lsprotocol import types
 
 from mathviz.formatter import FormatConfig, Formatter, format_source
@@ -143,7 +142,10 @@ class LSPFormatter:
         return edits
 
     def _format_closing_brace(
-        self, lines: list[str], line: int, character: int  # noqa: ARG002
+        self,
+        lines: list[str],
+        line: int,
+        character: int,  # noqa: ARG002
     ) -> list[types.TextEdit]:
         """
         Format a closing brace by aligning with its opening brace.
@@ -224,8 +226,10 @@ class LSPFormatter:
             current_line = lines[line]
             # Only adjust if the line is just whitespace or empty
             if not current_line.strip():
-                indent_str = " " * new_indent if self.config.use_spaces else "\t" * (
-                    new_indent // self.config.indent_size
+                indent_str = (
+                    " " * new_indent
+                    if self.config.use_spaces
+                    else "\t" * (new_indent // self.config.indent_size)
                 )
                 return [
                     types.TextEdit(

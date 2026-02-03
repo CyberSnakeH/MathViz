@@ -595,15 +595,15 @@ class BinaryOperator(Enum):
     OR = auto()
 
     # Set operations (mathematical)
-    ELEMENT_OF = auto()       # ∈
-    NOT_ELEMENT_OF = auto()   # ∉
-    SUBSET = auto()           # ⊆
-    SUPERSET = auto()         # ⊇
-    PROPER_SUBSET = auto()    # ⊂
+    ELEMENT_OF = auto()  # ∈
+    NOT_ELEMENT_OF = auto()  # ∉
+    SUBSET = auto()  # ⊆
+    SUPERSET = auto()  # ⊇
+    PROPER_SUBSET = auto()  # ⊂
     PROPER_SUPERSET = auto()  # ⊃
-    UNION = auto()            # ∪
-    INTERSECTION = auto()     # ∩
-    SET_DIFF = auto()         # ∖
+    UNION = auto()  # ∪
+    INTERSECTION = auto()  # ∩
+    SET_DIFF = auto()  # ∖
 
     # Membership (Python-style)
     IN = auto()
@@ -613,9 +613,9 @@ class BinaryOperator(Enum):
 class UnaryOperator(Enum):
     """Unary operator types."""
 
-    NEG = auto()      # -
-    NOT = auto()      # not
-    POS = auto()      # +
+    NEG = auto()  # -
+    NOT = auto()  # not
+    POS = auto()  # +
 
 
 @dataclass(frozen=True, slots=True)
@@ -1013,7 +1013,7 @@ class RangePattern(Pattern):
     """
 
     start: Expression  # Inclusive start
-    end: Expression    # Exclusive end (or inclusive with ..=)
+    end: Expression  # Exclusive end (or inclusive with ..=)
     inclusive: bool = False  # True for ..= (inclusive end)
     location: Optional[SourceLocation] = None
 
@@ -1332,13 +1332,14 @@ class CompoundAssignment(Statement):
 
 class JitMode(Enum):
     """JIT compilation modes for Numba optimization."""
-    NONE = "none"           # No JIT compilation
-    JIT = "jit"             # Standard @jit decorator
-    NJIT = "njit"           # @njit (nopython=True, faster)
-    VECTORIZE = "vectorize" # @vectorize for ufuncs
+
+    NONE = "none"  # No JIT compilation
+    JIT = "jit"  # Standard @jit decorator
+    NJIT = "njit"  # @njit (nopython=True, faster)
+    VECTORIZE = "vectorize"  # @vectorize for ufuncs
     GUVECTORIZE = "guvectorize"  # @guvectorize for generalized ufuncs
-    STENCIL = "stencil"     # @stencil for stencil computations
-    CFUNC = "cfunc"         # @cfunc for C-callable functions
+    STENCIL = "stencil"  # @stencil for stencil computations
+    CFUNC = "cfunc"  # @cfunc for C-callable functions
 
 
 @dataclass(frozen=True, slots=True)
@@ -1348,14 +1349,15 @@ class JitOptions:
 
     These map directly to Numba decorator arguments.
     """
+
     mode: JitMode = JitMode.NONE
-    nopython: bool = True       # Compile in nopython mode (faster, stricter)
-    nogil: bool = False         # Release GIL (for parallel execution)
-    cache: bool = True          # Cache compiled function to disk
-    parallel: bool = False      # Enable automatic parallelization
-    fastmath: bool = False      # Use fast math (less precise, faster)
-    boundscheck: bool = False   # Check array bounds (slower but safer)
-    inline: str = "never"       # Inlining: "never", "always", or "recursive"
+    nopython: bool = True  # Compile in nopython mode (faster, stricter)
+    nogil: bool = False  # Release GIL (for parallel execution)
+    cache: bool = True  # Cache compiled function to disk
+    parallel: bool = False  # Enable automatic parallelization
+    fastmath: bool = False  # Use fast math (less precise, faster)
+    boundscheck: bool = False  # Check array bounds (slower but safer)
+    inline: str = "never"  # Inlining: "never", "always", or "recursive"
 
     def to_decorator_args(self) -> str:
         """Generate the decorator argument string."""
@@ -1457,6 +1459,7 @@ class FunctionDef(Statement):
         for attr in self.attributes:
             if attr.name == "test" and attr.arguments:
                 from mathviz.compiler.ast_nodes import StringLiteral
+
                 if isinstance(attr.arguments[0], StringLiteral):
                     return attr.arguments[0].value
         return None
@@ -1890,7 +1893,7 @@ class Visibility(Enum):
     """Visibility modifier for struct fields and methods."""
 
     PRIVATE = auto()  # Default visibility
-    PUBLIC = auto()   # pub keyword
+    PUBLIC = auto()  # pub keyword
 
 
 @dataclass(frozen=True, slots=True)
@@ -2028,7 +2031,9 @@ class ImplBlock(Statement):
 
     target_type: str  # The struct/type being implemented
     trait_name: Optional[str] = None  # None for inherent impl, trait name for trait impl
-    trait_type_args: tuple[TypeAnnotation, ...] = ()  # Type args for trait (e.g., Float in Mul<Float>)
+    trait_type_args: tuple[
+        TypeAnnotation, ...
+    ] = ()  # Type args for trait (e.g., Float in Mul<Float>)
     methods: tuple[Method, ...] = ()
     associated_types: tuple[AssociatedType, ...] = ()  # Associated type declarations
     type_params: tuple["TypeParameter", ...] = ()
@@ -2045,6 +2050,7 @@ class ImplBlock(Statement):
     def is_operator_impl(self) -> bool:
         """Check if this impl block is for an operator trait."""
         from mathviz.compiler.operators import OPERATOR_TRAITS
+
         return self.trait_name is not None and self.trait_name in OPERATOR_TRAITS
 
     def accept(self, visitor: ASTVisitor) -> Any:

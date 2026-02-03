@@ -684,9 +684,7 @@ class PurityAnalyzer(BaseASTVisitor):
 
         if base_name in IO_FUNCTIONS:
             kind = self._get_io_kind(base_name)
-            self._add_side_effect(
-                kind, call_name, location, f"I/O operation: {call_name}"
-            )
+            self._add_side_effect(kind, call_name, location, f"I/O operation: {call_name}")
             self._current_info.io_calls.append(call_name)
             self._upgrade_purity(Purity.IMPURE_IO)
             return
@@ -694,9 +692,7 @@ class PurityAnalyzer(BaseASTVisitor):
         # Check for Manim functions
         if base_name in MANIM_FUNCTIONS:
             kind = self._get_manim_kind(base_name)
-            self._add_side_effect(
-                kind, call_name, location, f"Manim operation: {call_name}"
-            )
+            self._add_side_effect(kind, call_name, location, f"Manim operation: {call_name}")
             self._current_info.manim_calls.append(call_name)
             self._upgrade_purity(Purity.IMPURE_MANIM)
             return

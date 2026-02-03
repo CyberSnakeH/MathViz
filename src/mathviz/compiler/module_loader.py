@@ -233,49 +233,51 @@ class DependencyGraph:
 # =============================================================================
 
 # Modules that should be treated as Python imports, not MathViz modules
-PYTHON_MODULES = frozenset({
-    # Standard library
-    "math",
-    "random",
-    "os",
-    "sys",
-    "json",
-    "re",
-    "time",
-    "datetime",
-    "collections",
-    "itertools",
-    "functools",
-    "typing",
-    "pathlib",
-    "io",
-    "copy",
-    "operator",
-    "string",
-    "textwrap",
-    "struct",
-    "decimal",
-    "fractions",
-    "statistics",
-    "cmath",
-    # Scientific/numeric
-    "numpy",
-    "np",
-    "scipy",
-    "pandas",
-    "matplotlib",
-    "sympy",
-    "numba",
-    # Manim
-    "manim",
-    "manimlib",
-    # Other common libraries
-    "PIL",
-    "cv2",
-    "sklearn",
-    "torch",
-    "tensorflow",
-})
+PYTHON_MODULES = frozenset(
+    {
+        # Standard library
+        "math",
+        "random",
+        "os",
+        "sys",
+        "json",
+        "re",
+        "time",
+        "datetime",
+        "collections",
+        "itertools",
+        "functools",
+        "typing",
+        "pathlib",
+        "io",
+        "copy",
+        "operator",
+        "string",
+        "textwrap",
+        "struct",
+        "decimal",
+        "fractions",
+        "statistics",
+        "cmath",
+        # Scientific/numeric
+        "numpy",
+        "np",
+        "scipy",
+        "pandas",
+        "matplotlib",
+        "sympy",
+        "numba",
+        # Manim
+        "manim",
+        "manimlib",
+        # Other common libraries
+        "PIL",
+        "cv2",
+        "sklearn",
+        "torch",
+        "tensorflow",
+    }
+)
 
 
 def is_python_module(module_path: tuple[str, ...]) -> bool:

@@ -294,7 +294,7 @@ class TestResultTypeChecking:
         implicit conversion. We test with truly incompatible types instead.
         """
         r1 = ResultType(STRING_TYPE, STRING_TYPE)  # Result[String, String]
-        r2 = ResultType(INT_TYPE, STRING_TYPE)     # Result[Int, String]
+        r2 = ResultType(INT_TYPE, STRING_TYPE)  # Result[Int, String]
         # String is not compatible with Int
         assert not r1.is_compatible_with(r2)
 

@@ -133,26 +133,26 @@ class JitStrategy(Enum):
 class MemoryAccessPattern(Enum):
     """Classification of memory access patterns."""
 
-    SEQUENTIAL = auto()    # arr[i], arr[i+1], ...
-    STRIDED = auto()       # arr[i*k], arr[i*k + c], ...
-    RANDOM = auto()        # arr[indices[i]], unpredictable
-    BROADCAST = auto()     # Same element accessed by all iterations
-    GATHER = auto()        # Irregular read pattern
-    SCATTER = auto()       # Irregular write pattern
+    SEQUENTIAL = auto()  # arr[i], arr[i+1], ...
+    STRIDED = auto()  # arr[i*k], arr[i*k + c], ...
+    RANDOM = auto()  # arr[indices[i]], unpredictable
+    BROADCAST = auto()  # Same element accessed by all iterations
+    GATHER = auto()  # Irregular read pattern
+    SCATTER = auto()  # Irregular write pattern
 
 
 class LoopPattern(Enum):
     """Classification of loop computation patterns."""
 
-    MAP = auto()           # arr[i] = f(arr[i])
-    REDUCTION = auto()     # result = f(result, arr[i])
-    SCAN = auto()          # arr[i] = f(arr[i-1])
-    STENCIL = auto()       # arr[i] = f(arr[i-1], arr[i], arr[i+1])
-    HISTOGRAM = auto()     # bins[arr[i]] += 1
-    TRANSPOSE = auto()     # out[j,i] = in[i,j]
-    MATMUL = auto()        # c[i,j] = sum(a[i,k] * b[k,j])
-    DOT_PRODUCT = auto()   # result = sum(a[i] * b[i])
-    UNKNOWN = auto()       # Cannot classify
+    MAP = auto()  # arr[i] = f(arr[i])
+    REDUCTION = auto()  # result = f(result, arr[i])
+    SCAN = auto()  # arr[i] = f(arr[i-1])
+    STENCIL = auto()  # arr[i] = f(arr[i-1], arr[i], arr[i+1])
+    HISTOGRAM = auto()  # bins[arr[i]] += 1
+    TRANSPOSE = auto()  # out[j,i] = in[i,j]
+    MATMUL = auto()  # c[i,j] = sum(a[i,k] * b[k,j])
+    DOT_PRODUCT = auto()  # result = sum(a[i] * b[i])
+    UNKNOWN = auto()  # Cannot classify
 
 
 # =============================================================================
@@ -309,73 +309,201 @@ class CacheHints:
 
 
 # Types compatible with Numba nopython mode
-NUMBA_COMPATIBLE_TYPES: frozenset[str] = frozenset({
-    # Scalar types
-    "Int", "Float", "Bool", "int", "float", "bool",
-    "int8", "int16", "int32", "int64",
-    "uint8", "uint16", "uint32", "uint64",
-    "float32", "float64", "complex64", "complex128",
-    # NumPy array types
-    "Array", "Vec", "Mat", "Matrix", "NDArray",
-    "ndarray", "np.ndarray",
-})
+NUMBA_COMPATIBLE_TYPES: frozenset[str] = frozenset(
+    {
+        # Scalar types
+        "Int",
+        "Float",
+        "Bool",
+        "int",
+        "float",
+        "bool",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float32",
+        "float64",
+        "complex64",
+        "complex128",
+        # NumPy array types
+        "Array",
+        "Vec",
+        "Mat",
+        "Matrix",
+        "NDArray",
+        "ndarray",
+        "np.ndarray",
+    }
+)
 
 # Types that prevent nopython mode
-NUMBA_INCOMPATIBLE_TYPES: frozenset[str] = frozenset({
-    "String", "str", "Set", "set", "Dict", "dict",
-    "Optional", "Result", "Any", "object",
-})
+NUMBA_INCOMPATIBLE_TYPES: frozenset[str] = frozenset(
+    {
+        "String",
+        "str",
+        "Set",
+        "set",
+        "Dict",
+        "dict",
+        "Optional",
+        "Result",
+        "Any",
+        "object",
+    }
+)
 
 # Built-in functions supported in nopython mode
-NUMBA_SUPPORTED_BUILTINS: frozenset[str] = frozenset({
-    # Math operations
-    "abs", "min", "max", "sum", "pow", "round",
-    "int", "float", "bool", "complex",
-    # Container operations
-    "len", "range", "enumerate", "zip",
-    # Math functions (will be replaced with np.*)
-    "sqrt", "sin", "cos", "tan", "exp", "log", "log10", "log2",
-    "floor", "ceil", "fabs", "asin", "acos", "atan", "atan2",
-    "sinh", "cosh", "tanh", "degrees", "radians",
-    # NumPy array creation
-    "zeros", "ones", "empty", "arange", "linspace", "eye",
-    "full", "zeros_like", "ones_like", "empty_like",
-    # NumPy array operations
-    "dot", "matmul", "transpose", "reshape", "flatten", "ravel",
-    "concatenate", "stack", "vstack", "hstack",
-    "mean", "std", "var", "sum", "prod",
-    "argmax", "argmin", "argsort", "sort", "clip",
-    "where", "nonzero", "unique", "diff", "cumsum", "cumprod",
-})
+NUMBA_SUPPORTED_BUILTINS: frozenset[str] = frozenset(
+    {
+        # Math operations
+        "abs",
+        "min",
+        "max",
+        "sum",
+        "pow",
+        "round",
+        "int",
+        "float",
+        "bool",
+        "complex",
+        # Container operations
+        "len",
+        "range",
+        "enumerate",
+        "zip",
+        # Math functions (will be replaced with np.*)
+        "sqrt",
+        "sin",
+        "cos",
+        "tan",
+        "exp",
+        "log",
+        "log10",
+        "log2",
+        "floor",
+        "ceil",
+        "fabs",
+        "asin",
+        "acos",
+        "atan",
+        "atan2",
+        "sinh",
+        "cosh",
+        "tanh",
+        "degrees",
+        "radians",
+        # NumPy array creation
+        "zeros",
+        "ones",
+        "empty",
+        "arange",
+        "linspace",
+        "eye",
+        "full",
+        "zeros_like",
+        "ones_like",
+        "empty_like",
+        # NumPy array operations
+        "dot",
+        "matmul",
+        "transpose",
+        "reshape",
+        "flatten",
+        "ravel",
+        "concatenate",
+        "stack",
+        "vstack",
+        "hstack",
+        "mean",
+        "std",
+        "var",
+        "sum",
+        "prod",
+        "argmax",
+        "argmin",
+        "argsort",
+        "sort",
+        "clip",
+        "where",
+        "nonzero",
+        "unique",
+        "diff",
+        "cumsum",
+        "cumprod",
+    }
+)
 
 # Functions that prevent JIT compilation
-JIT_BLOCKING_FUNCTIONS: frozenset[str] = frozenset({
-    "print", "println", "input",
-    "open", "read_file", "write_file", "append_file",
-    "format", "repr", "str",
-    "eval", "exec", "compile",
-    "globals", "locals", "vars",
-})
+JIT_BLOCKING_FUNCTIONS: frozenset[str] = frozenset(
+    {
+        "print",
+        "println",
+        "input",
+        "open",
+        "read_file",
+        "write_file",
+        "append_file",
+        "format",
+        "repr",
+        "str",
+        "eval",
+        "exec",
+        "compile",
+        "globals",
+        "locals",
+        "vars",
+    }
+)
 
 # Operations that benefit from fastmath
-FASTMATH_BENEFICIAL_OPS: frozenset[str] = frozenset({
-    "sin", "cos", "tan", "exp", "log", "sqrt", "pow",
-    "sinh", "cosh", "tanh", "asin", "acos", "atan",
-})
+FASTMATH_BENEFICIAL_OPS: frozenset[str] = frozenset(
+    {
+        "sin",
+        "cos",
+        "tan",
+        "exp",
+        "log",
+        "sqrt",
+        "pow",
+        "sinh",
+        "cosh",
+        "tanh",
+        "asin",
+        "acos",
+        "atan",
+    }
+)
 
 # Typical cache sizes for reference (in bytes)
-L1_CACHE_SIZE = 32 * 1024       # 32 KB
-L2_CACHE_SIZE = 256 * 1024      # 256 KB
+L1_CACHE_SIZE = 32 * 1024  # 32 KB
+L2_CACHE_SIZE = 256 * 1024  # 256 KB
 L3_CACHE_SIZE = 8 * 1024 * 1024  # 8 MB
 
 # Type size estimates (in bytes)
 TYPE_SIZES: dict[str, int] = {
-    "Int": 8, "Float": 8, "Bool": 1,
-    "int": 8, "float": 8, "bool": 1,
-    "int8": 1, "int16": 2, "int32": 4, "int64": 8,
-    "uint8": 1, "uint16": 2, "uint32": 4, "uint64": 8,
-    "float32": 4, "float64": 8,
-    "complex64": 8, "complex128": 16,
+    "Int": 8,
+    "Float": 8,
+    "Bool": 1,
+    "int": 8,
+    "float": 8,
+    "bool": 1,
+    "int8": 1,
+    "int16": 2,
+    "int32": 4,
+    "int64": 8,
+    "uint8": 1,
+    "uint16": 2,
+    "uint32": 4,
+    "uint64": 8,
+    "float32": 4,
+    "float64": 8,
+    "complex64": 8,
+    "complex128": 16,
 }
 
 
@@ -721,20 +849,14 @@ class JitAnalyzer:
     ) -> None:
         """Add relevant warnings to the decision."""
         if not memory_pattern.is_cache_friendly:
-            decision.warnings.append(
-                "Memory access pattern may cause cache misses"
-            )
+            decision.warnings.append("Memory access pattern may cause cache misses")
             decision.warnings.extend(memory_pattern.suggestions)
 
         if decision.strategy == JitStrategy.NJIT_FASTMATH:
-            decision.warnings.append(
-                "fastmath may affect numerical precision"
-            )
+            decision.warnings.append("fastmath may affect numerical precision")
 
         if decision.options.get("parallel"):
-            decision.warnings.append(
-                "Parallel execution may not benefit small workloads"
-            )
+            decision.warnings.append("Parallel execution may not benefit small workloads")
 
     def _suggest_alternatives(
         self,
@@ -807,46 +929,54 @@ class LoopOptimizer:
         for i, loop in enumerate(loops):
             # Check for prange
             if self._can_use_prange(loop):
-                transformations.append(LoopTransformation(
-                    loop=loop,
-                    transformation="prange",
-                    description="Convert range() to prange() for parallel execution",
-                    expected_benefit="Linear speedup with available cores",
-                    prerequisites=["No loop-carried dependencies"],
-                ))
+                transformations.append(
+                    LoopTransformation(
+                        loop=loop,
+                        transformation="prange",
+                        description="Convert range() to prange() for parallel execution",
+                        expected_benefit="Linear speedup with available cores",
+                        prerequisites=["No loop-carried dependencies"],
+                    )
+                )
 
             # Check for reduction
             reduction = self._detect_reduction(loop)
             if reduction:
-                transformations.append(LoopTransformation(
-                    loop=loop,
-                    transformation="reduction",
-                    description=f"Parallel reduction on '{reduction.variable}'",
-                    expected_benefit="Parallel sum/product with tree reduction",
-                    prerequisites=["Associative operation"],
-                ))
+                transformations.append(
+                    LoopTransformation(
+                        loop=loop,
+                        transformation="reduction",
+                        description=f"Parallel reduction on '{reduction.variable}'",
+                        expected_benefit="Parallel sum/product with tree reduction",
+                        prerequisites=["Associative operation"],
+                    )
+                )
 
             # Check for tiling
             tiling = self._can_tile_loop(loop)
             if tiling:
-                transformations.append(LoopTransformation(
-                    loop=loop,
-                    transformation="tile",
-                    description=f"Tile loop with block size {tiling.suggested_tile_size}",
-                    expected_benefit=f"{tiling.estimated_cache_benefit:.0%} cache improvement",
-                    prerequisites=["Large iteration count", "Regular access pattern"],
-                ))
+                transformations.append(
+                    LoopTransformation(
+                        loop=loop,
+                        transformation="tile",
+                        description=f"Tile loop with block size {tiling.suggested_tile_size}",
+                        expected_benefit=f"{tiling.estimated_cache_benefit:.0%} cache improvement",
+                        prerequisites=["Large iteration count", "Regular access pattern"],
+                    )
+                )
 
             # Check for loop fusion with adjacent loop
             if i + 1 < len(loops):
                 if self._can_fuse_loops(loops[i], loops[i + 1]):
-                    transformations.append(LoopTransformation(
-                        loop=loop,
-                        transformation="fuse",
-                        description="Fuse with following loop to improve locality",
-                        expected_benefit="Reduced memory traffic",
-                        prerequisites=["Same iteration space", "No dependencies"],
-                    ))
+                    transformations.append(
+                        LoopTransformation(
+                            loop=loop,
+                            transformation="fuse",
+                            description="Fuse with following loop to improve locality",
+                            expected_benefit="Reduced memory traffic",
+                            prerequisites=["Same iteration space", "No dependencies"],
+                        )
+                    )
 
         return transformations
 
@@ -903,9 +1033,8 @@ class LoopOptimizer:
 
         if isinstance(iter1, RangeExpression) and isinstance(iter2, RangeExpression):
             # Check if bounds are the same (structurally)
-            return (
-                self._same_expr(iter1.start, iter2.start) and
-                self._same_expr(iter1.end, iter2.end)
+            return self._same_expr(iter1.start, iter2.start) and self._same_expr(
+                iter1.end, iter2.end
             )
 
         if isinstance(iter1, CallExpression) and isinstance(iter2, CallExpression):
@@ -1053,9 +1182,12 @@ class VectorizationAnalyzer:
         if isinstance(expr, BinaryExpression):
             # Arithmetic operations are element-wise
             if expr.operator in {
-                BinaryOperator.ADD, BinaryOperator.SUB,
-                BinaryOperator.MUL, BinaryOperator.DIV,
-                BinaryOperator.POW, BinaryOperator.MOD,
+                BinaryOperator.ADD,
+                BinaryOperator.SUB,
+                BinaryOperator.MUL,
+                BinaryOperator.DIV,
+                BinaryOperator.POW,
+                BinaryOperator.MOD,
             }:
                 return self._is_element_wise(expr.left) and self._is_element_wise(expr.right)
 
@@ -1070,9 +1202,9 @@ class VectorizationAnalyzer:
 
         if isinstance(expr, ConditionalExpression):
             return (
-                self._is_element_wise(expr.condition) and
-                self._is_element_wise(expr.then_expr) and
-                self._is_element_wise(expr.else_expr)
+                self._is_element_wise(expr.condition)
+                and self._is_element_wise(expr.then_expr)
+                and self._is_element_wise(expr.else_expr)
             )
 
         return False
@@ -1198,10 +1330,18 @@ class CostModel:
 
     # Operation costs (relative to simple arithmetic)
     OP_COSTS: dict[str, float] = {
-        "add": 1.0, "sub": 1.0, "mul": 1.0, "div": 4.0,
-        "mod": 8.0, "pow": 20.0,
-        "sqrt": 5.0, "sin": 15.0, "cos": 15.0, "tan": 20.0,
-        "exp": 12.0, "log": 15.0,
+        "add": 1.0,
+        "sub": 1.0,
+        "mul": 1.0,
+        "div": 4.0,
+        "mod": 8.0,
+        "pow": 20.0,
+        "sqrt": 5.0,
+        "sin": 15.0,
+        "cos": 15.0,
+        "tan": 20.0,
+        "exp": 12.0,
+        "log": 15.0,
         "memory_access": 50.0,  # L2/L3 miss
     }
 
@@ -1342,7 +1482,11 @@ def _generate_decorator(decision: JitDecision) -> Optional[str]:
     # Build njit/jit options string
     opt_parts: list[str] = []
 
-    if decision.strategy in {JitStrategy.NJIT, JitStrategy.NJIT_PARALLEL, JitStrategy.NJIT_FASTMATH}:
+    if decision.strategy in {
+        JitStrategy.NJIT,
+        JitStrategy.NJIT_PARALLEL,
+        JitStrategy.NJIT_FASTMATH,
+    }:
         decorator_name = "njit"
     else:
         decorator_name = "jit"
@@ -1388,9 +1532,14 @@ def _type_to_python(type_ann: TypeAnnotation) -> str:
     """Convert MathViz type annotation to Python type string."""
     if isinstance(type_ann, SimpleType):
         mapping = {
-            "Int": "int", "Float": "float", "Bool": "bool",
-            "String": "str", "None": "None",
-            "Array": "np.ndarray", "Vec": "np.ndarray", "Mat": "np.ndarray",
+            "Int": "int",
+            "Float": "float",
+            "Bool": "bool",
+            "String": "str",
+            "None": "None",
+            "Array": "np.ndarray",
+            "Vec": "np.ndarray",
+            "Mat": "np.ndarray",
         }
         return mapping.get(type_ann.name, type_ann.name)
     elif isinstance(type_ann, GenericType):
@@ -1488,9 +1637,12 @@ class _ArithmeticIntensityAnalyzer(BaseASTVisitor):
 
     def visit_binary_expression(self, node: BinaryExpression) -> None:
         if node.operator in {
-            BinaryOperator.ADD, BinaryOperator.SUB,
-            BinaryOperator.MUL, BinaryOperator.DIV,
-            BinaryOperator.MOD, BinaryOperator.POW,
+            BinaryOperator.ADD,
+            BinaryOperator.SUB,
+            BinaryOperator.MUL,
+            BinaryOperator.DIV,
+            BinaryOperator.MOD,
+            BinaryOperator.POW,
         }:
             self.arithmetic_ops += 1
         super().visit_binary_expression(node)
@@ -1610,16 +1762,20 @@ class _VectorizableOpFinder(BaseASTVisitor):
 
     def visit_binary_expression(self, node: BinaryExpression) -> None:
         if node.operator in {
-            BinaryOperator.ADD, BinaryOperator.SUB,
-            BinaryOperator.MUL, BinaryOperator.DIV,
+            BinaryOperator.ADD,
+            BinaryOperator.SUB,
+            BinaryOperator.MUL,
+            BinaryOperator.DIV,
         }:
-            self.ops.append(VectorizableOp(
-                expression=node,
-                element_type="float64",
-                operation=node.operator.name.lower(),
-                estimated_simd_lanes=4,
-                location=node.location,
-            ))
+            self.ops.append(
+                VectorizableOp(
+                    expression=node,
+                    element_type="float64",
+                    operation=node.operator.name.lower(),
+                    estimated_simd_lanes=4,
+                    location=node.location,
+                )
+            )
         super().visit_binary_expression(node)
 
 
@@ -1665,9 +1821,7 @@ class _CachePatternDetector(BaseASTVisitor):
         # Detect column-major access in row-major array
         if isinstance(node.object, IndexExpression):
             # Nested indexing like arr[j][i] - might be column-major
-            self.unfriendly_patterns.append(
-                "Possible column-major access in row-major array"
-            )
+            self.unfriendly_patterns.append("Possible column-major access in row-major array")
         super().visit_index_expression(node)
 
 

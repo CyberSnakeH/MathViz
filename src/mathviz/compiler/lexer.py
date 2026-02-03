@@ -93,7 +93,7 @@ class Lexer:
         end = self.source.find("\n", self._line_start)
         if end == -1:
             end = len(self.source)
-        return self.source[self._line_start:end]
+        return self.source[self._line_start : end]
 
     def _advance(self) -> str:
         """Consume and return the current character."""
@@ -191,9 +191,11 @@ class Lexer:
                     self._advance()
 
                 # Check for another ///
-                if (self._current_char == "/" and
-                    self._peek_char == "/" and
-                    self._peek_ahead(2) == "/"):
+                if (
+                    self._current_char == "/"
+                    and self._peek_char == "/"
+                    and self._peek_ahead(2) == "/"
+                ):
                     self._advance()  # first /
                     self._advance()  # second /
                     self._advance()  # third /
@@ -669,9 +671,7 @@ class Lexer:
         start_loc = self._location()
 
         # Try three-character operators first (...)
-        if (self._current_char == "." and
-            self._peek_char == "." and
-            self._peek_ahead(2) == "."):
+        if self._current_char == "." and self._peek_char == "." and self._peek_ahead(2) == ".":
             self._advance()
             self._advance()
             self._advance()

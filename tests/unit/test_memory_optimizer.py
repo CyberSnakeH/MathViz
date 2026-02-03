@@ -74,6 +74,7 @@ from mathviz.utils.errors import SourceLocation
 # Helper functions to create AST nodes directly
 # ============================================================================
 
+
 def make_identifier(name: str) -> Identifier:
     """Create an Identifier node."""
     return Identifier(name=name)
@@ -161,8 +162,7 @@ def make_function(
 ) -> FunctionDef:
     """Create a FunctionDef node with parameters and body."""
     parameters = tuple(
-        Parameter(name=p_name, type_annotation=SimpleType(name=p_type))
-        for p_name, p_type in params
+        Parameter(name=p_name, type_annotation=SimpleType(name=p_type)) for p_name, p_type in params
     )
     return FunctionDef(
         name=name,
@@ -174,6 +174,7 @@ def make_function(
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def allocation_analyzer():
@@ -208,6 +209,7 @@ def memory_optimizer():
 # ============================================================================
 # Allocation Analysis Tests
 # ============================================================================
+
 
 class TestAllocationAnalysis:
     """Tests for allocation detection and analysis."""
@@ -323,9 +325,7 @@ class TestAllocationAnalysis:
         func = make_function(
             name="test_func",
             params=[],
-            body_statements=(
-                make_let("arr", make_call("zeros", [make_int(100)])),
-            ),
+            body_statements=(make_let("arr", make_call("zeros", [make_int(100)])),),
         )
         allocations = allocation_analyzer.analyze(func)
 
@@ -362,6 +362,7 @@ class TestAllocationAnalysis:
 # ============================================================================
 # Buffer Reuse Tests
 # ============================================================================
+
 
 class TestBufferReuse:
     """Tests for buffer reuse optimization."""
@@ -473,6 +474,7 @@ class TestBufferReuse:
 # In-Place Operation Tests
 # ============================================================================
 
+
 class TestInPlaceOptimization:
     """Tests for in-place operation detection."""
 
@@ -522,6 +524,7 @@ class TestInPlaceOptimization:
 # ============================================================================
 # Cache Optimization Tests
 # ============================================================================
+
 
 class TestCacheOptimization:
     """Tests for cache optimization analysis."""
@@ -617,6 +620,7 @@ class TestCacheOptimization:
 # Layout Optimization Tests
 # ============================================================================
 
+
 class TestLayoutOptimization:
     """Tests for memory layout suggestions."""
 
@@ -647,6 +651,7 @@ class TestLayoutOptimization:
 # ============================================================================
 # Temporary Elimination Tests
 # ============================================================================
+
 
 class TestTemporaryElimination:
     """Tests for temporary array elimination."""
@@ -707,6 +712,7 @@ class TestTemporaryElimination:
 # Memory Pool Generation Tests
 # ============================================================================
 
+
 class TestMemoryPoolGeneration:
     """Tests for memory pool code generation."""
 
@@ -754,6 +760,7 @@ class TestMemoryPoolGeneration:
 # Memory Report Tests
 # ============================================================================
 
+
 class TestMemoryReport:
     """Tests for memory report generation."""
 
@@ -792,6 +799,7 @@ class TestMemoryReport:
 # Main Memory Optimizer Tests
 # ============================================================================
 
+
 class TestMemoryOptimizer:
     """Tests for the main MemoryOptimizer class."""
 
@@ -826,9 +834,7 @@ class TestMemoryOptimizer:
         func = make_function(
             name="test_func",
             params=[("n", "Int")],
-            body_statements=(
-                make_let("arr", make_call("zeros", [make_identifier("n")])),
-            ),
+            body_statements=(make_let("arr", make_call("zeros", [make_identifier("n")])),),
         )
         report = memory_optimizer.analyze_function(func)
 
@@ -839,6 +845,7 @@ class TestMemoryOptimizer:
 # Convenience Function Tests
 # ============================================================================
 
+
 class TestConvenienceFunctions:
     """Tests for convenience functions."""
 
@@ -847,9 +854,7 @@ class TestConvenienceFunctions:
         func = make_function(
             name="test_func",
             params=[("n", "Int")],
-            body_statements=(
-                make_let("arr", make_call("zeros", [make_identifier("n")])),
-            ),
+            body_statements=(make_let("arr", make_call("zeros", [make_identifier("n")])),),
         )
         report = analyze_memory(func)
 
@@ -860,9 +865,7 @@ class TestConvenienceFunctions:
         func = make_function(
             name="test_func",
             params=[("n", "Int")],
-            body_statements=(
-                make_let("arr", make_call("zeros", [make_identifier("n")])),
-            ),
+            body_statements=(make_let("arr", make_call("zeros", [make_identifier("n")])),),
         )
         allocations = find_allocations(func)
 
@@ -874,9 +877,7 @@ class TestConvenienceFunctions:
         func = make_function(
             name="test_func",
             params=[("n", "Int")],
-            body_statements=(
-                make_let("arr", make_call("zeros", [make_identifier("n")])),
-            ),
+            body_statements=(make_let("arr", make_call("zeros", [make_identifier("n")])),),
         )
         messages = suggest_buffer_reuse(func)
 
@@ -910,9 +911,7 @@ class TestConvenienceFunctions:
         func = make_function(
             name="compute",
             params=[("n", "Int")],
-            body_statements=(
-                make_let("buf", make_call("zeros", [make_identifier("n")])),
-            ),
+            body_statements=(make_let("buf", make_call("zeros", [make_identifier("n")])),),
         )
         pool_code = generate_memory_pool(func)
 
@@ -922,6 +921,7 @@ class TestConvenienceFunctions:
 # ============================================================================
 # Data Structure Tests
 # ============================================================================
+
 
 class TestDataStructures:
     """Tests for data structure representations."""
@@ -1013,6 +1013,7 @@ class TestDataStructures:
 # Edge Cases
 # ============================================================================
 
+
 class TestEdgeCases:
     """Tests for edge cases and boundary conditions."""
 
@@ -1080,12 +1081,12 @@ class TestEdgeCases:
             body_statements=(
                 IfStatement(
                     condition=make_identifier("condition"),
-                    then_block=Block(statements=(
-                        make_let("arr", make_call("zeros", [make_identifier("n")])),
-                    )),
-                    else_block=Block(statements=(
-                        make_let("arr", make_call("ones", [make_identifier("n")])),
-                    )),
+                    then_block=Block(
+                        statements=(make_let("arr", make_call("zeros", [make_identifier("n")])),)
+                    ),
+                    else_block=Block(
+                        statements=(make_let("arr", make_call("ones", [make_identifier("n")])),)
+                    ),
                 ),
             ),
         )
@@ -1098,6 +1099,7 @@ class TestEdgeCases:
 # ============================================================================
 # Access Pattern Tests
 # ============================================================================
+
 
 class TestAccessPattern:
     """Tests for AccessPattern enum."""

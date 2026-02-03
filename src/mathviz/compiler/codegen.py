@@ -413,19 +413,71 @@ NUMPY_ARRAY_TYPES = {"Array", "Vec", "Mat", "Matrix", "NDArray"}
 
 # Built-in functions that are JIT-compatible
 JIT_COMPATIBLE_BUILTINS = {
-    "abs", "min", "max", "sum", "len", "range", "enumerate",
-    "int", "float", "bool", "round", "pow",
+    "abs",
+    "min",
+    "max",
+    "sum",
+    "len",
+    "range",
+    "enumerate",
+    "int",
+    "float",
+    "bool",
+    "round",
+    "pow",
     # Math functions (numpy)
-    "sqrt", "sin", "cos", "tan", "exp", "log", "log10", "log2",
-    "floor", "ceil", "fabs", "asin", "acos", "atan", "atan2",
-    "sinh", "cosh", "tanh", "degrees", "radians",
+    "sqrt",
+    "sin",
+    "cos",
+    "tan",
+    "exp",
+    "log",
+    "log10",
+    "log2",
+    "floor",
+    "ceil",
+    "fabs",
+    "asin",
+    "acos",
+    "atan",
+    "atan2",
+    "sinh",
+    "cosh",
+    "tanh",
+    "degrees",
+    "radians",
     # NumPy array functions
-    "zeros", "ones", "empty", "arange", "linspace", "eye",
-    "dot", "matmul", "transpose", "reshape", "flatten",
-    "concatenate", "stack", "vstack", "hstack",
-    "mean", "std", "var", "median", "percentile",
-    "argmax", "argmin", "argsort", "sort", "clip",
-    "where", "nonzero", "unique", "diff", "cumsum", "cumprod",
+    "zeros",
+    "ones",
+    "empty",
+    "arange",
+    "linspace",
+    "eye",
+    "dot",
+    "matmul",
+    "transpose",
+    "reshape",
+    "flatten",
+    "concatenate",
+    "stack",
+    "vstack",
+    "hstack",
+    "mean",
+    "std",
+    "var",
+    "median",
+    "percentile",
+    "argmax",
+    "argmin",
+    "argsort",
+    "sort",
+    "clip",
+    "where",
+    "nonzero",
+    "unique",
+    "diff",
+    "cumsum",
+    "cumprod",
 }
 
 # NumPy type mappings for Numba compatibility
@@ -727,7 +779,7 @@ class CodeGenerator(BaseASTVisitor):
             self._emit("")
 
         if self._needs_io_runtime:
-            for line in MATHVIZ_IO_RUNTIME.strip().split('\n'):
+            for line in MATHVIZ_IO_RUNTIME.strip().split("\n"):
                 self._output.append(line)
             self._emit("")
 
@@ -844,7 +896,7 @@ class CodeGenerator(BaseASTVisitor):
         # that appear before the first function
         first_func_idx = min(
             (i for i, stmt in enumerate(program.statements) if isinstance(stmt, FunctionDef)),
-            default=len(program.statements)
+            default=len(program.statements),
         )
 
         for idx, stmt in other_statements:
@@ -1009,8 +1061,7 @@ class CodeGenerator(BaseASTVisitor):
                 if self.parent.optimize and node.elements:
                     # Check if all elements are numeric
                     all_numeric = all(
-                        isinstance(e, (IntegerLiteral, FloatLiteral))
-                        for e in node.elements
+                        isinstance(e, (IntegerLiteral, FloatLiteral)) for e in node.elements
                     )
                     if all_numeric:
                         self.parent._needs_numpy_import = True
@@ -1228,8 +1279,7 @@ class CodeGenerator(BaseASTVisitor):
             if isinstance(part, FStringLiteral):
                 # Escape special characters for f-string context
                 escaped = (
-                    part.value
-                    .replace("\\", "\\\\")
+                    part.value.replace("\\", "\\\\")
                     .replace("{", "{{")
                     .replace("}", "}}")
                     .replace('"', '\\"')
@@ -1260,10 +1310,7 @@ class CodeGenerator(BaseASTVisitor):
         if self.optimize and self._in_jit_function and node.elements:
             # Determine dtype from elements
             has_float = any(isinstance(e, FloatLiteral) for e in node.elements)
-            all_numeric = all(
-                isinstance(e, (IntegerLiteral, FloatLiteral))
-                for e in node.elements
-            )
+            all_numeric = all(isinstance(e, (IntegerLiteral, FloatLiteral)) for e in node.elements)
             if all_numeric:
                 dtype = "np.float64" if has_float else "np.int64"
                 return f"np.array([{elements}], dtype={dtype})"
@@ -1280,8 +1327,7 @@ class CodeGenerator(BaseASTVisitor):
     def visit_dict_literal(self, node: DictLiteral) -> str:
         """Generate code for a dictionary literal."""
         pairs = ", ".join(
-            f"{self._generate_expr(k)}: {self._generate_expr(v)}"
-            for k, v in node.pairs
+            f"{self._generate_expr(k)}: {self._generate_expr(v)}" for k, v in node.pairs
         )
         return f"{{{pairs}}}"
 
@@ -1338,8 +1384,7 @@ class CodeGenerator(BaseASTVisitor):
 
         # Generate keyword arguments
         keyword_args = [
-            f"{kwarg.name}={self._generate_expr(kwarg.value)}"
-            for kwarg in node.keyword_arguments
+            f"{kwarg.name}={self._generate_expr(kwarg.value)}" for kwarg in node.keyword_arguments
         ]
 
         # Combine all arguments
@@ -1449,9 +1494,7 @@ class CodeGenerator(BaseASTVisitor):
         if isinstance(node.body, Block):
             # Multi-statement lambda needs to be a regular function
             # For simplicity, just use the first return statement
-            raise NotImplementedError(
-                "Block-bodied lambdas require function extraction"
-            )
+            raise NotImplementedError("Block-bodied lambdas require function extraction")
         body = self._generate_expr(node.body)
         return f"lambda {params}: {body}"
 
@@ -1747,7 +1790,7 @@ class CodeGenerator(BaseASTVisitor):
                 conditions = [
                     f"isinstance({subject_var}, tuple)",
                     f"len({subject_var}) == 2",
-                    f"{subject_var}[0] is True"
+                    f"{subject_var}[0] is True",
                 ]
                 for i, arg in enumerate(pattern.args):
                     arg_cond = self._generate_pattern_condition(arg, f"{subject_var}[1]")
@@ -1760,7 +1803,7 @@ class CodeGenerator(BaseASTVisitor):
                 conditions = [
                     f"isinstance({subject_var}, tuple)",
                     f"len({subject_var}) == 2",
-                    f"{subject_var}[0] is False"
+                    f"{subject_var}[0] is False",
                 ]
                 for i, arg in enumerate(pattern.args):
                     arg_cond = self._generate_pattern_condition(arg, f"{subject_var}[1]")
@@ -1845,7 +1888,9 @@ class CodeGenerator(BaseASTVisitor):
                 after_rest = len(pattern.elements) - rest_index - 1
                 for j in range(after_rest):
                     elem = pattern.elements[rest_index + 1 + j]
-                    elem_cond = self._generate_pattern_condition(elem, f"{subject_var}[-{after_rest - j}]")
+                    elem_cond = self._generate_pattern_condition(
+                        elem, f"{subject_var}[-{after_rest - j}]"
+                    )
                     if elem_cond != "True":
                         conditions.append(elem_cond)
 
@@ -1954,7 +1999,9 @@ class CodeGenerator(BaseASTVisitor):
                 after_rest = len(pattern.elements) - rest_index - 1
                 for j in range(after_rest):
                     elem = pattern.elements[rest_index + 1 + j]
-                    elem_bindings = self._generate_pattern_bindings(elem, f"{subject_var}[-{after_rest - j}]")
+                    elem_bindings = self._generate_pattern_bindings(
+                        elem, f"{subject_var}[-{after_rest - j}]"
+                    )
                     bindings.update(elem_bindings)
 
         elif isinstance(pattern, RestPattern):
@@ -2128,7 +2175,9 @@ class CodeGenerator(BaseASTVisitor):
                     self._type_vars_declared.add(type_param.name)
                     if type_param.bounds:
                         bounds_str = ", ".join(type_param.bounds)
-                        self._emit(f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})")
+                        self._emit(
+                            f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})"
+                        )
                     else:
                         self._emit(f"{type_param.name} = TypeVar('{type_param.name}')")
 
@@ -2181,9 +2230,9 @@ class CodeGenerator(BaseASTVisitor):
                     mode=JitMode.NJIT,  # Use njit for best performance
                     nopython=True,
                     nogil=False,
-                    cache=True,         # Cache for faster subsequent runs
+                    cache=True,  # Cache for faster subsequent runs
                     parallel=needs_parallel,  # Enable if we detect parallelizable loops with reductions
-                    fastmath=False,     # Safe by default
+                    fastmath=False,  # Safe by default
                     boundscheck=False,
                 )
 
@@ -2422,9 +2471,7 @@ class CodeGenerator(BaseASTVisitor):
             if isinstance(iterable_node.callee, Identifier):
                 if iterable_node.callee.name == "range":
                     # Replace range with prange, preserving arguments
-                    args = ", ".join(
-                        self._generate_expr(arg) for arg in iterable_node.arguments
-                    )
+                    args = ", ".join(self._generate_expr(arg) for arg in iterable_node.arguments)
                     return f"prange({args})"
 
         # Fallback: just replace "range(" with "prange(" in the string
@@ -2554,10 +2601,7 @@ class CodeGenerator(BaseASTVisitor):
     def visit_import_statement(self, node: ImportStatement) -> None:
         """Generate code for an import statement."""
         if node.is_from_import:
-            names = ", ".join(
-                f"{name} as {alias}" if alias else name
-                for name, alias in node.names
-            )
+            names = ", ".join(f"{name} as {alias}" if alias else name for name, alias in node.names)
             self._emit(f"from {node.module} import {names}")
         else:
             if node.alias:
@@ -2685,9 +2729,7 @@ class CodeGenerator(BaseASTVisitor):
         # Check if animation is a tuple literal (multiple animations)
         if isinstance(node.animation, TupleLiteral):
             # Unpack tuple elements as separate arguments
-            animations = ", ".join(
-                self._generate_expr(elem) for elem in node.animation.elements
-            )
+            animations = ", ".join(self._generate_expr(elem) for elem in node.animation.elements)
         else:
             animations = self._generate_expr(node.animation)
 
@@ -2746,7 +2788,9 @@ class CodeGenerator(BaseASTVisitor):
                     self._type_vars_declared.add(type_param.name)
                     if type_param.bounds:
                         bounds_str = ", ".join(type_param.bounds)
-                        self._emit(f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})")
+                        self._emit(
+                            f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})"
+                        )
                     else:
                         self._emit(f"{type_param.name} = TypeVar('{type_param.name}')")
             self._emit("")
@@ -2814,7 +2858,9 @@ class CodeGenerator(BaseASTVisitor):
             self._generate_method(method, node.target_type, method_name_override=method_name)
             self._emit("")
 
-    def _generate_method(self, method: Method, target_type: str, method_name_override: Optional[str] = None) -> None:
+    def _generate_method(
+        self, method: Method, target_type: str, method_name_override: Optional[str] = None
+    ) -> None:
         """Generate code for a single method.
 
         Args:
@@ -2900,7 +2946,9 @@ class CodeGenerator(BaseASTVisitor):
                     self._type_vars_declared.add(type_param.name)
                     if type_param.bounds:
                         bounds_str = ", ".join(type_param.bounds)
-                        self._emit(f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})")
+                        self._emit(
+                            f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})"
+                        )
                     else:
                         self._emit(f"{type_param.name} = TypeVar('{type_param.name}')")
             self._emit("")
@@ -2993,7 +3041,9 @@ class CodeGenerator(BaseASTVisitor):
                     self._type_vars_declared.add(type_param.name)
                     if type_param.bounds:
                         bounds_str = ", ".join(type_param.bounds)
-                        self._emit(f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})")
+                        self._emit(
+                            f"{type_param.name} = TypeVar('{type_param.name}', bound={bounds_str})"
+                        )
                     else:
                         self._emit(f"{type_param.name} = TypeVar('{type_param.name}')")
             self._emit("")
@@ -3103,8 +3153,7 @@ class CodeGenerator(BaseASTVisitor):
             spread_expr = self._generate_expr(node.spread)
             if node.fields:
                 field_args = ", ".join(
-                    f"{name}={self._generate_expr(value)}"
-                    for name, value in node.fields
+                    f"{name}={self._generate_expr(value)}" for name, value in node.fields
                 )
                 return f"replace({spread_expr}, {field_args})"
             else:
@@ -3112,8 +3161,7 @@ class CodeGenerator(BaseASTVisitor):
                 return f"replace({spread_expr})"
         else:
             field_args = ", ".join(
-                f"{name}={self._generate_expr(value)}"
-                for name, value in node.fields
+                f"{name}={self._generate_expr(value)}" for name, value in node.fields
             )
             return f"{node.struct_name}({field_args})"
 

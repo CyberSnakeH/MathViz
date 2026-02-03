@@ -628,6 +628,7 @@ class DocumentAnalyzer:
 
         # Check if it's a keyword
         from mathviz.compiler.tokens import KEYWORDS
+
         if word in KEYWORDS:
             return types.Hover(
                 contents=types.MarkupContent(
@@ -639,6 +640,7 @@ class DocumentAnalyzer:
 
         # Check if it's a builtin type
         from mathviz.lsp.completions import BUILTIN_TYPES
+
         if word in BUILTIN_TYPES:
             return types.Hover(
                 contents=types.MarkupContent(
@@ -650,9 +652,7 @@ class DocumentAnalyzer:
 
         return None
 
-    def _create_hover_for_symbol(
-        self, symbol: Symbol, range_: types.Range
-    ) -> types.Hover:
+    def _create_hover_for_symbol(self, symbol: Symbol, range_: types.Range) -> types.Hover:
         """Create hover content for a symbol."""
         parts: list[str] = []
 
@@ -782,9 +782,7 @@ class DocumentAnalyzer:
         top_level = self.symbols.scopes.get("", [])
         return [symbol.to_document_symbol() for symbol in top_level]
 
-    def _get_word_at_position(
-        self, line: int, character: int
-    ) -> tuple[str, types.Range | None]:
+    def _get_word_at_position(self, line: int, character: int) -> tuple[str, types.Range | None]:
         """
         Get the word at a position.
 

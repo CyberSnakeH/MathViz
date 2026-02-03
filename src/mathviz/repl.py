@@ -38,6 +38,7 @@ from typing import Any, Callable, Optional
 
 try:
     import readline
+
     HAS_READLINE = True
 except ImportError:
     # readline not available on some platforms (e.g., Windows without pyreadline)
@@ -83,8 +84,19 @@ class Colors:
     @classmethod
     def disable(cls) -> None:
         """Disable all colors."""
-        for attr in ["RED", "GREEN", "YELLOW", "BLUE", "MAGENTA",
-                     "CYAN", "WHITE", "GRAY", "BOLD", "DIM", "RESET"]:
+        for attr in [
+            "RED",
+            "GREEN",
+            "YELLOW",
+            "BLUE",
+            "MAGENTA",
+            "CYAN",
+            "WHITE",
+            "GRAY",
+            "BOLD",
+            "DIM",
+            "RESET",
+        ]:
             setattr(cls, attr, "")
 
 
@@ -105,6 +117,7 @@ _init_colors()
 @dataclass
 class REPLCommand:
     """A REPL command definition."""
+
     name: str
     aliases: tuple[str, ...] = ()
     help_text: str = ""
@@ -119,6 +132,7 @@ class REPLCommand:
 @dataclass
 class DefinedFunction:
     """Information about a user-defined function."""
+
     name: str
     params: list[str]
     param_types: list[str]
@@ -157,52 +171,58 @@ class REPLSession:
     def _setup_builtins(self) -> None:
         """Setup built-in functions and constants."""
         # Mathematical constants
-        self._globals.update({
-            "PI": math.pi,
-            "E": math.e,
-            "TAU": math.tau,
-            "INF": float("inf"),
-            "NAN": float("nan"),
-        })
+        self._globals.update(
+            {
+                "PI": math.pi,
+                "E": math.e,
+                "TAU": math.tau,
+                "INF": float("inf"),
+                "NAN": float("nan"),
+            }
+        )
 
         # Mathematical functions (numpy-backed for array support)
-        self._globals.update({
-            "sqrt": np.sqrt,
-            "sin": np.sin,
-            "cos": np.cos,
-            "tan": np.tan,
-            "asin": np.arcsin,
-            "acos": np.arccos,
-            "atan": np.arctan,
-            "atan2": np.arctan2,
-            "sinh": np.sinh,
-            "cosh": np.cosh,
-            "tanh": np.tanh,
-            "exp": np.exp,
-            "log": np.log,
-            "log10": np.log10,
-            "log2": np.log2,
-            "abs": np.abs,
-            "floor": np.floor,
-            "ceil": np.ceil,
-            "round": np.round,
-            "min": min,
-            "max": max,
-            "sum": sum,
-            "len": len,
-            "range": range,
-            "print": print,
-            "println": lambda *args: print(*args),
-        })
+        self._globals.update(
+            {
+                "sqrt": np.sqrt,
+                "sin": np.sin,
+                "cos": np.cos,
+                "tan": np.tan,
+                "asin": np.arcsin,
+                "acos": np.arccos,
+                "atan": np.arctan,
+                "atan2": np.arctan2,
+                "sinh": np.sinh,
+                "cosh": np.cosh,
+                "tanh": np.tanh,
+                "exp": np.exp,
+                "log": np.log,
+                "log10": np.log10,
+                "log2": np.log2,
+                "abs": np.abs,
+                "floor": np.floor,
+                "ceil": np.ceil,
+                "round": np.round,
+                "min": min,
+                "max": max,
+                "sum": sum,
+                "len": len,
+                "range": range,
+                "print": print,
+                "println": lambda *args: print(*args),
+            }
+        )
 
         # NumPy array creation
-        self._globals.update({
-            "array": np.array,
-            "zeros": np.zeros,
-            "ones": np.ones,
-            "linspace": np.linspace,
-            "arange": np.arange,
-        })
+        self._globals.update(
+            {
+                "array": np.array,
+                "zeros": np.zeros,
+                "ones": np.ones,
+                "linspace": np.linspace,
+                "arange": np.arange,
+            }
+        )
 
         # Add variables to execution environment
         self._globals.update(self.variables)
@@ -401,8 +421,7 @@ class REPLSession:
         lines = []
         for name, func in sorted(self.functions.items()):
             params = ", ".join(
-                f"{p}: {t}" if t else p
-                for p, t in zip(func.params, func.param_types)
+                f"{p}: {t}" if t else p for p, t in zip(func.params, func.param_types)
             )
             ret = f" -> {func.return_type}" if func.return_type else ""
             lines.append(f"  {Colors.GREEN}{name}{Colors.RESET}({params}){ret}")
@@ -574,7 +593,9 @@ class REPLSession:
         # Extract function info
         params = [p.name for p in func.parameters]
         param_types = [
-            str(p.type_annotation.name) if p.type_annotation and hasattr(p.type_annotation, "name") else ""
+            str(p.type_annotation.name)
+            if p.type_annotation and hasattr(p.type_annotation, "name")
+            else ""
             for p in func.parameters
         ]
         return_type = ""
@@ -601,10 +622,7 @@ class REPLSession:
         eval(compiled, self._globals)  # noqa: S307 - Safe: executing compiler-generated code
 
         # Format output
-        params_str = ", ".join(
-            f"{p}: {t}" if t else p
-            for p, t in zip(params, param_types)
-        )
+        params_str = ", ".join(f"{p}: {t}" if t else p for p, t in zip(params, param_types))
         ret_str = f" -> {return_type}" if return_type else ""
 
         return f"{Colors.GREEN}defined:{Colors.RESET} {func.name}({params_str}){ret_str}"
@@ -731,7 +749,9 @@ class REPLSession:
     def run(self) -> None:
         """Main REPL loop."""
         print(f"{Colors.BOLD}MathViz {__version__}{Colors.RESET} - Interactive Mode")
-        print(f"Type {Colors.CYAN}:help{Colors.RESET} for help, {Colors.CYAN}:quit{Colors.RESET} to exit")
+        print(
+            f"Type {Colors.CYAN}:help{Colors.RESET} for help, {Colors.CYAN}:quit{Colors.RESET} to exit"
+        )
         print()
 
         # Setup readline if available
@@ -796,12 +816,33 @@ class REPLCompleter:
 
         # Keywords and built-in constructs
         self.keywords = [
-            "let", "fn", "if", "else", "elif", "for", "while",
-            "return", "break", "continue", "pass", "match",
-            "struct", "enum", "trait", "impl", "pub",
-            "true", "false", "None",
-            "in", "and", "or", "not",
-            "Some", "Ok", "Err",
+            "let",
+            "fn",
+            "if",
+            "else",
+            "elif",
+            "for",
+            "while",
+            "return",
+            "break",
+            "continue",
+            "pass",
+            "match",
+            "struct",
+            "enum",
+            "trait",
+            "impl",
+            "pub",
+            "true",
+            "false",
+            "None",
+            "in",
+            "and",
+            "or",
+            "not",
+            "Some",
+            "Ok",
+            "Err",
         ]
 
         # Built-in constants
@@ -809,16 +850,52 @@ class REPLCompleter:
 
         # Built-in functions
         self.builtin_functions = [
-            "sqrt", "sin", "cos", "tan", "asin", "acos", "atan", "atan2",
-            "sinh", "cosh", "tanh", "exp", "log", "log10", "log2",
-            "abs", "floor", "ceil", "round", "min", "max", "sum", "len",
-            "range", "print", "println", "array", "zeros", "ones", "linspace", "arange",
+            "sqrt",
+            "sin",
+            "cos",
+            "tan",
+            "asin",
+            "acos",
+            "atan",
+            "atan2",
+            "sinh",
+            "cosh",
+            "tanh",
+            "exp",
+            "log",
+            "log10",
+            "log2",
+            "abs",
+            "floor",
+            "ceil",
+            "round",
+            "min",
+            "max",
+            "sum",
+            "len",
+            "range",
+            "print",
+            "println",
+            "array",
+            "zeros",
+            "ones",
+            "linspace",
+            "arange",
         ]
 
         # REPL commands
         self.commands = [
-            ":help", ":quit", ":q", ":clear", ":type", ":ast",
-            ":vars", ":funcs", ":load", ":save", ":reset",
+            ":help",
+            ":quit",
+            ":q",
+            ":clear",
+            ":type",
+            ":ast",
+            ":vars",
+            ":funcs",
+            ":load",
+            ":save",
+            ":reset",
         ]
 
     def complete(self, text: str, state: int) -> Optional[str]:
@@ -841,34 +918,19 @@ class REPLCompleter:
             return sorted(set(completions))
 
         # Variable completions
-        completions.extend(
-            name for name in self.session.variables
-            if name.startswith(text)
-        )
+        completions.extend(name for name in self.session.variables if name.startswith(text))
 
         # Function completions
-        completions.extend(
-            name for name in self.session.functions
-            if name.startswith(text)
-        )
+        completions.extend(name for name in self.session.functions if name.startswith(text))
 
         # Keyword completions
-        completions.extend(
-            kw for kw in self.keywords
-            if kw.startswith(text)
-        )
+        completions.extend(kw for kw in self.keywords if kw.startswith(text))
 
         # Constant completions
-        completions.extend(
-            c for c in self.constants
-            if c.startswith(text)
-        )
+        completions.extend(c for c in self.constants if c.startswith(text))
 
         # Built-in function completions
-        completions.extend(
-            f for f in self.builtin_functions
-            if f.startswith(text)
-        )
+        completions.extend(f for f in self.builtin_functions if f.startswith(text))
 
         return sorted(set(completions))
 

@@ -174,8 +174,8 @@ class TestCartesianProduct:
 
     def test_basic_product(self):
         """Test basic Cartesian product."""
-        result = cartesian_product({1, 2}, {'a', 'b'})
-        expected = {(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')}
+        result = cartesian_product({1, 2}, {"a", "b"})
+        expected = {(1, "a"), (1, "b"), (2, "a"), (2, "b")}
         assert result == expected
 
     def test_empty_set(self):
@@ -214,4 +214,4 @@ class TestPowerSet:
         for n in range(5):
             s = set(range(n))
             ps = power_set(s)
-            assert len(ps) == 2 ** n
+            assert len(ps) == 2**n

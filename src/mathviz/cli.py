@@ -50,6 +50,7 @@ from mathviz.utils.errors import MathVizError, TypeError as MathVizTypeError
 # ANSI Color Codes for Terminal Output
 # =============================================================================
 
+
 class Colors:
     """ANSI escape codes for colored terminal output."""
 
@@ -92,6 +93,7 @@ def _init_colors() -> None:
     """Initialize colors based on terminal capabilities."""
     # Disable colors if not a TTY or if NO_COLOR is set
     import os
+
     if not sys.stdout.isatty() or os.environ.get("NO_COLOR"):
         Colors.disable()
 
@@ -109,7 +111,8 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-V", "--version",
+        "-V",
+        "--version",
         action="version",
         version=f"%(prog)s {__version__}",
     )
@@ -128,7 +131,8 @@ def create_parser() -> argparse.ArgumentParser:
         help="Input MathViz file (.mviz)",
     )
     compile_parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         type=Path,
         default=None,
         help="Output Python file (default: input file with .py extension)",
@@ -181,7 +185,8 @@ def create_parser() -> argparse.ArgumentParser:
         help="Disable Numba JIT optimization",
     )
     run_parser.add_argument(
-        "-q", "--quality",
+        "-q",
+        "--quality",
         choices=["l", "m", "h", "p", "k"],
         default="m",
         help="Manim render quality (l=low, m=medium, h=high, p=production, k=4k)",
@@ -370,7 +375,8 @@ def create_parser() -> argparse.ArgumentParser:
         help="Show diff of formatting changes",
     )
     fmt_parser.add_argument(
-        "-w", "--write",
+        "-w",
+        "--write",
         action="store_true",
         help="Write changes to files (default: print to stdout)",
     )
@@ -387,7 +393,8 @@ def create_parser() -> argparse.ArgumentParser:
         help="Input MathViz file or directory to watch",
     )
     watch_parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         type=Path,
         default=None,
         help="Output Python file (default: input file with .py extension)",
@@ -411,7 +418,8 @@ def create_parser() -> argparse.ArgumentParser:
         help="Input file or directory (default: current directory)",
     )
     doc_parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         type=Path,
         default=None,
         help="Output directory for generated docs",
@@ -561,6 +569,7 @@ def cmd_compile(args: argparse.Namespace) -> int:
         if not args.no_parallel:
             # Run parallel analysis if parallelization is enabled
             from mathviz.compiler.ast_nodes import FunctionDef
+
             parallel_analyzer = ParallelAnalyzer()
             parallel_info = {}
             for stmt in ast.statements:
@@ -612,9 +621,13 @@ def _print_verbose_type_info(checker: TypeChecker, errors: list[MathVizTypeError
     warning_count = 0  # TODO: Separate warnings from errors when we add warning support
 
     if error_count == 0:
-        print(f"{Colors.GREEN}[check]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)")
+        print(
+            f"{Colors.GREEN}[check]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)"
+        )
     else:
-        print(f"{Colors.YELLOW}[check]{Colors.RESET} Type check completed ({error_count} errors, {warning_count} warnings)")
+        print(
+            f"{Colors.YELLOW}[check]{Colors.RESET} Type check completed ({error_count} errors, {warning_count} warnings)"
+        )
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -691,7 +704,7 @@ def cmd_check(args: argparse.Namespace) -> int:
 
     except MathVizError as e:
         # Try to get rich diagnostics from parser
-        if parser is not None and hasattr(parser, 'diagnostics') and parser.diagnostics:
+        if parser is not None and hasattr(parser, "diagnostics") and parser.diagnostics:
             use_color = sys.stdout.isatty()
             for diagnostic in parser.diagnostics:
                 print(diagnostic.render(source, use_color=use_color), file=sys.stderr)
@@ -736,6 +749,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
         # Collect parallelizable loops for each function
         from mathviz.compiler.ast_nodes import FunctionDef
+
         for stmt in ast.statements:
             if isinstance(stmt, FunctionDef):
                 loops = parallel_analyzer.analyze_function(stmt)
@@ -790,7 +804,9 @@ def _print_analysis_report(
     warning_count = 0  # Future: separate warnings
 
     if error_count == 0:
-        print(f"\n{Colors.GREEN}[ok]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)")
+        print(
+            f"\n{Colors.GREEN}[ok]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)"
+        )
     else:
         print(f"\n{Colors.RED}[!!]{Colors.RESET} Type check found {error_count} error(s)")
         for error in type_errors:
@@ -834,7 +850,9 @@ def _print_analysis_report(
                 loops = parallel_info[func_name]
                 parallelizable_count = sum(1 for _, analysis in loops if analysis.is_parallelizable)
                 if parallelizable_count > 0:
-                    print(f"    Parallelizable loops: {Colors.GREEN}{parallelizable_count}{Colors.RESET}")
+                    print(
+                        f"    Parallelizable loops: {Colors.GREEN}{parallelizable_count}{Colors.RESET}"
+                    )
 
             # JIT compatibility
             if func_name in purity_info:
@@ -912,7 +930,9 @@ def _print_analysis_json(
                     "location": {
                         "line": e.location.line if e.location else None,
                         "column": e.location.column if e.location else None,
-                    } if e.location else None,
+                    }
+                    if e.location
+                    else None,
                 }
                 for e in type_errors
             ],
@@ -987,10 +1007,14 @@ def cmd_typecheck(args: argparse.Namespace) -> int:
         warning_count = 0  # Future: separate warnings from errors
 
         if error_count == 0:
-            print(f"{Colors.GREEN}[ok]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)")
+            print(
+                f"{Colors.GREEN}[ok]{Colors.RESET} Type check passed ({error_count} errors, {warning_count} warnings)"
+            )
             return 0
         else:
-            print(f"{Colors.RED}[!!]{Colors.RESET} Type check failed ({error_count} errors, {warning_count} warnings)")
+            print(
+                f"{Colors.RED}[!!]{Colors.RESET} Type check failed ({error_count} errors, {warning_count} warnings)"
+            )
             print()
 
             # Use rich diagnostics if available
@@ -1083,13 +1107,13 @@ def cmd_new(args: argparse.Namespace) -> int:
 
     # Create main file based on template
     templates = {
-        "basic": '''# {name} - MathViz Project
+        "basic": """# {name} - MathViz Project
 
 fn main() {{
     println("Hello from {name}!")
 }}
-''',
-        "manim": '''# {name} - MathViz Animation Project
+""",
+        "manim": """# {name} - MathViz Animation Project
 use manim.*
 
 fn main() {{
@@ -1104,8 +1128,8 @@ scene MainScene extends Scene {{
         play(FadeOut(title))
     }}
 }}
-''',
-        "math": '''# {name} - MathViz Math Project
+""",
+        "math": """# {name} - MathViz Math Project
 
 mod math_utils {{
     fn factorial(n: Int) -> Int {{
@@ -1121,7 +1145,7 @@ fn main() {{
     let arr = [1.0, 2.0, 3.0, 4.0, 5.0]
     println("sum = {{}}", sum(arr))
 }}
-''',
+""",
     }
 
     main_content = templates[template].format(name=name)
@@ -1204,7 +1228,9 @@ def cmd_lint(args: argparse.Namespace) -> int:
                 config.set_level_by_category(category, LintLevel.DENY)
             except ValueError:
                 print(f"Error: Unknown category '{args.deny}'", file=sys.stderr)
-                print("Valid categories: unused, unreachable, style, math, performance, correctness")
+                print(
+                    "Valid categories: unused, unreachable, style, math, performance, correctness"
+                )
                 return 1
 
         if args.allow:
@@ -1304,7 +1330,9 @@ def _print_lint_report(
                 underline_length = _estimate_span_length(violation)
                 padding = " " * (loc.column - 1)
                 underline = "^" * underline_length
-                print(f"   {Colors.BLUE}|{Colors.RESET} {padding}{level_color}{underline}{Colors.RESET}")
+                print(
+                    f"   {Colors.BLUE}|{Colors.RESET} {padding}{level_color}{underline}{Colors.RESET}"
+                )
 
                 print(f"   {Colors.BLUE}|{Colors.RESET}")
         else:
@@ -1313,11 +1341,15 @@ def _print_lint_report(
 
         # Help/suggestion
         if violation.suggestion:
-            print(f"   {Colors.BLUE}={Colors.RESET} {Colors.GREEN}help:{Colors.RESET} {violation.suggestion}")
+            print(
+                f"   {Colors.BLUE}={Colors.RESET} {Colors.GREEN}help:{Colors.RESET} {violation.suggestion}"
+            )
 
         # Related locations
         for related_loc in violation.related_locations:
-            print(f"   {Colors.BLUE}={Colors.RESET} {Colors.BOLD}note:{Colors.RESET} related location at {related_loc}")
+            print(
+                f"   {Colors.BLUE}={Colors.RESET} {Colors.BOLD}note:{Colors.RESET} related location at {related_loc}"
+            )
 
         print()
 
@@ -1368,9 +1400,7 @@ def _print_lint_json(input_path: Path, violations: list[LintViolation]) -> None:
     # Count by category
     for v in violations:
         cat = v.rule.category.value
-        result["summary"]["by_category"][cat] = (
-            result["summary"]["by_category"].get(cat, 0) + 1
-        )
+        result["summary"]["by_category"][cat] = result["summary"]["by_category"].get(cat, 0) + 1
 
     print(json.dumps(result, indent=2))
 
@@ -1411,6 +1441,7 @@ def _print_lint_rules() -> None:
 def cmd_repl(args: argparse.Namespace) -> int:
     """Handle the repl command - start interactive mode."""
     from mathviz.repl import REPLSession
+
     session = REPLSession()
     session.run()
     return 0
@@ -1509,10 +1540,16 @@ def cmd_watch(args: argparse.Namespace) -> int:
             try:
                 source = filepath.read_text(encoding="utf-8")
                 python_code = compile_source(source, optimize=not args.no_optimize)
-                out_file = output_path if output_path.suffix == ".py" else output_path / filepath.with_suffix(".py").name
+                out_file = (
+                    output_path
+                    if output_path.suffix == ".py"
+                    else output_path / filepath.with_suffix(".py").name
+                )
                 out_file.parent.mkdir(parents=True, exist_ok=True)
                 out_file.write_text(python_code, encoding="utf-8")
-                print(f"{Colors.GREEN}[{time.strftime('%H:%M:%S')}] Compiled:{Colors.RESET} {filepath}")
+                print(
+                    f"{Colors.GREEN}[{time.strftime('%H:%M:%S')}] Compiled:{Colors.RESET} {filepath}"
+                )
             except MathVizError as e:
                 print(f"{Colors.RED}[{time.strftime('%H:%M:%S')}] Error:{Colors.RESET} {e}")
             except Exception as e:
@@ -1613,32 +1650,41 @@ def _extract_documentation(ast, filepath: Path) -> dict[str, Any]:
                 "params": [
                     {
                         "name": p.name,
-                        "type": str(p.type_annotation.name) if p.type_annotation and hasattr(p.type_annotation, "name") else None,
+                        "type": str(p.type_annotation.name)
+                        if p.type_annotation and hasattr(p.type_annotation, "name")
+                        else None,
                     }
                     for p in stmt.parameters
                 ],
-                "return_type": str(stmt.return_type.name) if stmt.return_type and hasattr(stmt.return_type, "name") else None,
+                "return_type": str(stmt.return_type.name)
+                if stmt.return_type and hasattr(stmt.return_type, "name")
+                else None,
                 "jit": stmt.jit_options.mode.value if stmt.jit_options else None,
             }
             doc["functions"].append(func_doc)
         elif isinstance(stmt, StructDef):
-            doc["structs"].append({
-                "name": stmt.name,
-                "fields": [
-                    {"name": f.name, "type": str(f.type_annotation)}
-                    for f in stmt.fields
-                ],
-            })
+            doc["structs"].append(
+                {
+                    "name": stmt.name,
+                    "fields": [
+                        {"name": f.name, "type": str(f.type_annotation)} for f in stmt.fields
+                    ],
+                }
+            )
         elif isinstance(stmt, TraitDef):
-            doc["traits"].append({
-                "name": stmt.name,
-                "methods": [m.name for m in stmt.methods],
-            })
+            doc["traits"].append(
+                {
+                    "name": stmt.name,
+                    "methods": [m.name for m in stmt.methods],
+                }
+            )
         elif isinstance(stmt, EnumDef):
-            doc["enums"].append({
-                "name": stmt.name,
-                "variants": [v.name for v in stmt.variants],
-            })
+            doc["enums"].append(
+                {
+                    "name": stmt.name,
+                    "variants": [v.name for v in stmt.variants],
+                }
+            )
         elif isinstance(stmt, SceneDef):
             doc["scenes"].append({"name": stmt.name})
 
@@ -1653,11 +1699,14 @@ def _print_doc(doc: dict[str, Any]) -> None:
         print(f"{Colors.CYAN}Functions:{Colors.RESET}")
         for func in doc["functions"]:
             params = ", ".join(
-                f"{p['name']}: {p['type']}" if p["type"] else p["name"]
-                for p in func["params"]
+                f"{p['name']}: {p['type']}" if p["type"] else p["name"] for p in func["params"]
             )
             ret = f" -> {func['return_type']}" if func["return_type"] else ""
-            jit = f" {Colors.GREEN}@{func['jit']}{Colors.RESET}" if func["jit"] and func["jit"] != "none" else ""
+            jit = (
+                f" {Colors.GREEN}@{func['jit']}{Colors.RESET}"
+                if func["jit"] and func["jit"] != "none"
+                else ""
+            )
             print(f"  {func['name']}({params}){ret}{jit}")
 
     if doc["structs"]:
@@ -1685,7 +1734,7 @@ def _print_doc(doc: dict[str, Any]) -> None:
 
 def _generate_html_docs(docs: list[dict[str, Any]], output_path: Path) -> None:
     """Generate HTML documentation."""
-    html_template = '''<!DOCTYPE html>
+    html_template = """<!DOCTYPE html>
 <html>
 <head>
     <title>MathViz Documentation</title>
@@ -1704,7 +1753,7 @@ def _generate_html_docs(docs: list[dict[str, Any]], output_path: Path) -> None:
     <h1>MathViz Documentation</h1>
     {content}
 </body>
-</html>'''
+</html>"""
 
     content_parts = []
     for doc in docs:
@@ -1714,11 +1763,21 @@ def _generate_html_docs(docs: list[dict[str, Any]], output_path: Path) -> None:
             content_parts.append("<h3>Functions</h3>")
             for func in doc["functions"]:
                 params = ", ".join(
-                    f'{p["name"]}: <span class="type">{p["type"]}</span>' if p["type"] else p["name"]
+                    f'{p["name"]}: <span class="type">{p["type"]}</span>'
+                    if p["type"]
+                    else p["name"]
                     for p in func["params"]
                 )
-                ret = f' -&gt; <span class="type">{func["return_type"]}</span>' if func["return_type"] else ""
-                jit = f' <span class="jit">@{func["jit"]}</span>' if func["jit"] and func["jit"] != "none" else ""
+                ret = (
+                    f' -&gt; <span class="type">{func["return_type"]}</span>'
+                    if func["return_type"]
+                    else ""
+                )
+                jit = (
+                    f' <span class="jit">@{func["jit"]}</span>'
+                    if func["jit"] and func["jit"] != "none"
+                    else ""
+                )
                 content_parts.append(
                     f'<div class="function"><span class="signature">{func["name"]}({params}){ret}</span>{jit}</div>'
                 )
@@ -1726,8 +1785,10 @@ def _generate_html_docs(docs: list[dict[str, Any]], output_path: Path) -> None:
         if doc["structs"]:
             content_parts.append("<h3>Structs</h3>")
             for struct in doc["structs"]:
-                fields = ", ".join(f'{f["name"]}: {f["type"]}' for f in struct["fields"])
-                content_parts.append(f'<div class="function"><span class="signature">{struct["name"]} {{ {fields} }}</span></div>')
+                fields = ", ".join(f"{f['name']}: {f['type']}" for f in struct["fields"])
+                content_parts.append(
+                    f'<div class="function"><span class="signature">{struct["name"]} {{ {fields} }}</span></div>'
+                )
 
     html = html_template.format(content="\n".join(content_parts))
     (output_path / "index.html").write_text(html, encoding="utf-8")
@@ -1757,14 +1818,14 @@ def cmd_init(args: argparse.Namespace) -> int:
 
     # Create main file based on template
     templates = {
-        "basic": '''# {name} - MathViz Project
+        "basic": """# {name} - MathViz Project
 # Created with `mathviz init`
 
 fn main() {{
     println("Hello from {name}!")
 }}
-''',
-        "manim": '''# {name} - MathViz Animation Project
+""",
+        "manim": """# {name} - MathViz Animation Project
 # Created with `mathviz init --template=manim`
 
 use manim.*
@@ -1781,8 +1842,8 @@ scene MainScene {{
 fn main() {{
     println("Run with: mathviz run src/main.mviz")
 }}
-''',
-        "math": '''# {name} - MathViz Math Project
+""",
+        "math": """# {name} - MathViz Math Project
 # Created with `mathviz init --template=math`
 
 @njit
@@ -1808,8 +1869,8 @@ fn main() {{
     let b = [4.0, 5.0, 6.0]
     println("dot product = {{}}", dot_product(a, b))
 }}
-''',
-        "lib": '''# {name} - MathViz Library
+""",
+        "lib": """# {name} - MathViz Library
 # Created with `mathviz init --template=lib`
 
 /// A simple math utilities library
@@ -1827,7 +1888,7 @@ pub mod utils {{
         return a + (b - a) * t
     }}
 }}
-''',
+""",
     }
 
     main_content = templates[template].format(name=name)
@@ -1852,7 +1913,7 @@ warn_all = false
     (project_dir / "mathviz.toml").write_text(config_content, encoding="utf-8")
 
     # Create .gitignore
-    gitignore_content = '''# MathViz generated files
+    gitignore_content = """# MathViz generated files
 *.py
 !tests/*.py
 
@@ -1872,7 +1933,7 @@ docs/
 
 # Media
 media/
-'''
+"""
     (project_dir / ".gitignore").write_text(gitignore_content, encoding="utf-8")
 
     # Initialize git if not disabled
@@ -1897,7 +1958,9 @@ def cmd_build(args: argparse.Namespace) -> int:
     # Look for mathviz.toml in current directory
     config_file = Path("mathviz.toml")
     if not config_file.exists():
-        print(f"{Colors.YELLOW}Warning:{Colors.RESET} No mathviz.toml found. Looking for .mviz files...")
+        print(
+            f"{Colors.YELLOW}Warning:{Colors.RESET} No mathviz.toml found. Looking for .mviz files..."
+        )
 
     # Find source files
     src_dir = Path("src")
@@ -1946,7 +2009,9 @@ def cmd_build(args: argparse.Namespace) -> int:
     if error_count == 0:
         print(f"{Colors.GREEN}Build successful:{Colors.RESET} {success_count} file(s) compiled")
     else:
-        print(f"{Colors.YELLOW}Build completed with errors:{Colors.RESET} {success_count} succeeded, {error_count} failed")
+        print(
+            f"{Colors.YELLOW}Build completed with errors:{Colors.RESET} {success_count} succeeded, {error_count} failed"
+        )
 
     return 1 if error_count > 0 else 0
 

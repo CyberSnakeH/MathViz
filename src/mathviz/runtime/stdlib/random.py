@@ -8,7 +8,7 @@ from __future__ import annotations
 import random as _random
 from typing import TypeVar, Sequence, List, Optional
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 # Global random generator
 _rng = _random.Random()
@@ -98,24 +98,25 @@ def random_bytes(n: int) -> bytes:
 
 def random_string(length: int, chars: str = "abcdefghijklmnopqrstuvwxyz") -> str:
     """Return random string of given length from given characters."""
-    return ''.join(_rng.choice(chars) for _ in range(length))
+    return "".join(_rng.choice(chars) for _ in range(length))
 
 
 def random_hex(length: int) -> str:
     """Return random hexadecimal string of given length."""
-    return ''.join(_rng.choice('0123456789abcdef') for _ in range(length))
+    return "".join(_rng.choice("0123456789abcdef") for _ in range(length))
 
 
 def random_color() -> str:
     """Return random hex color string."""
-    return '#' + random_hex(6)
+    return "#" + random_hex(6)
 
 
 def random_unit_vector(dim: int = 3) -> List[float]:
     """Return random unit vector of given dimension."""
     import math
+
     vec = [_rng.gauss(0, 1) for _ in range(dim)]
-    mag = math.sqrt(sum(x*x for x in vec))
+    mag = math.sqrt(sum(x * x for x in vec))
     if mag == 0:
         return [1.0] + [0.0] * (dim - 1)
     return [x / mag for x in vec]
@@ -124,6 +125,7 @@ def random_unit_vector(dim: int = 3) -> List[float]:
 def random_angle() -> float:
     """Return random angle in [0, 2*pi)."""
     import math
+
     return _rng.random() * 2 * math.pi
 
 

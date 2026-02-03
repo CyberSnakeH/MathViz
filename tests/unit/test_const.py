@@ -345,7 +345,7 @@ class TestConstCodegen:
     def test_generate_string_const(self):
         """Test generating code for string const."""
         code = self._generate_program('const VERSION = "1.0.0"')
-        assert 'VERSION = ' in code
+        assert "VERSION = " in code
         assert '"1.0.0"' in code or "'1.0.0'" in code
 
     def test_generate_computed_const(self):
@@ -360,12 +360,12 @@ class TestConstIntegration:
 
     def test_const_in_function(self):
         """Test using constant in function."""
-        source = '''
+        source = """
 const PI = 3.14159
 fn circle_area(r: Float) -> Float {
     return PI * r ^ 2
 }
-'''
+"""
         tokens = Lexer(source).tokenize()
         parser = Parser(tokens, source=source)
         program = parser.parse()
@@ -378,12 +378,12 @@ fn circle_area(r: Float) -> Float {
 
     def test_multiple_consts(self):
         """Test multiple constant declarations."""
-        source = '''
+        source = """
 const PI = 3.14159
 const TAU = 2.0 * PI
 const VERSION = "1.0.0"
 const DEBUG = false
-'''
+"""
         tokens = Lexer(source).tokenize()
         parser = Parser(tokens, source=source)
         program = parser.parse()

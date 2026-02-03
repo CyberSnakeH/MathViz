@@ -138,24 +138,24 @@ class Precedence:
     """Operator precedence levels."""
 
     NONE = 0
-    ASSIGNMENT = 1      # =
-    CONDITIONAL = 2     # ? :
-    OR = 3              # or
-    AND = 4             # and
-    EQUALITY = 5        # == !=
-    COMPARISON = 6      # < > <= >=
-    MEMBERSHIP = 7      # in, ∈, ⊆, etc.
-    RANGE = 8           # ..
-    BITWISE_OR = 9      # |
-    BITWISE_XOR = 10    # ^^ (not exponentiation)
-    BITWISE_AND = 11    # &
-    SHIFT = 12          # << >>
-    SET_OPS = 13        # ∪ ∩ ∖
-    ADDITIVE = 14       # + -
-    MULTIPLICATIVE = 15 # * / // %
-    UNARY = 16          # - not
-    POWER = 17          # ^ **
-    POSTFIX = 18        # () [] .
+    ASSIGNMENT = 1  # =
+    CONDITIONAL = 2  # ? :
+    OR = 3  # or
+    AND = 4  # and
+    EQUALITY = 5  # == !=
+    COMPARISON = 6  # < > <= >=
+    MEMBERSHIP = 7  # in, ∈, ⊆, etc.
+    RANGE = 8  # ..
+    BITWISE_OR = 9  # |
+    BITWISE_XOR = 10  # ^^ (not exponentiation)
+    BITWISE_AND = 11  # &
+    SHIFT = 12  # << >>
+    SET_OPS = 13  # ∪ ∩ ∖
+    ADDITIVE = 14  # + -
+    MULTIPLICATIVE = 15  # * / // %
+    UNARY = 16  # - not
+    POWER = 17  # ^ **
+    POSTFIX = 18  # () [] .
 
 
 # Map token types to binary operators
@@ -267,8 +267,7 @@ class Parser:
         ast = parser.parse()
     """
 
-    def __init__(self, tokens: list[Token], source: str = "",
-                 filename: str = "<input>") -> None:
+    def __init__(self, tokens: list[Token], source: str = "", filename: str = "<input>") -> None:
         """
         Initialize the parser.
 
@@ -599,9 +598,7 @@ class Parser:
                 name = self._expect(TokenType.IDENTIFIER, "Expected import name").value
                 alias = None
                 if self._match(TokenType.AS):
-                    alias = self._expect(
-                        TokenType.IDENTIFIER, "Expected alias name"
-                    ).value
+                    alias = self._expect(TokenType.IDENTIFIER, "Expected alias name").value
                 names.append((name, alias))
                 if not self._match(TokenType.COMMA):
                     break
@@ -699,7 +696,9 @@ class Parser:
             type_annotation = self._parse_type_annotation()
 
         # Constants must have an initializer
-        self._expect(TokenType.ASSIGN, "Expected '=' in const declaration (constants must have a value)")
+        self._expect(
+            TokenType.ASSIGN, "Expected '=' in const declaration (constants must have a value)"
+        )
         value = self._parse_expression()
 
         return ConstDeclaration(
@@ -982,7 +981,9 @@ class Parser:
 
         # Additional bounds: + Bound2 + Bound3
         while self._match(TokenType.PLUS):
-            bound_name = self._expect(TokenType.IDENTIFIER, "Expected trait bound name after '+'").value
+            bound_name = self._expect(
+                TokenType.IDENTIFIER, "Expected trait bound name after '+'"
+            ).value
             bounds.append(bound_name)
 
         return bounds
@@ -1002,7 +1003,9 @@ class Parser:
         constraints: list[tuple[str, tuple[str, ...]]] = []
 
         while True:
-            type_param = self._expect(TokenType.IDENTIFIER, "Expected type parameter name in where clause").value
+            type_param = self._expect(
+                TokenType.IDENTIFIER, "Expected type parameter name in where clause"
+            ).value
             self._expect(TokenType.COLON, "Expected ':' after type parameter in where clause")
             bounds = self._parse_type_bounds()
             constraints.append((type_param, tuple(bounds)))
@@ -1029,9 +1032,7 @@ class Parser:
         base_classes: list[str] = []
         if self._match(TokenType.LPAREN):
             while True:
-                base = self._expect(
-                    TokenType.IDENTIFIER, "Expected base class name"
-                ).value
+                base = self._expect(TokenType.IDENTIFIER, "Expected base class name").value
                 base_classes.append(base)
                 if not self._match(TokenType.COMMA):
                     break
@@ -1600,7 +1601,7 @@ class Parser:
         self._advance()  # consume '{'
 
         # Track the opening brace for better error messages
-        self._delimiter_stack.append(('{', open_loc))
+        self._delimiter_stack.append(("{", open_loc))
         self._skip_newlines()
 
         statements: list[Statement] = []
@@ -1616,7 +1617,7 @@ class Parser:
         # Check for unclosed delimiter
         if self._check(TokenType.EOF):
             self._delimiter_stack.pop()
-            raise self._error_unclosed_delimiter('{', open_loc)
+            raise self._error_unclosed_delimiter("{", open_loc)
 
         self._expect(TokenType.RBRACE, "Expected '}' to end block")
         self._delimiter_stack.pop()
@@ -1896,7 +1897,7 @@ class Parser:
                 callee=left,
                 arguments=tuple(positional_args),
                 keyword_arguments=tuple(keyword_args),
-                location=loc
+                location=loc,
             )
             return self._continue_postfix(left)
 
@@ -2070,9 +2071,7 @@ class Parser:
             # Check for enum variant access: Name::Variant
             if self._match(TokenType.DOUBLE_COLON):
                 variant_name = self._parse_variant_name()
-                return EnumVariantAccess(
-                    enum_name=name, variant_name=variant_name, location=loc
-                )
+                return EnumVariantAccess(enum_name=name, variant_name=variant_name, location=loc)
             # Check for struct literal: Name { field: value, ... }
             if self._check(TokenType.LBRACE) and self._is_struct_literal_context():
                 return self._parse_struct_literal(name, loc)
@@ -2080,9 +2079,7 @@ class Parser:
 
         raise self._error(f"Unexpected token: {self._current.type.name}")
 
-    def _parse_fstring_parts(
-        self, parts: tuple, loc: SourceLocation
-    ) -> FString:
+    def _parse_fstring_parts(self, parts: tuple, loc: SourceLocation) -> FString:
         """
         Parse f-string parts into an FString AST node.
 
@@ -2223,7 +2220,9 @@ class Parser:
             clause_loc = self._previous.location
 
             # Parse variable (could be simple identifier or tuple pattern)
-            variable = self._expect(TokenType.IDENTIFIER, "Expected variable name after 'for'").value
+            variable = self._expect(
+                TokenType.IDENTIFIER, "Expected variable name after 'for'"
+            ).value
 
             self._expect(TokenType.IN, "Expected 'in' after variable in comprehension")
 
@@ -2234,12 +2233,14 @@ class Parser:
             if self._match(TokenType.IF):
                 condition = self._parse_expression()
 
-            clauses.append(ComprehensionClause(
-                variable=variable,
-                iterable=iterable,
-                condition=condition,
-                location=clause_loc,
-            ))
+            clauses.append(
+                ComprehensionClause(
+                    variable=variable,
+                    iterable=iterable,
+                    condition=condition,
+                    location=clause_loc,
+                )
+            )
 
         return clauses
 
@@ -2264,7 +2265,9 @@ class Parser:
 
         # Parse parameter list
         while True:
-            param_name = self._expect(TokenType.IDENTIFIER, "Expected parameter name in lambda").value
+            param_name = self._expect(
+                TokenType.IDENTIFIER, "Expected parameter name in lambda"
+            ).value
             params.append(param_name)
 
             if not self._match(TokenType.COMMA):
@@ -2367,9 +2370,11 @@ class Parser:
                 self._skip_newlines()
 
                 # Check for keyword argument: identifier followed by colon
-                if (self._check(TokenType.IDENTIFIER) and
-                    self.pos + 1 < len(self.tokens) and
-                    self.tokens[self.pos + 1].type == TokenType.COLON):
+                if (
+                    self._check(TokenType.IDENTIFIER)
+                    and self.pos + 1 < len(self.tokens)
+                    and self.tokens[self.pos + 1].type == TokenType.COLON
+                ):
                     # It's a keyword argument
                     loc = self._current.location
                     name = self._current.value

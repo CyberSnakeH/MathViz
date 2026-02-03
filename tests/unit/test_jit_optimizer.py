@@ -165,10 +165,7 @@ def make_function(
 ) -> FunctionDef:
     """Create a FunctionDef node with parameters and body."""
     parameters = tuple(
-        Parameter(
-            name=p_name,
-            type_annotation=SimpleType(name=p_type) if p_type else None
-        )
+        Parameter(name=p_name, type_annotation=SimpleType(name=p_type) if p_type else None)
         for p_name, p_type in params
     )
     ret_type = SimpleType(name=return_type) if return_type else None
@@ -286,9 +283,7 @@ class TestNumbaCompatibility:
         func = make_function(
             name="greet",
             params=[("name", "String")],
-            body_statements=(
-                make_return(make_identifier("name")),
-            ),
+            body_statements=(make_return(make_identifier("name")),),
             return_type="String",
         )
 
@@ -535,14 +530,12 @@ class TestVectorizationAnalyzer:
                         BinaryOperator.LT,
                         make_float(0.0),
                     ),
-                    then_block=Block(statements=(
-                        make_return(
-                            make_unary(UnaryOperator.NEG, make_identifier("x"))
-                        ),
-                    )),
-                    else_block=Block(statements=(
-                        make_return(make_identifier("x")),
-                    )),
+                    then_block=Block(
+                        statements=(
+                            make_return(make_unary(UnaryOperator.NEG, make_identifier("x"))),
+                        )
+                    ),
+                    else_block=Block(statements=(make_return(make_identifier("x")),)),
                 ),
             ),
             return_type="Float",
@@ -550,7 +543,9 @@ class TestVectorizationAnalyzer:
 
         info = vectorization_analyzer.analyze(func)
         # Conditionals can block or complicate vectorization
-        assert len(info.blocking_reasons) > 0 or not info.is_vectorizable or True  # Flexible assertion
+        assert (
+            len(info.blocking_reasons) > 0 or not info.is_vectorizable or True
+        )  # Flexible assertion
 
     def test_math_function_calls_are_vectorizable(self, vectorization_analyzer):
         """Math function calls like sqrt, sin are vectorizable."""
@@ -689,9 +684,7 @@ class TestCostModel:
         func = make_function(
             name="identity",
             params=[("x", "Float")],
-            body_statements=(
-                make_return(make_identifier("x")),
-            ),
+            body_statements=(make_return(make_identifier("x")),),
             return_type="Float",
         )
 
@@ -811,9 +804,7 @@ class TestConvenienceFunctions:
                     variable="i",
                     start=0,
                     end_var="n",
-                    statements=(
-                        make_let("x", make_identifier("i")),
-                    ),
+                    statements=(make_let("x", make_identifier("i")),),
                 ),
             ),
         )
@@ -973,9 +964,7 @@ class TestEdgeCases:
         func = make_function(
             name="return_only",
             params=[],
-            body_statements=(
-                make_return(make_int(42)),
-            ),
+            body_statements=(make_return(make_int(42)),),
             return_type="Int",
         )
 
@@ -988,9 +977,7 @@ class TestEdgeCases:
             variable="k",
             start=0,
             end_var="N",
-            statements=(
-                make_let("x", make_int(0)),
-            ),
+            statements=(make_let("x", make_int(0)),),
         )
 
         middle_loop = make_range_loop(

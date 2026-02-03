@@ -286,10 +286,12 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
 
         new_elif_clauses: list[tuple[Expression, Block]] = []
         for cond, block in stmt.elif_clauses:
-            new_elif_clauses.append((
-                self._fold_expression(cond),
-                self._fold_block(block),
-            ))
+            new_elif_clauses.append(
+                (
+                    self._fold_expression(cond),
+                    self._fold_block(block),
+                )
+            )
 
         new_else_block = None
         if stmt.else_block:
@@ -318,12 +320,14 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
                 new_default = self._fold_expression(param.default_value)
                 if new_default is not param.default_value:
                     params_changed = True
-                    new_params.append(Parameter(
-                        name=param.name,
-                        type_annotation=param.type_annotation,
-                        default_value=new_default,
-                        location=param.location,
-                    ))
+                    new_params.append(
+                        Parameter(
+                            name=param.name,
+                            type_annotation=param.type_annotation,
+                            default_value=new_default,
+                            location=param.location,
+                        )
+                    )
                 else:
                     new_params.append(param)
             else:
@@ -417,9 +421,11 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
                 self._changed = True
                 return then_expr if condition.value else else_expr
 
-            if (condition is not expr.condition or
-                then_expr is not expr.then_expr or
-                else_expr is not expr.else_expr):
+            if (
+                condition is not expr.condition
+                or then_expr is not expr.then_expr
+                or else_expr is not expr.else_expr
+            ):
                 return ConditionalExpression(
                     condition=condition,
                     then_expr=then_expr,
@@ -476,8 +482,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
             new_start = self._fold_expression(expr.start)
             new_end = self._fold_expression(expr.end)
             new_step = self._fold_expression(expr.step) if expr.step else None
-            if (new_start is not expr.start or new_end is not expr.end or
-                new_step is not expr.step):
+            if new_start is not expr.start or new_end is not expr.end or new_step is not expr.step:
                 return RangeExpression(
                     start=new_start,
                     end=new_end,
@@ -490,12 +495,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
         # For literals and identifiers, return as-is
         return expr
 
-    def _fold_binary(
-        self,
-        left: Any,
-        op: BinaryOperator,
-        right: Any
-    ) -> Optional[Any]:
+    def _fold_binary(self, left: Any, op: BinaryOperator, right: Any) -> Optional[Any]:
         """
         Fold a binary operation on constant values.
 
@@ -521,7 +521,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
                     return None
                 return left % right
             if op == BinaryOperator.POW:
-                return left ** right
+                return left**right
             if op == BinaryOperator.EQ:
                 return left == right
             if op == BinaryOperator.NE:
@@ -565,13 +565,16 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
 
     def _is_literal(self, expr: Expression) -> bool:
         """Check if an expression is a literal value."""
-        return isinstance(expr, (
-            IntegerLiteral,
-            FloatLiteral,
-            StringLiteral,
-            BooleanLiteral,
-            NoneLiteral,
-        ))
+        return isinstance(
+            expr,
+            (
+                IntegerLiteral,
+                FloatLiteral,
+                StringLiteral,
+                BooleanLiteral,
+                NoneLiteral,
+            ),
+        )
 
     def _literal_value(self, expr: Expression) -> Any:
         """Extract the value from a literal expression."""
@@ -582,9 +585,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
         raise ValueError(f"Not a literal: {expr}")
 
     def _value_to_literal(
-        self,
-        value: Any,
-        location: Optional[SourceLocation] = None
+        self, value: Any, location: Optional[SourceLocation] = None
     ) -> Expression:
         """Convert a Python value to a literal expression."""
         if isinstance(value, bool):
@@ -623,6 +624,7 @@ class ConstantScope:
 
     Handles nested scopes with proper shadowing.
     """
+
     constants: dict[str, Any] = field(default_factory=dict)
     parent: Optional["ConstantScope"] = None
 
@@ -925,9 +927,7 @@ class ConstantPropagator(OptimizerPass):
 
     def _propagate_block(self, block: Block) -> Block:
         """Propagate constants through a block."""
-        new_statements = tuple(
-            self._propagate_statement(stmt) for stmt in block.statements
-        )
+        new_statements = tuple(self._propagate_statement(stmt) for stmt in block.statements)
         if new_statements != block.statements:
             return Block(statements=new_statements, location=block.location)
         return block
@@ -979,9 +979,11 @@ class ConstantPropagator(OptimizerPass):
             if isinstance(condition, BooleanLiteral):
                 return then_expr if condition.value else else_expr
 
-            if (condition is not expr.condition or
-                then_expr is not expr.then_expr or
-                else_expr is not expr.else_expr):
+            if (
+                condition is not expr.condition
+                or then_expr is not expr.then_expr
+                or else_expr is not expr.else_expr
+            ):
                 return ConditionalExpression(
                     condition=condition,
                     then_expr=then_expr,
@@ -1038,8 +1040,9 @@ class ConstantPropagator(OptimizerPass):
 
     def _is_constant_value(self, expr: Expression) -> bool:
         """Check if an expression evaluates to a constant."""
-        if isinstance(expr, (IntegerLiteral, FloatLiteral, StringLiteral,
-                            BooleanLiteral, NoneLiteral)):
+        if isinstance(
+            expr, (IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral)
+        ):
             return True
         if isinstance(expr, Identifier):
             return self._scope.has(expr.name)
@@ -1056,7 +1059,7 @@ class ConstantPropagator(OptimizerPass):
 
         for stmt in block.statements:
             if isinstance(stmt, (LetStatement, ConstDeclaration)):
-                if hasattr(stmt, 'value') and stmt.value:
+                if hasattr(stmt, "value") and stmt.value:
                     try:
                         value = evaluator.evaluate(stmt.value)
                         constants[stmt.name] = value
@@ -1238,9 +1241,7 @@ class DeadCodeEliminator(OptimizerPass):
 
         return result
 
-    def _eliminate_statement(
-        self, stmt: Statement
-    ) -> Optional[Union[Statement, list[Statement]]]:
+    def _eliminate_statement(self, stmt: Statement) -> Optional[Union[Statement, list[Statement]]]:
         """
         Eliminate dead code from a single statement.
 
@@ -1347,8 +1348,9 @@ class DeadCodeEliminator(OptimizerPass):
                             condition=cond,
                             then_block=self._eliminate_block(block),
                             elif_clauses=tuple(remaining_elifs),
-                            else_block=(self._eliminate_block(stmt.else_block)
-                                       if stmt.else_block else None),
+                            else_block=(
+                                self._eliminate_block(stmt.else_block) if stmt.else_block else None
+                            ),
                             location=stmt.location,
                         )
 
@@ -1360,15 +1362,14 @@ class DeadCodeEliminator(OptimizerPass):
 
         # Non-constant condition, just eliminate within blocks
         new_then = self._eliminate_block(stmt.then_block)
-        new_elifs = tuple(
-            (cond, self._eliminate_block(block))
-            for cond, block in stmt.elif_clauses
-        )
+        new_elifs = tuple((cond, self._eliminate_block(block)) for cond, block in stmt.elif_clauses)
         new_else = self._eliminate_block(stmt.else_block) if stmt.else_block else None
 
-        if (new_then is not stmt.then_block or
-            new_elifs != stmt.elif_clauses or
-            new_else is not stmt.else_block):
+        if (
+            new_then is not stmt.then_block
+            or new_elifs != stmt.elif_clauses
+            or new_else is not stmt.else_block
+        ):
             return IfStatement(
                 condition=stmt.condition,
                 then_block=new_then,
@@ -1406,8 +1407,10 @@ class DeadCodeEliminator(OptimizerPass):
 
     def _is_pure_expression(self, expr: Expression) -> bool:
         """Check if an expression has no side effects."""
-        if isinstance(expr, (IntegerLiteral, FloatLiteral, StringLiteral,
-                            BooleanLiteral, NoneLiteral, Identifier)):
+        if isinstance(
+            expr,
+            (IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral, Identifier),
+        ):
             return True
         if isinstance(expr, BinaryExpression):
             return self._is_pure_expression(expr.left) and self._is_pure_expression(expr.right)
@@ -1418,9 +1421,11 @@ class DeadCodeEliminator(OptimizerPass):
         if isinstance(expr, TupleLiteral):
             return all(self._is_pure_expression(e) for e in expr.elements)
         if isinstance(expr, ConditionalExpression):
-            return (self._is_pure_expression(expr.condition) and
-                    self._is_pure_expression(expr.then_expr) and
-                    self._is_pure_expression(expr.else_expr))
+            return (
+                self._is_pure_expression(expr.condition)
+                and self._is_pure_expression(expr.then_expr)
+                and self._is_pure_expression(expr.else_expr)
+            )
         # Function calls may have side effects
         return False
 
@@ -1467,9 +1472,7 @@ class AlgebraicSimplifier(OptimizerPass):
 
     def optimize(self, program: Program) -> Program:
         """Apply algebraic simplifications to the entire program."""
-        new_statements = tuple(
-            self._simplify_statement(stmt) for stmt in program.statements
-        )
+        new_statements = tuple(self._simplify_statement(stmt) for stmt in program.statements)
         return Program(statements=new_statements, location=program.location)
 
     def simplify(self, expr: Expression) -> Expression:
@@ -1536,8 +1539,12 @@ class AlgebraicSimplifier(OptimizerPass):
             )
             new_else = self._simplify_block(stmt.else_block) if stmt.else_block else None
 
-            if (new_cond is not stmt.condition or new_then is not stmt.then_block or
-                new_elifs != stmt.elif_clauses or new_else is not stmt.else_block):
+            if (
+                new_cond is not stmt.condition
+                or new_then is not stmt.then_block
+                or new_elifs != stmt.elif_clauses
+                or new_else is not stmt.else_block
+            ):
                 return IfStatement(
                     condition=new_cond,
                     then_block=new_then,
@@ -1604,9 +1611,7 @@ class AlgebraicSimplifier(OptimizerPass):
 
     def _simplify_block(self, block: Block) -> Block:
         """Simplify algebraic expressions in a block."""
-        new_statements = tuple(
-            self._simplify_statement(stmt) for stmt in block.statements
-        )
+        new_statements = tuple(self._simplify_statement(stmt) for stmt in block.statements)
         if new_statements != block.statements:
             return Block(statements=new_statements, location=block.location)
         return block
@@ -1654,9 +1659,11 @@ class AlgebraicSimplifier(OptimizerPass):
             then_expr = self._simplify_expression(expr.then_expr)
             else_expr = self._simplify_expression(expr.else_expr)
 
-            if (condition is not expr.condition or
-                then_expr is not expr.then_expr or
-                else_expr is not expr.else_expr):
+            if (
+                condition is not expr.condition
+                or then_expr is not expr.then_expr
+                or else_expr is not expr.else_expr
+            ):
                 return ConditionalExpression(
                     condition=condition,
                     then_expr=then_expr,
@@ -1873,9 +1880,7 @@ class StrengthReducer(OptimizerPass):
 
     def optimize(self, program: Program) -> Program:
         """Apply strength reduction to the entire program."""
-        new_statements = tuple(
-            self._reduce_statement(stmt) for stmt in program.statements
-        )
+        new_statements = tuple(self._reduce_statement(stmt) for stmt in program.statements)
         return Program(statements=new_statements, location=program.location)
 
     def reduce(self, expr: Expression) -> Expression:
@@ -1937,13 +1942,16 @@ class StrengthReducer(OptimizerPass):
             new_cond = self._reduce_expression(stmt.condition)
             new_then = self._reduce_block(stmt.then_block)
             new_elifs = tuple(
-                (self._reduce_expression(c), self._reduce_block(b))
-                for c, b in stmt.elif_clauses
+                (self._reduce_expression(c), self._reduce_block(b)) for c, b in stmt.elif_clauses
             )
             new_else = self._reduce_block(stmt.else_block) if stmt.else_block else None
 
-            if (new_cond is not stmt.condition or new_then is not stmt.then_block or
-                new_elifs != stmt.elif_clauses or new_else is not stmt.else_block):
+            if (
+                new_cond is not stmt.condition
+                or new_then is not stmt.then_block
+                or new_elifs != stmt.elif_clauses
+                or new_else is not stmt.else_block
+            ):
                 return IfStatement(
                     condition=new_cond,
                     then_block=new_then,
@@ -1998,9 +2006,7 @@ class StrengthReducer(OptimizerPass):
 
     def _reduce_block(self, block: Block) -> Block:
         """Apply strength reduction to a block."""
-        new_statements = tuple(
-            self._reduce_statement(stmt) for stmt in block.statements
-        )
+        new_statements = tuple(self._reduce_statement(stmt) for stmt in block.statements)
         if new_statements != block.statements:
             return Block(statements=new_statements, location=block.location)
         return block
@@ -2130,6 +2136,7 @@ class ExpressionKey:
     """
     Hashable key for identifying common subexpressions.
     """
+
     type_name: str
     data: tuple
 
@@ -2255,8 +2262,7 @@ class CSEliminator(OptimizerPass):
         # Find common subexpressions
         expr_counts = self._count_expressions(block)
         common_exprs = {
-            key: exprs[0] for key, exprs in expr_counts.items()
-            if len(exprs) >= self._min_uses
+            key: exprs[0] for key, exprs in expr_counts.items() if len(exprs) >= self._min_uses
         }
 
         if not common_exprs:
@@ -2269,11 +2275,13 @@ class CSEliminator(OptimizerPass):
         for key, expr in common_exprs.items():
             temp_name = self._generate_temp_name()
             temp_map[key] = temp_name
-            new_statements.append(LetStatement(
-                name=temp_name,
-                value=expr,
-                location=expr.location,
-            ))
+            new_statements.append(
+                LetStatement(
+                    name=temp_name,
+                    value=expr,
+                    location=expr.location,
+                )
+            )
 
         # Substitute common subexpressions with temporaries
         for stmt in block.statements:
@@ -2478,8 +2486,7 @@ class CSEliminator(OptimizerPass):
 
         if isinstance(expr, CallExpression):
             new_args = tuple(
-                self._substitute_in_expression(arg, temp_map)
-                for arg in expr.arguments
+                self._substitute_in_expression(arg, temp_map) for arg in expr.arguments
             )
             if new_args != expr.arguments:
                 return CallExpression(
@@ -2497,9 +2504,7 @@ class CSEliminator(OptimizerPass):
         self._temp_counter += 1
         return name
 
-    def _find_common_subexpressions(
-        self, block: Block
-    ) -> dict[str, list[Expression]]:
+    def _find_common_subexpressions(self, block: Block) -> dict[str, list[Expression]]:
         """Find expressions that appear multiple times."""
         return {
             str(key): exprs
@@ -2507,9 +2512,7 @@ class CSEliminator(OptimizerPass):
             if len(exprs) >= self._min_uses
         }
 
-    def _introduce_temp_variable(
-        self, expr: Expression
-    ) -> tuple[LetStatement, Identifier]:
+    def _introduce_temp_variable(self, expr: Expression) -> tuple[LetStatement, Identifier]:
         """Create a temporary variable for a common subexpression."""
         temp_name = self._generate_temp_name()
         let_stmt = LetStatement(
@@ -2637,8 +2640,7 @@ class ConstOptimizer:
         optimized = self.optimize(program)
 
         # Extract the expression
-        if (optimized.statements and
-            isinstance(optimized.statements[0], ExpressionStatement)):
+        if optimized.statements and isinstance(optimized.statements[0], ExpressionStatement):
             return optimized.statements[0].expression
         return expr
 

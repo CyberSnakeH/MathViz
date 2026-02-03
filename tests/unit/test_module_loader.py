@@ -134,6 +134,7 @@ class TestModuleRegistry:
 
         # Add a dummy module
         from mathviz.compiler.ast_nodes import Program
+
         module = ModuleInfo(
             name="test",
             file_path=None,
@@ -231,7 +232,8 @@ class TestModuleLoader:
         """Test loading a simple .mviz module."""
         # Create a simple module file
         module_file = tmp_path / "utils.mviz"
-        module_file.write_text(dedent("""
+        module_file.write_text(
+            dedent("""
             pub fn add(a, b) {
                 return a + b
             }
@@ -239,7 +241,8 @@ class TestModuleLoader:
             fn private_helper() {
                 return 42
             }
-        """))
+        """)
+        )
 
         loader = ModuleLoader(root_path=tmp_path)
         module = loader.load_file(module_file)
@@ -251,7 +254,9 @@ class TestModuleLoader:
         # the MathViz parser doesn't yet track `pub` visibility on FunctionDef.
         # When visibility support is added, this test should check that
         # private_helper is NOT in exports.
-        assert "private_helper" in module.exports  # TODO: Change to `not in` when visibility is implemented
+        assert (
+            "private_helper" in module.exports
+        )  # TODO: Change to `not in` when visibility is implemented
 
     def test_load_nested_module(self, tmp_path):
         """Test loading a nested module (lib/math.mviz)."""
@@ -260,11 +265,13 @@ class TestModuleLoader:
         lib_dir.mkdir()
 
         math_file = lib_dir / "math.mviz"
-        math_file.write_text(dedent("""
+        math_file.write_text(
+            dedent("""
             pub fn sqrt(x) {
                 return x ^ 0.5
             }
-        """))
+        """)
+        )
 
         loader = ModuleLoader(root_path=tmp_path)
         module = loader.load_file(math_file)
@@ -279,11 +286,13 @@ class TestModuleLoader:
         utils_dir.mkdir()
 
         mod_file = utils_dir / "mod.mviz"
-        mod_file.write_text(dedent("""
+        mod_file.write_text(
+            dedent("""
             pub fn helper() {
                 return 1
             }
-        """))
+        """)
+        )
 
         loader = ModuleLoader(root_path=tmp_path)
         module = loader.load_file(mod_file)
@@ -314,6 +323,7 @@ class TestModuleLoader:
 
         # Now try to resolve use b from a - this should work
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_b = UseStatement(module_path=("b",))
 
         # b will try to load a which is already loaded - no cycle there
@@ -321,7 +331,10 @@ class TestModuleLoader:
         b_module = loader.resolve_use_statement(use_b, a_file)
 
         # The modules are loaded, but we should track the dependency
-        assert "b" in loader.dependency_graph.edges.get("a", set()) or len(loader.registry.modules) >= 1
+        assert (
+            "b" in loader.dependency_graph.edges.get("a", set())
+            or len(loader.registry.modules) >= 1
+        )
 
     def test_resolve_relative_module(self, tmp_path):
         """Test resolving a module relative to current file."""
@@ -335,6 +348,7 @@ class TestModuleLoader:
         loader = ModuleLoader(root_path=tmp_path)
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_stmt = UseStatement(module_path=("utils",))
 
         module = loader.resolve_use_statement(use_stmt, main_file)
@@ -346,6 +360,7 @@ class TestModuleLoader:
         loader = ModuleLoader(root_path=tmp_path)
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_numpy = UseStatement(module_path=("numpy",))
 
         result = loader.resolve_use_statement(use_numpy, tmp_path / "main.mviz")
@@ -372,6 +387,7 @@ class TestModuleLoader:
         )
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_stmt = UseStatement(module_path=("utils",))
 
         module = loader.resolve_use_statement(use_stmt, main_file)
@@ -398,17 +414,21 @@ class TestModuleLoader:
         When visibility support is added, private_fn should NOT be visible.
         """
         module_file = tmp_path / "test.mviz"
-        module_file.write_text(dedent("""
+        module_file.write_text(
+            dedent("""
             pub fn public_fn() { return 1 }
             fn private_fn() { return 2 }
-        """))
+        """)
+        )
 
         loader = ModuleLoader(root_path=tmp_path)
         loader.load_file(module_file)
 
         assert loader.check_visibility("test", "public_fn") is True
         # TODO: When visibility is implemented, change to: assert ... is False
-        assert loader.check_visibility("test", "private_fn") is True  # Currently all functions are exported
+        assert (
+            loader.check_visibility("test", "private_fn") is True
+        )  # Currently all functions are exported
 
     def test_get_compilation_order(self, tmp_path):
         """Test getting compilation order of modules."""
@@ -434,15 +454,19 @@ class TestModuleLoader:
 
     def test_load_from_ast(self, tmp_path):
         """Test registering a module from an already-parsed AST."""
-        from mathviz.compiler.ast_nodes import Program, FunctionDef, Block, ReturnStatement, IntegerLiteral
+        from mathviz.compiler.ast_nodes import (
+            Program,
+            FunctionDef,
+            Block,
+            ReturnStatement,
+            IntegerLiteral,
+        )
 
         # Create a simple AST
         func = FunctionDef(
             name="test_func",
             parameters=(),
-            body=Block(statements=(
-                ReturnStatement(value=IntegerLiteral(value=42)),
-            )),
+            body=Block(statements=(ReturnStatement(value=IntegerLiteral(value=42)),)),
         )
         ast = Program(statements=(func,))
 
@@ -474,6 +498,7 @@ class TestModuleLoaderResolutionOrder:
         )
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_stmt = UseStatement(module_path=("utils",))
 
         # From root, should get root version
@@ -491,6 +516,7 @@ class TestModuleLoaderResolutionOrder:
         loader = ModuleLoader(root_path=tmp_path)
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_stmt = UseStatement(module_path=("utils",))
 
         module = loader.resolve_use_statement(use_stmt, tmp_path / "main.mviz")
@@ -511,6 +537,7 @@ class TestModuleLoaderResolutionOrder:
         loader = ModuleLoader(root_path=tmp_path)
 
         from mathviz.compiler.ast_nodes import UseStatement
+
         use_stmt = UseStatement(module_path=("utils",))
 
         module = loader.resolve_use_statement(use_stmt, tmp_path / "main.mviz")

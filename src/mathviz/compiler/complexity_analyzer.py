@@ -305,9 +305,7 @@ class _RecursionVisitor(BaseASTVisitor):
             if pattern:
                 self._argument_patterns.append(pattern)
 
-    def _detect_argument_pattern(
-        self, arg: ASTNode
-    ) -> Optional[tuple[str, str]]:
+    def _detect_argument_pattern(self, arg: ASTNode) -> Optional[tuple[str, str]]:
         """Detect the pattern of argument transformation in recursion."""
         if isinstance(arg, BinaryExpression):
             # Check for n - 1 pattern (linear recursion)
@@ -342,9 +340,7 @@ class _FunctionCallVisitor(BaseASTVisitor):
     def max_known_complexity(self) -> Complexity:
         if not self._known_call_complexities:
             return Complexity.O_1
-        return max(
-            self._known_call_complexities, key=lambda c: list(Complexity).index(c)
-        )
+        return max(self._known_call_complexities, key=lambda c: list(Complexity).index(c))
 
     def visit_call_expression(self, node: CallExpression) -> Any:
         callee_name = self._get_callee_name(node.callee)
@@ -507,9 +503,7 @@ class ComplexityAnalyzer(BaseASTVisitor):
                 self._complexity_from_recursion(recursion_result),
                 self._complexity_from_loops(loop_result),
             )
-            explanations.append(
-                "Recursion inside loops compounds the complexity."
-            )
+            explanations.append("Recursion inside loops compounds the complexity.")
 
         return final_complexity, " ".join(explanations)
 
@@ -523,9 +517,7 @@ class ComplexityAnalyzer(BaseASTVisitor):
 
         return Complexity.from_loop_depth(result.depth)
 
-    def _complexity_from_recursion(
-        self, result: _RecursionAnalysisResult
-    ) -> Complexity:
+    def _complexity_from_recursion(self, result: _RecursionAnalysisResult) -> Complexity:
         """Determine complexity from recursion analysis."""
         if not result.is_recursive:
             return Complexity.O_1
@@ -568,9 +560,7 @@ class ComplexityAnalyzer(BaseASTVisitor):
 
         return f"Loop depth of {result.depth} indicates polynomial time."
 
-    def _explain_recursion(
-        self, result: _RecursionAnalysisResult, function_name: str
-    ) -> str:
+    def _explain_recursion(self, result: _RecursionAnalysisResult, function_name: str) -> str:
         """Generate explanation for recursion complexity."""
         if result.call_count == 1:
             if result.has_linear_reduction:
@@ -596,9 +586,7 @@ class ComplexityAnalyzer(BaseASTVisitor):
             "suggest exponential complexity."
         )
 
-    def _multiply_complexities(
-        self, c1: Complexity, c2: Complexity
-    ) -> Complexity:
+    def _multiply_complexities(self, c1: Complexity, c2: Complexity) -> Complexity:
         """
         Multiply two complexities (for nested patterns).
 

@@ -57,6 +57,7 @@ from mathviz.compiler.parallel_analyzer import (
 # Helper functions to create AST nodes directly
 # ============================================================================
 
+
 def make_identifier(name: str) -> Identifier:
     """Create an Identifier node."""
     return Identifier(name=name)
@@ -120,8 +121,7 @@ def make_function(
 ) -> FunctionDef:
     """Create a FunctionDef node with parameters and body."""
     parameters = tuple(
-        Parameter(name=p_name, type_annotation=SimpleType(name=p_type))
-        for p_name, p_type in params
+        Parameter(name=p_name, type_annotation=SimpleType(name=p_type)) for p_name, p_type in params
     )
     return FunctionDef(
         name=name,
@@ -134,6 +134,7 @@ def make_function(
 # Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def analyzer():
     """Create a fresh ParallelAnalyzer instance."""
@@ -143,6 +144,7 @@ def analyzer():
 # ============================================================================
 # Basic Parallelization Tests
 # ============================================================================
+
 
 class TestBasicParallelization:
     """Tests for simple parallelizable loops."""
@@ -225,6 +227,7 @@ class TestBasicParallelization:
 # Loop-Carried Dependency Tests
 # ============================================================================
 
+
 class TestLoopCarriedDependencies:
     """Tests for loops with cross-iteration dependencies."""
 
@@ -267,6 +270,7 @@ class TestLoopCarriedDependencies:
 # ============================================================================
 # Reduction Pattern Tests
 # ============================================================================
+
 
 class TestReductionPatterns:
     """Tests for reduction pattern detection."""
@@ -348,6 +352,7 @@ class TestReductionPatterns:
 # Race Condition Tests
 # ============================================================================
 
+
 class TestRaceConditions:
     """Tests for race condition detection."""
 
@@ -393,6 +398,7 @@ class TestRaceConditions:
 # ============================================================================
 # Variable Classification Tests
 # ============================================================================
+
 
 class TestVariableClassification:
     """Tests for private/shared variable classification."""
@@ -456,6 +462,7 @@ class TestVariableClassification:
 # Control Flow Tests
 # ============================================================================
 
+
 class TestControlFlow:
     """Tests for loops with control flow statements."""
 
@@ -468,16 +475,18 @@ class TestControlFlow:
                 start=make_int(0),
                 end=make_identifier("n"),
             ),
-            body=Block(statements=(
-                IfStatement(
-                    condition=make_binary(
-                        make_index("arr", make_identifier("i")),
-                        BinaryOperator.EQ,
-                        make_identifier("target"),
+            body=Block(
+                statements=(
+                    IfStatement(
+                        condition=make_binary(
+                            make_index("arr", make_identifier("i")),
+                            BinaryOperator.EQ,
+                            make_identifier("target"),
+                        ),
+                        then_block=Block(statements=(BreakStatement(),)),
                     ),
-                    then_block=Block(statements=(BreakStatement(),)),
-                ),
-            )),
+                )
+            ),
         )
         analysis = analyzer.analyze_loop(loop)
 
@@ -493,24 +502,26 @@ class TestControlFlow:
                 start=make_int(0),
                 end=make_identifier("n"),
             ),
-            body=Block(statements=(
-                IfStatement(
-                    condition=make_binary(
-                        make_index("arr", make_identifier("i")),
-                        BinaryOperator.EQ,
-                        make_int(0),
+            body=Block(
+                statements=(
+                    IfStatement(
+                        condition=make_binary(
+                            make_index("arr", make_identifier("i")),
+                            BinaryOperator.EQ,
+                            make_int(0),
+                        ),
+                        then_block=Block(statements=(ContinueStatement(),)),
                     ),
-                    then_block=Block(statements=(ContinueStatement(),)),
-                ),
-                make_assignment(
-                    target=make_index("arr", make_identifier("i")),
-                    value=make_binary(
-                        make_index("arr", make_identifier("i")),
-                        BinaryOperator.MUL,
-                        make_int(2),
+                    make_assignment(
+                        target=make_index("arr", make_identifier("i")),
+                        value=make_binary(
+                            make_index("arr", make_identifier("i")),
+                            BinaryOperator.MUL,
+                            make_int(2),
+                        ),
                     ),
-                ),
-            )),
+                )
+            ),
         )
         analysis = analyzer.analyze_loop(loop)
 
@@ -521,6 +532,7 @@ class TestControlFlow:
 # ============================================================================
 # Function Analysis Tests
 # ============================================================================
+
 
 class TestFunctionAnalysis:
     """Tests for analyzing entire functions."""
@@ -621,6 +633,7 @@ class TestFunctionAnalysis:
 # Convenience Function Tests
 # ============================================================================
 
+
 class TestConvenienceFunctions:
     """Tests for convenience functions."""
 
@@ -667,6 +680,7 @@ class TestConvenienceFunctions:
 # ============================================================================
 # Helper Class Tests
 # ============================================================================
+
 
 class TestVariableCollector:
     """Tests for VariableCollector helper class."""
@@ -751,6 +765,7 @@ class TestIndexAnalyzer:
 # Edge Cases
 # ============================================================================
 
+
 class TestEdgeCases:
     """Tests for edge cases and boundary conditions."""
 
@@ -774,9 +789,7 @@ class TestEdgeCases:
         loop = ForStatement(
             variable="item",
             iterable=Identifier(name="items"),
-            body=Block(statements=(
-                make_let("x", make_identifier("item")),
-            )),
+            body=Block(statements=(make_let("x", make_identifier("item")),)),
         )
         analysis = analyzer.analyze_loop(loop)
 
@@ -821,6 +834,7 @@ class TestEdgeCases:
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 class TestIntegration:
     """Integration tests with real-world patterns."""

@@ -51,9 +51,7 @@ def iter_filter(iterable: Iterable[T], predicate: Callable[[T], bool]) -> list[T
     return list(filter(predicate, iterable))
 
 
-def iter_reduce(
-    iterable: Iterable[T], initial: U, func: Callable[[U, T], U]
-) -> U:
+def iter_reduce(iterable: Iterable[T], initial: U, func: Callable[[U, T], U]) -> U:
     """
     Reduce the iterable to a single value using an accumulator function.
 
@@ -63,9 +61,7 @@ def iter_reduce(
     return functools_reduce(func, iterable, initial)
 
 
-def iter_fold(
-    iterable: Iterable[T], initial: U, func: Callable[[U, T], U]
-) -> U:
+def iter_fold(iterable: Iterable[T], initial: U, func: Callable[[U, T], U]) -> U:
     """
     Alias for reduce. Fold the iterable using an accumulator function.
 
@@ -75,9 +71,7 @@ def iter_fold(
     return functools_reduce(func, iterable, initial)
 
 
-def iter_flat_map(
-    iterable: Iterable[T], func: Callable[[T], Iterable[U]]
-) -> list[U]:
+def iter_flat_map(iterable: Iterable[T], func: Callable[[T], Iterable[U]]) -> list[U]:
     """
     Apply a function that returns an iterable to each element and flatten.
 
@@ -357,9 +351,7 @@ def iter_skip(iterable: Iterable[T], n: int) -> list[T]:
     return result
 
 
-def iter_take_while(
-    iterable: Iterable[T], predicate: Callable[[T], bool]
-) -> list[T]:
+def iter_take_while(iterable: Iterable[T], predicate: Callable[[T], bool]) -> list[T]:
     """
     Take elements while the predicate is true.
 
@@ -374,9 +366,7 @@ def iter_take_while(
     return result
 
 
-def iter_skip_while(
-    iterable: Iterable[T], predicate: Callable[[T], bool]
-) -> list[T]:
+def iter_skip_while(iterable: Iterable[T], predicate: Callable[[T], bool]) -> list[T]:
     """
     Skip elements while the predicate is true.
 
@@ -408,9 +398,7 @@ def iter_sorted(iterable: Iterable[T]) -> list[T]:
     return sorted(iterable)  # type: ignore
 
 
-def iter_sorted_by(
-    iterable: Iterable[T], key: Callable[[T], Any]
-) -> list[T]:
+def iter_sorted_by(iterable: Iterable[T], key: Callable[[T], Any]) -> list[T]:
     """
     Return a sorted list of elements by a key function.
 
@@ -420,9 +408,7 @@ def iter_sorted_by(
     return sorted(iterable, key=key)
 
 
-def iter_sorted_by_desc(
-    iterable: Iterable[T], key: Callable[[T], Any]
-) -> list[T]:
+def iter_sorted_by_desc(iterable: Iterable[T], key: Callable[[T], Any]) -> list[T]:
     """
     Return a sorted list of elements by a key function in descending order.
 
@@ -553,9 +539,7 @@ def iter_join(iterable: Iterable[str], separator: str) -> str:
     return separator.join(iterable)
 
 
-def iter_group_by(
-    iterable: Iterable[T], key: Callable[[T], K]
-) -> dict[K, list[T]]:
+def iter_group_by(iterable: Iterable[T], key: Callable[[T], K]) -> dict[K, list[T]]:
     """
     Group elements by a key function.
 

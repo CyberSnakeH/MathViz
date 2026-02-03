@@ -19,6 +19,7 @@ from mathviz.compiler.ast_nodes import BinaryOperator, UnaryOperator
 
 class OperatorKind(Enum):
     """Classification of operator types."""
+
     BINARY = auto()
     UNARY = auto()
     COMPARISON = auto()
@@ -38,6 +39,7 @@ class OperatorTraitInfo:
         has_output_type: Whether the trait has an associated Output type
         right_operand_generic: Whether the right operand can be generic (e.g., Mul<Float>)
     """
+
     method_name: str
     operator: Optional[BinaryOperator | UnaryOperator]
     python_magic: str
@@ -105,7 +107,6 @@ OPERATOR_TRAITS: dict[str, OperatorTraitInfo] = {
         has_output_type=True,
         right_operand_generic=True,
     ),
-
     # Comparison operators (return Bool, no Output type)
     "Eq": OperatorTraitInfo(
         method_name="eq",
@@ -155,7 +156,6 @@ OPERATOR_TRAITS: dict[str, OperatorTraitInfo] = {
         has_output_type=False,
         right_operand_generic=True,
     ),
-
     # Unary operators
     "Neg": OperatorTraitInfo(
         method_name="neg",
@@ -181,7 +181,6 @@ OPERATOR_TRAITS: dict[str, OperatorTraitInfo] = {
         has_output_type=True,
         right_operand_generic=False,
     ),
-
     # Index operators
     "Index": OperatorTraitInfo(
         method_name="index",

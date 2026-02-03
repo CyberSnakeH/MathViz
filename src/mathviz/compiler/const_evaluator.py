@@ -260,7 +260,7 @@ class ConstEvaluator:
                 raise ConstEvalError("Modulo by zero", expr.location)
             return left % right
         if op == BinaryOperator.POW:
-            return left ** right
+            return left**right
 
         # Comparison operators
         if op == BinaryOperator.EQ:
@@ -404,9 +404,7 @@ class ConstEvaluator:
             A dictionary of user-defined constants
         """
         return {
-            name: value
-            for name, value in self.constants.items()
-            if name not in BUILTIN_CONSTANTS
+            name: value for name, value in self.constants.items() if name not in BUILTIN_CONSTANTS
         }
 
 

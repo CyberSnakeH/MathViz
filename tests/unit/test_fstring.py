@@ -209,10 +209,10 @@ class TestFStringIntegration:
 
     def test_fstring_in_let_statement(self):
         """Test f-string assignment in let statement."""
-        source = '''
+        source = """
 let name = "Alice"
 let greeting = f"Hello, {name}!"
-'''
+"""
         tokens = Lexer(source).tokenize()
         parser = Parser(tokens, source=source)
         program = parser.parse()

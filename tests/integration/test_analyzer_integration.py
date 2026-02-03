@@ -230,9 +230,11 @@ fn calls_impure() -> Int {
         # Functions calling leaves - purity should propagate
         # Note: This depends on inter-procedural analysis implementation
         # calls_pure should remain pure
-        assert purity["calls_pure"].is_pure() or \
-               len(purity["calls_pure"].side_effects) == 0 or \
-               all(se.kind.name == "EXTERNAL_CALL" for se in purity["calls_pure"].side_effects)
+        assert (
+            purity["calls_pure"].is_pure()
+            or len(purity["calls_pure"].side_effects) == 0
+            or all(se.kind.name == "EXTERNAL_CALL" for se in purity["calls_pure"].side_effects)
+        )
 
     def test_type_errors_dont_break_other_analyses(self, compile_with_analysis):
         """Test that type errors don't prevent other analyses from running."""
@@ -411,15 +413,17 @@ fn c() -> Int {
         for caller_name, caller_node in graph.nodes.items():
             for callee_name in caller_node.calls:
                 if callee_name in graph.nodes:
-                    assert caller_name in graph.nodes[callee_name].called_by, \
+                    assert caller_name in graph.nodes[callee_name].called_by, (
                         f"Inconsistent edge: {caller_name} calls {callee_name} but reverse edge missing"
+                    )
 
         # And vice versa
         for callee_name, callee_node in graph.nodes.items():
             for caller_name in callee_node.called_by:
                 if caller_name in graph.nodes:
-                    assert callee_name in graph.nodes[caller_name].calls, \
+                    assert callee_name in graph.nodes[caller_name].calls, (
                         f"Inconsistent reverse edge: {callee_name} called by {caller_name}"
+                    )
 
     def test_purity_levels_are_ordered(self, compile_with_analysis):
         """Test that purity levels follow expected ordering."""

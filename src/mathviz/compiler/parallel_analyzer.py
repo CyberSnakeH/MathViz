@@ -69,8 +69,8 @@ class DependencyType(Enum):
     - OUTPUT (WAW): Write After Write - output dependency, last write wins concern
     """
 
-    FLOW = "flow"      # Read after write (RAW) - true dependency
-    ANTI = "anti"      # Write after read (WAR) - anti-dependency
+    FLOW = "flow"  # Read after write (RAW) - true dependency
+    ANTI = "anti"  # Write after read (WAR) - anti-dependency
     OUTPUT = "output"  # Write after write (WAW) - output dependency
 
 
@@ -82,13 +82,13 @@ class ReductionOperator(Enum):
     allowing parallel reduction with a final combine step.
     """
 
-    SUM = auto()       # += addition
-    PRODUCT = auto()   # *= multiplication
-    MAX = auto()       # max(var, x)
-    MIN = auto()       # min(var, x)
-    AND = auto()       # &= / and
-    OR = auto()        # |= / or
-    XOR = auto()       # ^= / xor
+    SUM = auto()  # += addition
+    PRODUCT = auto()  # *= multiplication
+    MAX = auto()  # max(var, x)
+    MIN = auto()  # min(var, x)
+    AND = auto()  # &= / and
+    OR = auto()  # |= / or
+    XOR = auto()  # ^= / xor
 
 
 @dataclass(frozen=True, slots=True)
@@ -359,7 +359,7 @@ class LoopBodyAnalyzer(BaseASTVisitor):
         self.memory_accesses: list[MemoryAccess] = []
         self.defined_vars: set[str] = set()  # Variables defined with let
         self.written_vars: set[str] = set()  # All variables written to
-        self.read_vars: set[str] = set()     # All variables read
+        self.read_vars: set[str] = set()  # All variables read
         self.compound_assignments: list[tuple[str, BinaryOperator, Expression]] = []
         self.has_break_continue: bool = False
         self.has_function_calls: bool = False
@@ -401,11 +401,13 @@ class LoopBodyAnalyzer(BaseASTVisitor):
         if isinstance(target, Identifier):
             # Simple variable assignment
             self.written_vars.add(target.name)
-            self.memory_accesses.append(MemoryAccess(
-                variable=target.name,
-                is_write=True,
-                statement=node,
-            ))
+            self.memory_accesses.append(
+                MemoryAccess(
+                    variable=target.name,
+                    is_write=True,
+                    statement=node,
+                )
+            )
 
         elif isinstance(target, IndexExpression):
             # Array element assignment: arr[i] = value
@@ -429,11 +431,13 @@ class LoopBodyAnalyzer(BaseASTVisitor):
             # Record for reduction analysis
             self.compound_assignments.append((var_name, node.operator, node.value))
 
-            self.memory_accesses.append(MemoryAccess(
-                variable=var_name,
-                is_write=True,
-                statement=node,
-            ))
+            self.memory_accesses.append(
+                MemoryAccess(
+                    variable=var_name,
+                    is_write=True,
+                    statement=node,
+                )
+            )
 
         elif isinstance(target, IndexExpression):
             # Array element compound assignment: arr[i] += value
@@ -460,14 +464,16 @@ class LoopBodyAnalyzer(BaseASTVisitor):
             # Analyze the index expression
             depends_on_loop, offset = self._index_analyzer.analyze(target.index)
 
-            self.memory_accesses.append(MemoryAccess(
-                variable=base_var,
-                index_expr=target.index,
-                is_write=True,
-                depends_on_loop_var=depends_on_loop,
-                index_offset=offset,
-                statement=stmt,
-            ))
+            self.memory_accesses.append(
+                MemoryAccess(
+                    variable=base_var,
+                    index_expr=target.index,
+                    is_write=True,
+                    depends_on_loop_var=depends_on_loop,
+                    index_offset=offset,
+                    statement=stmt,
+                )
+            )
 
     def visit_index_expression(self, node: IndexExpression) -> None:
         """Track array read accesses."""
@@ -479,14 +485,16 @@ class LoopBodyAnalyzer(BaseASTVisitor):
             depends_on_loop, offset = self._index_analyzer.analyze(node.index)
 
             # Only add read access if we're not already tracking a write at the same position
-            self.memory_accesses.append(MemoryAccess(
-                variable=base_var,
-                index_expr=node.index,
-                is_write=False,
-                depends_on_loop_var=depends_on_loop,
-                index_offset=offset,
-                statement=self._current_statement,
-            ))
+            self.memory_accesses.append(
+                MemoryAccess(
+                    variable=base_var,
+                    index_expr=node.index,
+                    is_write=False,
+                    depends_on_loop_var=depends_on_loop,
+                    index_offset=offset,
+                    statement=self._current_statement,
+                )
+            )
 
         self.visit(node.object)
         self.visit(node.index)
@@ -500,9 +508,24 @@ class LoopBodyAnalyzer(BaseASTVisitor):
             func_name = node.callee.name
             # These are known pure functions safe in parallel contexts
             pure_functions = {
-                "abs", "min", "max", "sqrt", "sin", "cos", "tan",
-                "exp", "log", "log10", "log2", "floor", "ceil",
-                "pow", "round", "int", "float", "len",
+                "abs",
+                "min",
+                "max",
+                "sqrt",
+                "sin",
+                "cos",
+                "tan",
+                "exp",
+                "log",
+                "log10",
+                "log2",
+                "floor",
+                "ceil",
+                "pow",
+                "round",
+                "int",
+                "float",
+                "len",
             }
             if func_name in pure_functions:
                 self.has_function_calls = False  # Reset, it's safe
@@ -644,7 +667,8 @@ class ParallelAnalyzer(BaseASTVisitor):
 
         # Step 8: Check for loop-carried dependencies (excluding reductions)
         loop_carried_deps = [
-            d for d in dependencies
+            d
+            for d in dependencies
             if d.from_iteration and d.variable not in analysis.reduction_vars
         ]
 
@@ -662,11 +686,11 @@ class ParallelAnalyzer(BaseASTVisitor):
         )
 
         if shared_writes:
-            analysis.reason = "Potential race condition: multiple iterations may write to same location"
+            analysis.reason = (
+                "Potential race condition: multiple iterations may write to same location"
+            )
             for var in shared_writes:
-                analysis.suggested_transforms.append(
-                    f"Variable '{var}' may have concurrent writes"
-                )
+                analysis.suggested_transforms.append(f"Variable '{var}' may have concurrent writes")
             return analysis
 
         # Step 10: All checks passed - loop is parallelizable
@@ -676,8 +700,7 @@ class ParallelAnalyzer(BaseASTVisitor):
         if reduction_vars:
             analysis.needs_parallel_flag = True
             analysis.reason = (
-                f"Parallelizable with reduction(s): "
-                f"{', '.join(str(rv) for rv in reduction_vars)}"
+                f"Parallelizable with reduction(s): {', '.join(str(rv) for rv in reduction_vars)}"
             )
         else:
             analysis.reason = "All iterations are independent"
@@ -788,10 +811,12 @@ class ParallelAnalyzer(BaseASTVisitor):
             # Check if operator is a reduction operator
             if operator in self.REDUCTION_OPERATORS:
                 reduction_op = self.REDUCTION_OPERATORS[operator]
-                reductions.append(ReductionVariable(
-                    name=var_name,
-                    operator=reduction_op,
-                ))
+                reductions.append(
+                    ReductionVariable(
+                        name=var_name,
+                        operator=reduction_op,
+                    )
+                )
                 seen_vars.add(var_name)
 
         return reductions
@@ -847,14 +872,16 @@ class ParallelAnalyzer(BaseASTVisitor):
                 for read in reads:
                     if read.depends_on_loop_var and read.index_offset != write.index_offset:
                         # Read from different iteration - RAW dependency
-                        dependencies.append(DataDependency(
-                            variable=var,
-                            dep_type=DependencyType.FLOW,
-                            from_iteration=True,
-                            source_stmt=write.statement,
-                            sink_stmt=read.statement,
-                            description=f"writes arr[i+{write.index_offset}], reads arr[i+{read.index_offset}]",
-                        ))
+                        dependencies.append(
+                            DataDependency(
+                                variable=var,
+                                dep_type=DependencyType.FLOW,
+                                from_iteration=True,
+                                source_stmt=write.statement,
+                                sink_stmt=read.statement,
+                                description=f"writes arr[i+{write.index_offset}], reads arr[i+{read.index_offset}]",
+                            )
+                        )
 
                 # Check writes from other iterations
                 for other_write in writes:
@@ -863,14 +890,16 @@ class ParallelAnalyzer(BaseASTVisitor):
                         and other_write.depends_on_loop_var
                         and other_write.index_offset != write.index_offset
                     ):
-                        dependencies.append(DataDependency(
-                            variable=var,
-                            dep_type=DependencyType.OUTPUT,
-                            from_iteration=True,
-                            source_stmt=write.statement,
-                            sink_stmt=other_write.statement,
-                            description="multiple writes to different indices",
-                        ))
+                        dependencies.append(
+                            DataDependency(
+                                variable=var,
+                                dep_type=DependencyType.OUTPUT,
+                                from_iteration=True,
+                                source_stmt=write.statement,
+                                sink_stmt=other_write.statement,
+                                description="multiple writes to different indices",
+                            )
+                        )
 
             # Check for reads that depend on writes from previous iterations
             for read in reads:
@@ -882,14 +911,16 @@ class ParallelAnalyzer(BaseASTVisitor):
                             # This is a loop-carried RAW dependency
                             if read.index_offset < 0:
                                 # Reading from previous iteration
-                                dependencies.append(DataDependency(
-                                    variable=var,
-                                    dep_type=DependencyType.FLOW,
-                                    from_iteration=True,
-                                    source_stmt=write.statement,
-                                    sink_stmt=read.statement,
-                                    description=f"reads arr[i{read.index_offset}] depends on prior write to arr[i]",
-                                ))
+                                dependencies.append(
+                                    DataDependency(
+                                        variable=var,
+                                        dep_type=DependencyType.FLOW,
+                                        from_iteration=True,
+                                        source_stmt=write.statement,
+                                        sink_stmt=read.statement,
+                                        description=f"reads arr[i{read.index_offset}] depends on prior write to arr[i]",
+                                    )
+                                )
 
         return dependencies
 

@@ -27,6 +27,7 @@ from typing import Optional
 # Error Codes Catalog
 # =============================================================================
 
+
 class ErrorCode:
     """
     Centralized catalog of error codes for MathViz diagnostics.
@@ -120,6 +121,7 @@ ERROR_DESCRIPTIONS: dict[str, str] = {
 # Diagnostic Types
 # =============================================================================
 
+
 class DiagnosticLevel(Enum):
     """Severity level of a diagnostic message."""
 
@@ -131,10 +133,10 @@ class DiagnosticLevel(Enum):
     def color_code(self) -> str:
         """Get ANSI color code for this level."""
         colors = {
-            DiagnosticLevel.ERROR: "\033[91m",    # Red
+            DiagnosticLevel.ERROR: "\033[91m",  # Red
             DiagnosticLevel.WARNING: "\033[93m",  # Yellow
-            DiagnosticLevel.NOTE: "\033[96m",     # Cyan
-            DiagnosticLevel.HELP: "\033[92m",     # Green
+            DiagnosticLevel.NOTE: "\033[96m",  # Cyan
+            DiagnosticLevel.HELP: "\033[92m",  # Green
         }
         return colors.get(self, "")
 
@@ -159,8 +161,9 @@ class SourceSpan:
     filename: str = "<input>"
 
     @classmethod
-    def from_location(cls, line: int, col: int, length: int = 1,
-                      filename: str = "<input>") -> "SourceSpan":
+    def from_location(
+        cls, line: int, col: int, length: int = 1, filename: str = "<input>"
+    ) -> "SourceSpan":
         """Create a span from a single location with a given length."""
         return cls(
             start_line=line,
@@ -171,8 +174,9 @@ class SourceSpan:
         )
 
     @classmethod
-    def single_line(cls, line: int, start_col: int, end_col: int,
-                    filename: str = "<input>") -> "SourceSpan":
+    def single_line(
+        cls, line: int, start_col: int, end_col: int, filename: str = "<input>"
+    ) -> "SourceSpan":
         """Create a span on a single line."""
         return cls(
             start_line=line,
@@ -284,7 +288,9 @@ class Diagnostic:
         level_str = self.level.value
         code_desc = ERROR_DESCRIPTIONS.get(self.code, "")
         if code_desc:
-            header = f"{level_color}{bold}{level_str}[{self.code}]{reset}: {bold}{self.message}{reset}"
+            header = (
+                f"{level_color}{bold}{level_str}[{self.code}]{reset}: {bold}{self.message}{reset}"
+            )
         else:
             header = f"{level_color}{bold}{level_str}{reset}: {bold}{self.message}{reset}"
         lines.append(header)
@@ -322,7 +328,9 @@ class Diagnostic:
                         padding = " " * (label.span.start_col - 1)
                         underline = underline_char * label.span.length
 
-                        underline_line = f"   {blue}|{reset} {padding}{underline_color}{underline}{reset}"
+                        underline_line = (
+                            f"   {blue}|{reset} {padding}{underline_color}{underline}{reset}"
+                        )
                         if label.message:
                             underline_line += f" {underline_color}{label.message}{reset}"
                         lines.append(underline_line)
@@ -355,6 +363,7 @@ class Diagnostic:
 # =============================================================================
 # Diagnostic Builder (Fluent API)
 # =============================================================================
+
 
 class DiagnosticBuilder:
     """
@@ -389,8 +398,9 @@ class DiagnosticBuilder:
         if primary_span:
             self._labels.append(DiagnosticLabel(primary_span, "", True))
 
-    def label(self, span: SourceSpan, message: str = "",
-              is_primary: bool = False) -> "DiagnosticBuilder":
+    def label(
+        self, span: SourceSpan, message: str = "", is_primary: bool = False
+    ) -> "DiagnosticBuilder":
         """Add a source code label."""
         self._labels.append(DiagnosticLabel(span, message, is_primary))
         return self
@@ -417,8 +427,7 @@ class DiagnosticBuilder:
         self._helps.append(message)
         return self
 
-    def suggestion(self, span: SourceSpan, replacement: str,
-                   message: str) -> "DiagnosticBuilder":
+    def suggestion(self, span: SourceSpan, replacement: str, message: str) -> "DiagnosticBuilder":
         """Add a code suggestion."""
         self._suggestions.append(Suggestion(span, replacement, message))
         return self
@@ -454,6 +463,7 @@ class DiagnosticBuilder:
 # Diagnostic Emitter
 # =============================================================================
 
+
 class DiagnosticEmitter:
     """
     Collects and renders diagnostics for a source file.
@@ -485,13 +495,15 @@ class DiagnosticEmitter:
         """Add a diagnostic to the collection."""
         self.diagnostics.append(diagnostic)
 
-    def error(self, code: str, message: str,
-              span: Optional[SourceSpan] = None) -> DiagnosticBuilder:
+    def error(
+        self, code: str, message: str, span: Optional[SourceSpan] = None
+    ) -> DiagnosticBuilder:
         """Create an error diagnostic builder."""
         return DiagnosticBuilder(self, code, DiagnosticLevel.ERROR, message, span)
 
-    def warning(self, code: str, message: str,
-                span: Optional[SourceSpan] = None) -> DiagnosticBuilder:
+    def warning(
+        self, code: str, message: str, span: Optional[SourceSpan] = None
+    ) -> DiagnosticBuilder:
         """Create a warning diagnostic builder."""
         return DiagnosticBuilder(self, code, DiagnosticLevel.WARNING, message, span)
 
@@ -532,6 +544,7 @@ class DiagnosticEmitter:
 # =============================================================================
 # String Similarity (Levenshtein Distance)
 # =============================================================================
+
 
 def levenshtein_distance(s1: str, s2: str) -> int:
     """
@@ -635,6 +648,7 @@ def suggest_similar_with_context(
 # Variable Information (for tracking definitions)
 # =============================================================================
 
+
 @dataclass
 class VariableInfo:
     """
@@ -658,6 +672,7 @@ class VariableInfo:
 # =============================================================================
 # Common Diagnostic Helpers
 # =============================================================================
+
 
 def create_undefined_variable_diagnostic(
     emitter: DiagnosticEmitter,
@@ -804,13 +819,15 @@ def create_break_outside_loop_diagnostic(
     span: SourceSpan,
 ) -> Diagnostic:
     """Create a diagnostic for 'break' outside of a loop."""
-    return emitter.error(
-        ErrorCode.E0301,
-        "'break' outside of loop",
-        span,
-    ).help(
-        "'break' can only be used inside 'for' or 'while' loops"
-    ).emit()
+    return (
+        emitter.error(
+            ErrorCode.E0301,
+            "'break' outside of loop",
+            span,
+        )
+        .help("'break' can only be used inside 'for' or 'while' loops")
+        .emit()
+    )
 
 
 def create_return_outside_function_diagnostic(
@@ -818,13 +835,15 @@ def create_return_outside_function_diagnostic(
     span: SourceSpan,
 ) -> Diagnostic:
     """Create a diagnostic for 'return' outside of a function."""
-    return emitter.error(
-        ErrorCode.E0302,
-        "'return' outside of function",
-        span,
-    ).help(
-        "'return' can only be used inside function definitions"
-    ).emit()
+    return (
+        emitter.error(
+            ErrorCode.E0302,
+            "'return' outside of function",
+            span,
+        )
+        .help("'return' can only be used inside function definitions")
+        .emit()
+    )
 
 
 def create_unexpected_token_diagnostic(

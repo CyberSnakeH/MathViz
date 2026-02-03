@@ -160,7 +160,9 @@ scene CircleAnimation {
         scene_purity = result.purity_info["CircleAnimation"]
         assert scene_purity.purity == Purity.IMPURE_MANIM
         assert scene_purity.has_manim_calls()
-        assert "play" in scene_purity.manim_calls or any("play" in c for c in scene_purity.manim_calls)
+        assert "play" in scene_purity.manim_calls or any(
+            "play" in c for c in scene_purity.manim_calls
+        )
 
         # Scene should NOT be JIT-safe
         assert not is_jit_safe(scene_purity)
@@ -252,8 +254,10 @@ fn vector_norm(v: List[Float], n: Int) -> Float {
 
         # dot_product should have 'result' as reduction variable
         if "dot_product" in analyses_by_func:
-            assert "result" in analyses_by_func["dot_product"][0].reduction_vars or \
-                   analyses_by_func["dot_product"][0].is_parallelizable
+            assert (
+                "result" in analyses_by_func["dot_product"][0].reduction_vars
+                or analyses_by_func["dot_product"][0].is_parallelizable
+            )
 
         # All should get JIT decorators in optimized code
         assert "@njit" in result.optimized_code or "@jit" in result.optimized_code
@@ -487,7 +491,10 @@ fn median(data: List[Float], n: Int) -> Float {
 
         # Complexities
         assert result.complexity_info["mean"].complexity == Complexity.O_N
-        assert result.complexity_info["variance"].complexity in [Complexity.O_N, Complexity.O_N_LOG_N]
+        assert result.complexity_info["variance"].complexity in [
+            Complexity.O_N,
+            Complexity.O_N_LOG_N,
+        ]
         # median uses sorted() which is O(n log n)
         assert result.complexity_info["median"].complexity == Complexity.O_N_LOG_N
 
@@ -742,5 +749,7 @@ fn reduce_sum(arr: List[Int], n: Int) -> Int {
 
         # reduce_sum has reduction pattern
         if "reduce_sum" in analyses_by_func:
-            assert "acc" in analyses_by_func["reduce_sum"][0].reduction_vars or \
-                   analyses_by_func["reduce_sum"][0].is_parallelizable
+            assert (
+                "acc" in analyses_by_func["reduce_sum"][0].reduction_vars
+                or analyses_by_func["reduce_sum"][0].is_parallelizable
+            )

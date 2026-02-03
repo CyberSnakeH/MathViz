@@ -70,20 +70,20 @@ from mathviz.utils.errors import SourceLocation
 class AccessPattern(Enum):
     """Memory access pattern classification."""
 
-    SEQUENTIAL = auto()    # arr[i], arr[i+1], ...
-    STRIDED = auto()       # arr[i*2], arr[i*stride], ...
-    RANDOM = auto()        # arr[indices[i]], unpredictable
+    SEQUENTIAL = auto()  # arr[i], arr[i+1], ...
+    STRIDED = auto()  # arr[i*2], arr[i*stride], ...
+    RANDOM = auto()  # arr[indices[i]], unpredictable
     COLUMN_MAJOR = auto()  # arr[i][j] with j as outer loop
-    ROW_MAJOR = auto()     # arr[i][j] with i as outer loop
-    UNKNOWN = auto()       # Cannot determine
+    ROW_MAJOR = auto()  # arr[i][j] with i as outer loop
+    UNKNOWN = auto()  # Cannot determine
 
 
 class MemoryOrder(Enum):
     """Memory layout order."""
 
-    C_ORDER = "C"          # Row-major (C-style)
-    FORTRAN_ORDER = "F"    # Column-major (Fortran-style)
-    UNKNOWN = "?"          # Cannot determine
+    C_ORDER = "C"  # Row-major (C-style)
+    FORTRAN_ORDER = "F"  # Column-major (Fortran-style)
+    UNKNOWN = "?"  # Cannot determine
 
 
 @dataclass(frozen=True, slots=True)
@@ -335,21 +335,39 @@ class AllocationAnalyzer(BaseASTVisitor):
     """
 
     # Known allocation functions
-    ALLOCATION_FUNCTIONS: frozenset[str] = frozenset({
-        "zeros", "ones", "empty", "full",
-        "zeros_like", "ones_like", "empty_like",
-        "np.zeros", "np.ones", "np.empty", "np.full",
-        "np.zeros_like", "np.ones_like", "np.empty_like",
-        "arange", "linspace", "np.arange", "np.linspace",
-        "eye", "identity", "np.eye", "np.identity",
-    })
+    ALLOCATION_FUNCTIONS: frozenset[str] = frozenset(
+        {
+            "zeros",
+            "ones",
+            "empty",
+            "full",
+            "zeros_like",
+            "ones_like",
+            "empty_like",
+            "np.zeros",
+            "np.ones",
+            "np.empty",
+            "np.full",
+            "np.zeros_like",
+            "np.ones_like",
+            "np.empty_like",
+            "arange",
+            "linspace",
+            "np.arange",
+            "np.linspace",
+            "eye",
+            "identity",
+            "np.eye",
+            "np.identity",
+        }
+    )
 
     def __init__(self) -> None:
         """Initialize the allocation analyzer."""
         self._allocations: list[AllocationInfo] = []
         self._current_line: int = 0
         self._variable_definitions: dict[str, int] = {}  # var -> definition line
-        self._variable_uses: dict[str, list[int]] = {}   # var -> list of use lines
+        self._variable_uses: dict[str, list[int]] = {}  # var -> list of use lines
         self._local_vars: set[str] = set()
         self._parameters: set[str] = set()
 
@@ -579,10 +597,7 @@ class AllocationAnalyzer(BaseASTVisitor):
         """
         all_allocs = self.analyze(func)
         target_funcs = {"zeros", "ones", "empty"}
-        return [
-            a for a in all_allocs
-            if a.allocation_func in target_funcs
-        ]
+        return [a for a in all_allocs if a.allocation_func in target_funcs]
 
 
 # =============================================================================
@@ -687,7 +702,7 @@ class BufferReuseOptimizer:
 
         # Add edges for interfering allocations
         for i, alloc1 in enumerate(allocations):
-            for alloc2 in allocations[i + 1:]:
+            for alloc2 in allocations[i + 1 :]:
                 if self._lifetimes_overlap(alloc1.lifetime, alloc2.lifetime):
                     graph.add_edge(alloc1.variable, alloc2.variable)
 
@@ -718,10 +733,7 @@ class BufferReuseOptimizer:
         coloring: dict[str, int] = {}
         for node in sorted_nodes:
             # Find colors used by neighbors
-            neighbor_colors = {
-                coloring[n] for n in graph.neighbors(node)
-                if n in coloring
-            }
+            neighbor_colors = {coloring[n] for n in graph.neighbors(node) if n in coloring}
 
             # Find smallest available color
             color = 0
@@ -799,16 +811,48 @@ class InPlaceOptimizer(BaseASTVisitor):
     }
 
     # NumPy functions that support out= parameter
-    NUMPY_OUT_FUNCS: frozenset[str] = frozenset({
-        "sqrt", "sin", "cos", "tan", "exp", "log", "log10", "log2",
-        "abs", "floor", "ceil", "round",
-        "add", "subtract", "multiply", "divide", "power",
-        "negative", "positive", "square", "reciprocal",
-        "np.sqrt", "np.sin", "np.cos", "np.tan", "np.exp",
-        "np.log", "np.log10", "np.log2", "np.abs",
-        "np.floor", "np.ceil", "np.round",
-        "np.add", "np.subtract", "np.multiply", "np.divide", "np.power",
-    })
+    NUMPY_OUT_FUNCS: frozenset[str] = frozenset(
+        {
+            "sqrt",
+            "sin",
+            "cos",
+            "tan",
+            "exp",
+            "log",
+            "log10",
+            "log2",
+            "abs",
+            "floor",
+            "ceil",
+            "round",
+            "add",
+            "subtract",
+            "multiply",
+            "divide",
+            "power",
+            "negative",
+            "positive",
+            "square",
+            "reciprocal",
+            "np.sqrt",
+            "np.sin",
+            "np.cos",
+            "np.tan",
+            "np.exp",
+            "np.log",
+            "np.log10",
+            "np.log2",
+            "np.abs",
+            "np.floor",
+            "np.ceil",
+            "np.round",
+            "np.add",
+            "np.subtract",
+            "np.multiply",
+            "np.divide",
+            "np.power",
+        }
+    )
 
     def __init__(self) -> None:
         """Initialize the in-place optimizer."""
@@ -944,30 +988,34 @@ class InPlaceOptimizer(BaseASTVisitor):
             if value.operator in self.INPLACE_OPS:
                 if self._can_use_compound(target_name, value):
                     op_str = self.INPLACE_OPS[value.operator]
-                    self._candidates.append(InPlaceCandidate(
-                        variable=target_name,
-                        operation=str(value.operator),
-                        source_vars=self._collect_vars(value),
-                        location=stmt.location,
-                        transform_type="compound",
-                        original_code=f"{target_name} = {target_name} {op_str[0]} ...",
-                        suggested_code=f"{target_name} {op_str} ...",
-                    ))
+                    self._candidates.append(
+                        InPlaceCandidate(
+                            variable=target_name,
+                            operation=str(value.operator),
+                            source_vars=self._collect_vars(value),
+                            location=stmt.location,
+                            transform_type="compound",
+                            original_code=f"{target_name} = {target_name} {op_str[0]} ...",
+                            suggested_code=f"{target_name} {op_str} ...",
+                        )
+                    )
 
         # Pattern 2: result = np.func(arr)  ->  np.func(arr, out=result)
         elif isinstance(value, CallExpression):
             func_name = self._get_func_name(value.callee)
             if func_name in self.NUMPY_OUT_FUNCS:
                 if target_name in self._pre_allocated:
-                    self._candidates.append(InPlaceCandidate(
-                        variable=target_name,
-                        operation=func_name,
-                        source_vars=self._collect_vars(value),
-                        location=stmt.location,
-                        transform_type="out_param",
-                        original_code=f"{target_name} = {func_name}(...)",
-                        suggested_code=f"{func_name}(..., out={target_name})",
-                    ))
+                    self._candidates.append(
+                        InPlaceCandidate(
+                            variable=target_name,
+                            operation=func_name,
+                            source_vars=self._collect_vars(value),
+                            location=stmt.location,
+                            transform_type="out_param",
+                            original_code=f"{target_name} = {func_name}(...)",
+                            suggested_code=f"{func_name}(..., out={target_name})",
+                        )
+                    )
 
     def _can_use_compound(self, target: str, expr: BinaryExpression) -> bool:
         """Check if expression can be converted to compound assignment."""
@@ -1156,9 +1204,8 @@ class CacheOptimizer(BaseASTVisitor):
             return index.name == self._current_loop_var
 
         elif isinstance(index, BinaryExpression):
-            return (
-                self._index_depends_on_loop(index.left) or
-                self._index_depends_on_loop(index.right)
+            return self._index_depends_on_loop(index.left) or self._index_depends_on_loop(
+                index.right
             )
 
         return False
@@ -1446,18 +1493,22 @@ class TemporaryEliminator(BaseASTVisitor):
         for name, use_count in self._temp_uses.items():
             if use_count == 1:
                 # Used exactly once - can inline
-                self._elimination_candidates.append((
-                    name,
-                    "used only once, can be inlined",
-                    "inline",
-                ))
+                self._elimination_candidates.append(
+                    (
+                        name,
+                        "used only once, can be inlined",
+                        "inline",
+                    )
+                )
             elif use_count == 0:
                 # Never used - dead code
-                self._elimination_candidates.append((
-                    name,
-                    "never used, can be removed",
-                    "remove",
-                ))
+                self._elimination_candidates.append(
+                    (
+                        name,
+                        "never used, can be removed",
+                        "remove",
+                    )
+                )
 
 
 # =============================================================================
@@ -1514,9 +1565,7 @@ class MemoryPoolGenerator:
         for elem_type, allocs in type_groups.items():
             dtype = "np.float64" if elem_type == "Float" else "np.int64"
             for alloc in allocs:
-                lines.append(
-                    f"        self.{alloc.variable} = np.empty(n, dtype={dtype})"
-                )
+                lines.append(f"        self.{alloc.variable} = np.empty(n, dtype={dtype})")
                 buffer_idx += 1
 
         lines.append("")

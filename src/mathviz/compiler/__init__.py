@@ -271,7 +271,9 @@ class FunctionAnalysis:
         lines.append(f"  JIT Compatible: {self.is_jit_compatible}")
         if self.parallelizable_loops:
             parallel_count = sum(1 for l in self.parallelizable_loops if l.is_parallelizable)
-            lines.append(f"  Parallelizable Loops: {parallel_count}/{len(self.parallelizable_loops)}")
+            lines.append(
+                f"  Parallelizable Loops: {parallel_count}/{len(self.parallelizable_loops)}"
+            )
         if self.suggested_optimizations:
             lines.append("  Suggested Optimizations:")
             for opt in self.suggested_optimizations:
@@ -321,7 +323,9 @@ class CompilationResult:
         if self.function_analysis:
             lines.append(f"  Functions Analyzed: {len(self.function_analysis)}")
         if self.call_graph:
-            lines.append(f"  Call Graph: {len(self.call_graph.nodes)} nodes, {len(self.call_graph.edges)} edges")
+            lines.append(
+                f"  Call Graph: {len(self.call_graph.nodes)} nodes, {len(self.call_graph.edges)} edges"
+            )
         lines.append(f"  Generated Code: {len(self.python_code)} characters")
         return "\n".join(lines)
 
@@ -332,14 +336,14 @@ class CompilationResult:
     def get_jit_compatible_functions(self) -> list[str]:
         """Get names of all JIT-compatible functions."""
         return [
-            name for name, analysis in self.function_analysis.items()
-            if analysis.is_jit_compatible
+            name for name, analysis in self.function_analysis.items() if analysis.is_jit_compatible
         ]
 
     def get_parallelizable_functions(self) -> list[str]:
         """Get names of functions with parallelizable loops."""
         return [
-            name for name, analysis in self.function_analysis.items()
+            name
+            for name, analysis in self.function_analysis.items()
             if any(loop.is_parallelizable for loop in analysis.parallelizable_loops)
         ]
 
@@ -507,9 +511,7 @@ class CompilationPipeline:
                 return result
 
             if type_errors:
-                warnings.append(
-                    f"Type checking found {len(type_errors)} error(s)"
-                )
+                warnings.append(f"Type checking found {len(type_errors)} error(s)")
 
         # Stage 4: Build Call Graph
         call_graph_builder = CallGraphBuilder()
@@ -625,9 +627,7 @@ class CompilationPipeline:
                 # Get parallelization analysis
                 loop_analyses: list[LoopAnalysis] = []
                 if func_name in parallel_results:
-                    loop_analyses = [
-                        analysis for _, analysis in parallel_results[func_name]
-                    ]
+                    loop_analyses = [analysis for _, analysis in parallel_results[func_name]]
 
                 # Determine JIT compatibility
                 is_jit_compatible = is_jit_safe(purity_info) and not purity_info.has_manim_calls()
@@ -674,8 +674,7 @@ class CompilationPipeline:
                 )
             if analysis.purity.has_manim_calls():
                 suggestions.append(
-                    f"Function '{analysis.name}' contains Manim calls; "
-                    "move to scene methods"
+                    f"Function '{analysis.name}' contains Manim calls; move to scene methods"
                 )
 
         # Complexity-based suggestions
@@ -700,14 +699,10 @@ class CompilationPipeline:
                         f"reduction variables: {', '.join(loop_analysis.reduction_vars)}"
                     )
                 else:
-                    suggestions.append(
-                        f"Loop in '{analysis.name}' can be parallelized with prange"
-                    )
+                    suggestions.append(f"Loop in '{analysis.name}' can be parallelized with prange")
             else:
                 for transform in loop_analysis.suggested_transforms:
-                    suggestions.append(
-                        f"In '{analysis.name}': {transform}"
-                    )
+                    suggestions.append(f"In '{analysis.name}': {transform}")
 
 
 # =============================================================================
@@ -736,7 +731,7 @@ def compile_source(source: str, optimize: bool = True) -> str:
         optimize=optimize,
         check_types=True,
         analyze_complexity=False,  # Skip for simple compilation
-        auto_parallelize=False,    # Skip for simple compilation
+        auto_parallelize=False,  # Skip for simple compilation
         strict=False,
     )
     result = pipeline.compile(source)
