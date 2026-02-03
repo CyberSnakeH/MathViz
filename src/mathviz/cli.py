@@ -1150,7 +1150,8 @@ def cmd_exec(args: argparse.Namespace) -> int:
 
         # Execute the generated code directly using Python's exec
         # This is safe because we're executing compiler-generated code
-        exec_globals: dict = {}
+        # Set __name__ to "__main__" so that `if __name__ == "__main__":` block runs
+        exec_globals: dict = {"__name__": "__main__"}
         compiled_code = compile(python_code, str(input_path), "exec")
         eval(compiled_code, exec_globals)  # noqa: S307
 

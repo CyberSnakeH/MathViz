@@ -44,6 +44,7 @@ fn main() {
             // Compiler operations
             compiler::compile_mathviz,
             compiler::run_mathviz,
+            compiler::exec_mathviz,
             compiler::check_syntax,
             compiler::get_completions,
             compiler::format_code,

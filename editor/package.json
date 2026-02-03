@@ -1,6 +1,6 @@
 {
   "name": "mathviz-editor",
-  "version": "0.1.0",
+  "version": "0.1.6",
   "description": "Cross-platform code editor for MathViz",
   "type": "module",
   "scripts": {

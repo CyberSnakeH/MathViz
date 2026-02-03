@@ -1854,6 +1854,13 @@ class TypeChecker(BaseASTVisitor):
         """Infer the type of an identifier by looking it up in the symbol table."""
         type_ = self.symbol_table.lookup(expr.name)
         if type_ is None:
+            # Check if it's a type name (enum, struct, class)
+            if expr.name in self.enum_types:
+                return self.enum_types[expr.name]
+            if expr.name in self.struct_types:
+                return self.struct_types[expr.name]
+            if expr.name in self.class_types:
+                return self.class_types[expr.name]
             self._error_undefined_variable(expr.name, expr.location)
             return UNKNOWN_TYPE
         return type_

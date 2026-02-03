@@ -246,7 +246,7 @@ const CommandPalette: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     },
     {
       id: 'run-file',
-      label: 'Run Current File',
+      label: 'Run with Manim (Scene)',
       shortcut: 'F5',
       icon: (
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -265,9 +265,30 @@ const CommandPalette: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       },
     },
     {
+      id: 'exec-file',
+      label: 'Execute Script',
+      shortcut: 'F6',
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="4 17 10 11 4 5" />
+          <line x1="12" y1="19" x2="20" y2="19" />
+        </svg>
+      ),
+      action: () => {
+        const activeFile = useEditorStore.getState().openFiles.get(useEditorStore.getState().activeFileId || '');
+        const canExec = activeFile &&
+          !activeFile.path.startsWith('/untitled') &&
+          (activeFile.path.endsWith('.mviz') || activeFile.path.endsWith('.mathviz'));
+        if (canExec) {
+          useCompilerStore.getState().exec(activeFile.path);
+        }
+        onClose();
+      },
+    },
+    {
       id: 'compile-file',
-      label: 'Compile Current File',
-      shortcut: 'Ctrl+Shift+B',
+      label: 'Compile Only',
+      shortcut: 'F8',
       icon: (
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
@@ -850,18 +871,22 @@ const WelcomeScreen: React.FC = () => {
       </div>
 
       {/* Keyboard shortcuts */}
-      <div className="flex items-center gap-8 text-xs text-[var(--mviz-foreground,#a9b1d6)] opacity-40">
+      <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-[var(--mviz-foreground,#a9b1d6)] opacity-40">
+        <span className="flex items-center gap-2">
+          <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">F5</kbd>
+          <span>Run (Manim)</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">F6</kbd>
+          <span>Execute</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">F8</kbd>
+          <span>Compile</span>
+        </span>
         <span className="flex items-center gap-2">
           <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">Ctrl+P</kbd>
-          <span>Command palette</span>
-        </span>
-        <span className="flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">Ctrl+B</kbd>
-          <span>Toggle sidebar</span>
-        </span>
-        <span className="flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-[var(--mviz-sidebar-background,#1f2335)] border border-[var(--mviz-border,#1a1b26)] rounded text-[10px] font-mono">Ctrl+J</kbd>
-          <span>Toggle terminal</span>
+          <span>Commands</span>
         </span>
       </div>
     </div>
@@ -1054,7 +1079,7 @@ const App: React.FC = () => {
         useLayoutStore.getState().setLeftSidebarPanel('debug');
       }
 
-      // F5: Run current file (only for saved .mviz files)
+      // F5: Run with Manim (for scene files)
       if (e.key === 'F5') {
         e.preventDefault();
         const activeFile = useEditorStore.getState().openFiles.get(useEditorStore.getState().activeFileId || '');
@@ -1063,6 +1088,30 @@ const App: React.FC = () => {
           (activeFile.path.endsWith('.mviz') || activeFile.path.endsWith('.mathviz'));
         if (canRun) {
           useCompilerStore.getState().run(activeFile.path, true, 'm');
+        }
+      }
+
+      // F6: Execute script (without Manim, for simple scripts with println)
+      if (e.key === 'F6') {
+        e.preventDefault();
+        const activeFile = useEditorStore.getState().openFiles.get(useEditorStore.getState().activeFileId || '');
+        const canExec = activeFile &&
+          !activeFile.path.startsWith('/untitled') &&
+          (activeFile.path.endsWith('.mviz') || activeFile.path.endsWith('.mathviz'));
+        if (canExec) {
+          useCompilerStore.getState().exec(activeFile.path);
+        }
+      }
+
+      // F8: Compile only (no execution)
+      if (e.key === 'F8') {
+        e.preventDefault();
+        const activeFile = useEditorStore.getState().openFiles.get(useEditorStore.getState().activeFileId || '');
+        const canCompile = activeFile &&
+          !activeFile.path.startsWith('/untitled') &&
+          (activeFile.path.endsWith('.mviz') || activeFile.path.endsWith('.mathviz'));
+        if (canCompile) {
+          useCompilerStore.getState().compile(activeFile.path);
         }
       }
 

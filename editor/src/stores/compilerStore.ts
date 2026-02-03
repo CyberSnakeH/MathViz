@@ -73,6 +73,7 @@ interface CompilerActions {
   // Compilation
   compile: (sourcePath: string, outputDir?: string) => Promise<CompileResult>;
   run: (sourcePath: string, preview?: boolean, quality?: string) => Promise<RunResult>;
+  exec: (sourcePath: string) => Promise<RunResult>;
   checkSyntax: (code: string, filePath?: string) => Promise<{ valid: boolean; errors: CompileError[]; warnings: CompileWarning[] }>;
   formatCode: (code: string) => Promise<{ success: boolean; formattedCode?: string; error?: string }>;
 
@@ -277,6 +278,68 @@ export const useCompilerStore = create<CompilerStore>()(
             const videoUrl = convertFileSrc(result.videoPath);
             usePreviewStore.getState().setRenderComplete(videoUrl);
           }
+
+          return result;
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          set((state) => {
+            state.status = 'error';
+            state.output.push(`[Error] ${errorMsg}`);
+          });
+
+          return {
+            success: false,
+            stdout: '',
+            stderr: errorMsg,
+            exitCode: 1,
+          };
+        }
+      },
+
+      exec: async (sourcePath: string) => {
+        set((state) => {
+          state.status = 'running';
+          state.output.push(`[Executing] ${sourcePath}...`);
+        });
+
+        try {
+          const result = await invoke<RunResult>('exec_mathviz', {
+            sourcePath,
+          });
+
+          set((state) => {
+            state.lastRunResult = result;
+            state.status = result.success ? 'success' : 'error';
+
+            // Show stdout output (contains print statements)
+            if (result.stdout && result.stdout.trim()) {
+              const text = result.stdout.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+              text.split('\n').forEach((line: string) => {
+                if (line.trim()) {
+                  state.output.push(line);
+                }
+              });
+            }
+
+            // Show stderr output
+            if (result.stderr && result.stderr.trim()) {
+              const text = result.stderr.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+              text.split('\n').forEach((line: string) => {
+                if (line.includes('ERROR') || line.includes('Error') || line.includes('Traceback')) {
+                  state.output.push(`[Error] ${line}`);
+                } else if (line.trim()) {
+                  state.output.push(line);
+                }
+              });
+            }
+
+            state.output.push('');
+            if (result.success) {
+              state.output.push(`[Success] Execution completed (exit code: ${result.exitCode || 0})`);
+            } else {
+              state.output.push(`[Error] Execution failed (exit code: ${result.exitCode})`);
+            }
+          });
 
           return result;
         } catch (error) {

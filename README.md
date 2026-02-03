@@ -1,83 +1,102 @@
-# MathViz
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="MathViz Logo" width="120" height="120">
+</p>
 
-A domain-specific language for mathematical animations.
+<h1 align="center">MathViz</h1>
 
-MathViz extends Python with a clean, math-first syntax and compiles to pure Python
-with first-class Manim integration. The standard file extension is `.mviz`.
+<p align="center">
+  <strong>A domain-specific language for mathematical animations</strong>
+</p>
 
-Status: Alpha (work in progress).
+<p align="center">
+  <a href="https://github.com/CyberSnakeH/MathViz/releases"><img src="https://img.shields.io/github/v/release/CyberSnakeH/MathViz?style=flat-square&color=7aa2f7" alt="Release"></a>
+  <a href="https://github.com/CyberSnakeH/MathViz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/CyberSnakeH/MathViz?style=flat-square&color=9ece6a" alt="License"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12+-bb9af7?style=flat-square" alt="Python"></a>
+  <a href="https://github.com/CyberSnakeH/MathViz/stargazers"><img src="https://img.shields.io/github/stars/CyberSnakeH/MathViz?style=flat-square&color=e0af68" alt="Stars"></a>
+</p>
 
-## Highlights
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#editor">Editor</a> •
+  <a href="#documentation">Documentation</a>
+</p>
 
-- Unicode math operators (∈, ⊆, ∪, ∩, ∞, π, etc.)
-- Clean block syntax with `let` and `fn`
-- Manim-first `scene` blocks that compile to Python
-- Static tooling: `check`, `analyze`, `typecheck`, `lint`, `fmt`
-- Multi-file modules via `use` and `.mviz` imports
-- REPL and watch mode for fast iteration
-- Cross-platform desktop editor (Tauri + Monaco) in `editor/`
+---
 
-## Quick Start
+MathViz is a modern programming language designed specifically for creating mathematical animations. It extends Python with a clean, math-first syntax and compiles to pure Python with first-class [Manim](https://www.manim.community/) integration.
 
-### 1) Clone
+## Features
 
-```bash
-git clone https://github.com/CyberSnakeH/MathViz.git
-cd MathViz
-```
+- **Unicode Math Operators** — Write math naturally: `∈`, `⊆`, `∪`, `∩`, `∞`, `π`, `≤`, `≥`, `≠`
+- **Clean Syntax** — Modern block syntax with `let`, `fn`, `scene`, and pattern matching
+- **Manim Integration** — First-class support for creating mathematical animations
+- **Static Analysis** — Built-in `check`, `analyze`, `typecheck`, `lint`, and `fmt` commands
+- **Module System** — Multi-file projects with `use` imports
+- **Desktop Editor** — Cross-platform editor with live preview (Tauri + React)
+- **Fast Iteration** — REPL mode and file watcher for rapid development
 
-### 2) Install
+## Installation
 
-```bash
-# Recommended (uv)
-uv sync --dev
-
-# Or with pip
-pip install -e ".[dev]"
-```
-
-Install with pipx (isolated CLI):
+### Using pipx (Recommended)
 
 ```bash
 pipx install git+https://github.com/CyberSnakeH/MathViz.git
 ```
 
-### 3) Run an example
+### Using uv
 
 ```bash
-mathviz run examples/hello_world.mviz
+git clone https://github.com/CyberSnakeH/MathViz.git
+cd MathViz
+uv sync --dev
 ```
 
-Or compile to Python:
+### Using pip
 
 ```bash
-mathviz compile examples/hello_world.mviz -o hello_world.py
-python hello_world.py
+git clone https://github.com/CyberSnakeH/MathViz.git
+cd MathViz
+pip install -e ".[dev]"
 ```
 
-## Language Example
+### Prerequisites
 
-```mathviz
-let message = "Hello, MathViz!"
-let x = 2 ^ 10
+- Python 3.12 or higher
+- [Manim](https://docs.manim.community/en/stable/installation.html) (for animations)
+- [LaTeX](https://www.latex-project.org/get/) (optional, for math rendering)
 
-fn greet(name: String) -> String {
-    return "Hello, " + name + "!"
+## Quick Start
+
+### Hello World
+
+Create a file `hello.mviz`:
+
+```mviz
+fn main() {
+    println("Hello, MathViz!")
 }
-
-print(message)
-print(greet("World"))
-print(x)  # 1024
 ```
 
-### Manim Scene Example
+Run it:
 
-```mathviz
+```bash
+mathviz exec hello.mviz
+```
+
+### Your First Animation
+
+Create `animation.mviz`:
+
+```mviz
 from manim import Circle, Create, FadeOut
 
 scene CircleAnimation {
     fn construct(self) {
         let circle = Circle()
+        circle.set_color(BLUE)
+
         self.play(Create(circle))
         self.wait(1)
         self.play(FadeOut(circle))
@@ -85,89 +104,192 @@ scene CircleAnimation {
 }
 ```
 
+Run with preview:
+
 ```bash
-mathviz run examples/circle_animation.mviz --preview
+mathviz run animation.mviz --preview
 ```
 
-## CLI (most used)
+### Language Features
+
+```mviz
+// Variables with type inference
+let x = 42
+let name = "MathViz"
+let pi = 3.14159
+
+// Functions with type annotations
+fn add(a: int, b: int) -> int {
+    return a + b
+}
+
+// Pattern matching
+let result = match x {
+    0 -> "zero"
+    1 -> "one"
+    _ -> "other"
+}
+
+// For loops with ranges
+for i in 0..10 {
+    println(i)
+}
+
+// List comprehensions
+let squares = [x^2 for x in 1..=10]
+
+// Unicode math
+let is_member = 5 ∈ {1, 2, 3, 4, 5}
+let union = {1, 2} ∪ {3, 4}
+```
+
+## CLI Reference
 
 ```bash
-mathviz --help
+# Compile to Python
 mathviz compile file.mviz -o output.py
-mathviz run file.mviz
-mathviz check file.mviz
-mathviz analyze file.mviz
-mathviz typecheck file.mviz
+
+# Run with Manim (animations)
+mathviz run file.mviz --preview
+
+# Execute script (no Manim)
+mathviz exec file.mviz
+
+# Static analysis
+mathviz check file.mviz      # Syntax check
+mathviz typecheck file.mviz  # Type check
+mathviz analyze file.mviz    # Full analysis
+mathviz lint file.mviz       # Linter
+
+# Formatting
 mathviz fmt file.mviz
-mathviz watch src/
+
+# Development
+mathviz watch src/           # Watch mode
+mathviz repl                 # Interactive REPL
+
+# Project management
+mathviz new my-project       # Create new project
+mathviz build                # Build project
+mathviz test                 # Run tests
 ```
 
-## MathViz Editor (Tauri)
+## Editor
+
+MathViz includes a cross-platform desktop editor built with Tauri and React.
+
+### Features
+
+- Syntax highlighting for `.mviz` files
+- Live animation preview
+- Integrated terminal
+- File explorer
+- Command palette (`Ctrl+P`)
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `F5` | Run with Manim |
+| `F6` | Execute script |
+| `F8` | Compile only |
+| `Ctrl+S` | Save |
+| `Ctrl+P` | Command palette |
+| `Ctrl+B` | Toggle sidebar |
+| `Ctrl+J` | Toggle terminal |
+
+### Running the Editor
 
 ```bash
 cd editor
-npm ci
+npm install
 npm run tauri dev
 ```
 
-Build a native app:
+### Building
 
 ```bash
 npm run tauri build
 ```
 
+Binaries will be in `editor/src-tauri/target/release/bundle/`.
+
+## Project Structure
+
+```
+MathViz/
+├── src/mathviz/          # Compiler and runtime
+│   ├── compiler/         # Lexer, parser, codegen
+│   ├── utils/            # Errors, diagnostics
+│   └── cli.py            # CLI entry point
+├── editor/               # Desktop editor (Tauri)
+│   ├── src/              # React frontend
+│   └── src-tauri/        # Rust backend
+├── examples/             # Example programs
+├── tests/                # Test suite
+└── docs/                 # Documentation
+```
+
 ## Examples
 
-- `examples/hello_world.mviz`
-- `examples/set_operations.mviz`
-- `examples/circle_animation.mviz`
-- `examples/venn_diagram.mviz`
-- `examples/multimodule/` (multi-file imports)
+Explore the `examples/` directory:
+
+- [`hello_world.mviz`](examples/hello_world.mviz) — Basic syntax
+- [`circle_animation.mviz`](examples/circle_animation.mviz) — Simple animation
+- [`set_operations.mviz`](examples/set_operations.mviz) — Unicode math
+- [`venn_diagram.mviz`](examples/venn_diagram.mviz) — Complex animation
+- [`multimodule/`](examples/multimodule/) — Multi-file project
 
 ## Development
 
-Requirements:
-- Python 3.12+
-- Node.js (for the editor)
-
-Tests:
+### Running Tests
 
 ```bash
 uv run pytest
 ```
 
-Format and lint:
+### Code Quality
 
 ```bash
+# Format
 uv run ruff format src tests
+
+# Lint
 uv run ruff check src tests
+
+# Type check
 uv run mypy src
 ```
 
-Optional extras:
+### Language Server
 
 ```bash
-pip install -e ".[dev,watch,lsp]"
-```
-
-Run the language server:
-
-```bash
+pip install -e ".[lsp]"
 mathviz-lsp
 ```
 
-## Project Structure
+## Contributing
 
-```
-.
-├── src/            # MathViz compiler and runtime
-├── editor/         # Tauri-based desktop editor
-├── examples/       # Example .mviz programs
-├── tests/          # Unit and integration tests
-├── media/          # Assets used by examples
-└── pyproject.toml  # Python package config
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Manim Community](https://www.manim.community/) — The animation engine
+- [Tauri](https://tauri.app/) — Desktop app framework
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) — Code editor
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/CyberSnakeH">CyberSnakeH</a>
+</p>

@@ -1,6 +1,6 @@
 [project]
 name = "mathviz"
-version = "0.1.0"
+version = "0.1.6"
 description = "A domain-specific programming language for mathematical animations"
 readme = "README.md"
 requires-python = ">=3.12"

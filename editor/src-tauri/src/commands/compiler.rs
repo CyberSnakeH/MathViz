@@ -10,6 +10,7 @@ use tokio::process::Command;
 
 /// Compilation result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CompileResult {
     pub success: bool,
     pub output_path: Option<String>,
@@ -58,6 +59,7 @@ pub struct CompletionItem {
 
 /// Format result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FormatResult {
     pub success: bool,
     pub formatted_code: Option<String>,
@@ -66,6 +68,7 @@ pub struct FormatResult {
 
 /// Run result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RunResult {
     pub success: bool,
     pub stdout: String,
@@ -375,6 +378,45 @@ pub async fn run_mathviz(
         stderr,
         exit_code: result.status.code(),
         video_path,
+    })
+}
+
+/// Execute a MathViz file (without Manim, for simple scripts)
+#[tauri::command]
+pub async fn exec_mathviz(source_path: String) -> Result<RunResult, String> {
+    let compiler = find_mathviz_compiler().ok_or("MathViz compiler not found")?;
+
+    let mut cmd_parts: Vec<&str> = compiler.split_whitespace().collect();
+    let program = cmd_parts.remove(0);
+
+    let mut command = Command::new(program);
+    command.args(&cmd_parts);
+    command.arg("exec");
+    command.arg(&source_path);
+
+    // Force unbuffered Python output and disable Rich terminal formatting
+    command.env("PYTHONUNBUFFERED", "1");
+    command.env("NO_COLOR", "1");
+    command.env("TERM", "dumb");
+    command.env("FORCE_COLOR", "0");
+
+    command.stdout(Stdio::piped());
+    command.stderr(Stdio::piped());
+
+    let result = command
+        .output()
+        .await
+        .map_err(|e| format!("Failed to exec MathViz: {}", e))?;
+
+    let stdout = String::from_utf8_lossy(&result.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&result.stderr).to_string();
+
+    Ok(RunResult {
+        success: result.status.success(),
+        stdout,
+        stderr,
+        exit_code: result.status.code(),
+        video_path: None,
     })
 }
 

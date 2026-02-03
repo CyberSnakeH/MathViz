@@ -59,6 +59,7 @@ export const DebugPanel: React.FC = () => {
   const output = useCompilerStore((state) => state.output);
   const compile = useCompilerStore((state) => state.compile);
   const run = useCompilerStore((state) => state.run);
+  const exec = useCompilerStore((state) => state.exec);
   const clearOutput = useCompilerStore((state) => state.clearOutput);
   const reset = useCompilerStore((state) => state.reset);
 
@@ -87,8 +88,18 @@ export const DebugPanel: React.FC = () => {
 
   const handleRun = useCallback(async () => {
     if (!canCompile || isBusy || !activeFile) return;
-    await run(activeFile.path, true, 'm');
-  }, [canCompile, activeFile, isBusy, run]);
+
+    // Check if the file contains a scene declaration (for Manim)
+    // If it does, use `run` (renders animation), otherwise use `exec` (runs script)
+    const content = activeFile.content || '';
+    const hasScene = /\bscene\s+\w+/.test(content);
+
+    if (hasScene) {
+      await run(activeFile.path, true, 'm');
+    } else {
+      await exec(activeFile.path);
+    }
+  }, [canCompile, activeFile, isBusy, run, exec]);
 
   const handleStop = useCallback(() => {
     reset();
