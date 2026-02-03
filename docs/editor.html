@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desktop Editor - MathViz Documentation</title>
+  <meta name="description" content="Guide to using the MathViz desktop editor for creating mathematical animations.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link">Manim</a>
+        <a href="cli.html" class="nav-link">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Getting Started</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Introduction</a>
+          <a href="getting-started.html#installation" class="sidebar-link">Installation</a>
+          <a href="getting-started.html#first-program" class="sidebar-link">First Program</a>
+          <a href="getting-started.html#running" class="sidebar-link">Running Code</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="modules.html" class="sidebar-link">Module System</a>
+          <a href="cli.html" class="sidebar-link">CLI Reference</a>
+          <a href="editor.html" class="sidebar-link active">Desktop Editor</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">On This Page</div>
+        <nav class="sidebar-nav">
+          <a href="#installation" class="sidebar-link">Installation</a>
+          <a href="#interface" class="sidebar-link">Interface Overview</a>
+          <a href="#code-editor" class="sidebar-link">Code Editor</a>
+          <a href="#preview" class="sidebar-link">Live Preview</a>
+          <a href="#rendering" class="sidebar-link">Rendering</a>
+          <a href="#settings" class="sidebar-link">Settings</a>
+          <a href="#shortcuts" class="sidebar-link">Keyboard Shortcuts</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Desktop Editor</h1>
+
+      <p>
+        The MathViz Desktop Editor is a native application for writing MathViz code with
+        syntax highlighting, live preview, and integrated rendering. Built with Tauri for
+        a fast, lightweight experience across Windows, macOS, and Linux.
+      </p>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Beta Software</div>
+          <p class="callout-text">
+            The desktop editor is currently in beta. Some features may be incomplete or change
+            in future releases.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="installation">Installation</h2>
+
+      <h3>Download</h3>
+
+      <p>Download the latest release for your platform:</p>
+
+      <div class="feature-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <a href="https://github.com/CyberSnakeH/MathViz/releases" class="feature-card" style="text-decoration: none;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h4>Windows</h4>
+          <p>MathViz-x.x.x-setup.exe</p>
+        </a>
+        <a href="https://github.com/CyberSnakeH/MathViz/releases" class="feature-card" style="text-decoration: none;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </div>
+          <h4>macOS</h4>
+          <p>MathViz-x.x.x.dmg</p>
+        </a>
+        <a href="https://github.com/CyberSnakeH/MathViz/releases" class="feature-card" style="text-decoration: none;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+              <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+              <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+              <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+            </svg>
+          </div>
+          <h4>Linux</h4>
+          <p>MathViz-x.x.x.AppImage</p>
+        </a>
+      </div>
+
+      <h3>Build from Source</h3>
+
+      <p>To build the editor from source, you need Node.js and Rust installed:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Clone the repository
+git clone https://github.com/CyberSnakeH/MathViz.git
+cd MathViz/editor
+
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run tauri dev
+
+# Build for production
+npm run tauri build</code></pre>
+        </div>
+      </div>
+
+      <h2 id="interface">Interface Overview</h2>
+
+      <p>The editor interface is divided into several key areas:</p>
+
+      <div class="editor-interface-diagram" style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <div style="display: grid; grid-template-columns: 200px 1fr 300px; grid-template-rows: 40px 1fr 32px; gap: 8px; height: 400px;">
+          <!-- Menu Bar -->
+          <div style="grid-column: 1 / -1; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; padding: 0 16px; gap: 16px;">
+            <span style="font-weight: 600; color: var(--accent-blue);">MathViz</span>
+            <span style="color: var(--text-secondary); font-size: 14px;">File</span>
+            <span style="color: var(--text-secondary); font-size: 14px;">Edit</span>
+            <span style="color: var(--text-secondary); font-size: 14px;">View</span>
+            <span style="color: var(--text-secondary); font-size: 14px;">Run</span>
+            <span style="color: var(--text-secondary); font-size: 14px;">Help</span>
+          </div>
+          <!-- File Explorer -->
+          <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Explorer</div>
+            <div style="font-size: 13px; color: var(--text-secondary);">
+              <div style="margin-bottom: 4px;">src/</div>
+              <div style="margin-left: 12px; margin-bottom: 2px; color: var(--accent-blue);">main.mviz</div>
+              <div style="margin-left: 12px; margin-bottom: 2px;">utils.mviz</div>
+              <div style="margin-bottom: 4px;">scenes/</div>
+              <div style="margin-left: 12px; margin-bottom: 2px;">intro.mviz</div>
+            </div>
+          </div>
+          <!-- Code Editor -->
+          <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 13px;">
+            <div style="color: var(--text-muted); margin-bottom: 8px;">main.mviz</div>
+            <div><span style="color: var(--syntax-keyword);">scene</span> <span style="color: var(--syntax-function);">Demo</span> {</div>
+            <div style="margin-left: 16px;"><span style="color: var(--syntax-keyword);">fn</span> <span style="color: var(--syntax-function);">construct</span>(<span style="color: var(--syntax-variable);">self</span>) {</div>
+            <div style="margin-left: 32px;"><span style="color: var(--syntax-keyword);">let</span> c = <span style="color: var(--syntax-function);">Circle</span>()</div>
+            <div style="margin-left: 32px;"><span style="color: var(--syntax-function);">play</span>(<span style="color: var(--syntax-function);">Create</span>(c))</div>
+            <div style="margin-left: 16px;">}</div>
+            <div>}</div>
+          </div>
+          <!-- Preview Panel -->
+          <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 12px; display: flex; flex-direction: column;">
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Preview</div>
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border-color); border-radius: 4px;">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="var(--accent-blue)" stroke-width="2">
+                <circle cx="30" cy="30" r="20"/>
+              </svg>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button style="flex: 1; padding: 6px; background: var(--accent-blue); border: none; border-radius: 4px; color: white; font-size: 12px; cursor: pointer;">Play</button>
+              <button style="flex: 1; padding: 6px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-secondary); font-size: 12px; cursor: pointer;">Render</button>
+            </div>
+          </div>
+          <!-- Status Bar -->
+          <div style="grid-column: 1 / -1; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; color: var(--text-muted);">
+            <span>Ready</span>
+            <span>MathViz | UTF-8 | LF | Ln 4, Col 12</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Layout Components</h3>
+
+      <ul>
+        <li><strong>Menu Bar</strong> - Access file operations, settings, and run commands</li>
+        <li><strong>File Explorer</strong> - Navigate your project files and folders</li>
+        <li><strong>Code Editor</strong> - Write MathViz code with syntax highlighting</li>
+        <li><strong>Preview Panel</strong> - See live preview of your animations</li>
+        <li><strong>Status Bar</strong> - View file info, cursor position, and status messages</li>
+      </ul>
+
+      <h2 id="code-editor">Code Editor</h2>
+
+      <p>The code editor provides a modern editing experience with features designed for MathViz development.</p>
+
+      <h3>Syntax Highlighting</h3>
+
+      <p>
+        Full syntax highlighting for MathViz code using the Tokyo Night color scheme:
+      </p>
+
+      <ul>
+        <li><span style="color: var(--syntax-keyword);">Keywords</span> - fn, let, if, for, scene, struct, etc.</li>
+        <li><span style="color: var(--syntax-function);">Functions</span> - Function names and calls</li>
+        <li><span style="color: var(--syntax-string);">Strings</span> - String literals</li>
+        <li><span style="color: var(--syntax-number);">Numbers</span> - Numeric literals</li>
+        <li><span style="color: var(--syntax-comment);">Comments</span> - Single and multi-line comments</li>
+        <li><span style="color: var(--syntax-type);">Types</span> - Type annotations</li>
+      </ul>
+
+      <h3>Auto-completion</h3>
+
+      <p>
+        Intelligent code completion suggests relevant items as you type:
+      </p>
+
+      <ul>
+        <li>Language keywords and built-in functions</li>
+        <li>Manim mobjects and animation functions</li>
+        <li>User-defined functions and variables</li>
+        <li>Module imports and exports</li>
+      </ul>
+
+      <h3>Error Highlighting</h3>
+
+      <p>
+        Syntax and type errors are highlighted inline with descriptive messages.
+        Hover over underlined code to see the error details.
+      </p>
+
+      <h3>Code Folding</h3>
+
+      <p>
+        Collapse functions, scenes, and blocks to focus on specific sections.
+        Click the fold icons in the gutter or use keyboard shortcuts.
+      </p>
+
+      <h2 id="preview">Live Preview</h2>
+
+      <p>
+        The preview panel shows a real-time visualization of your animation as you code.
+      </p>
+
+      <h3>Preview Modes</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>Description</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Static</strong></td>
+              <td>Shows the final frame of the animation</td>
+              <td>Positioning and layout</td>
+            </tr>
+            <tr>
+              <td><strong>Interactive</strong></td>
+              <td>Step through animation frames manually</td>
+              <td>Debugging timing</td>
+            </tr>
+            <tr>
+              <td><strong>Live</strong></td>
+              <td>Plays animation automatically on save</td>
+              <td>Rapid iteration</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Preview Controls</h3>
+
+      <ul>
+        <li><strong>Play/Pause</strong> - Start or pause animation playback</li>
+        <li><strong>Step Forward/Back</strong> - Move one frame at a time</li>
+        <li><strong>Timeline Scrubber</strong> - Jump to specific points in the animation</li>
+        <li><strong>Speed Control</strong> - Adjust playback speed (0.25x - 4x)</li>
+        <li><strong>Zoom</strong> - Zoom in/out of the preview canvas</li>
+      </ul>
+
+      <h3>Preview Quality</h3>
+
+      <p>
+        Adjust preview quality for faster iteration or higher fidelity:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Settings</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>Preview Quality:
+  Draft    - 480p, 15fps (fastest)
+  Standard - 720p, 30fps (balanced)
+  High     - 1080p, 60fps (best quality)</code></pre>
+        </div>
+      </div>
+
+      <h2 id="rendering">Rendering</h2>
+
+      <p>
+        Export your animations to video files directly from the editor.
+      </p>
+
+      <h3>Render Dialog</h3>
+
+      <p>
+        Access via <strong>Run &gt; Render</strong> or press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Values</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Quality</td>
+              <td>480p, 720p, 1080p, 1440p, 4K</td>
+              <td>Output resolution</td>
+            </tr>
+            <tr>
+              <td>Format</td>
+              <td>MP4, WebM, GIF</td>
+              <td>Output file format</td>
+            </tr>
+            <tr>
+              <td>Frame Rate</td>
+              <td>24, 30, 60 fps</td>
+              <td>Frames per second</td>
+            </tr>
+            <tr>
+              <td>Background</td>
+              <td>Black, White, Transparent</td>
+              <td>Background color</td>
+            </tr>
+            <tr>
+              <td>Scene</td>
+              <td>All, Specific</td>
+              <td>Which scenes to render</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Batch Rendering</h3>
+
+      <p>
+        Render multiple scenes or files at once:
+      </p>
+
+      <ol>
+        <li>Select files in the explorer (Ctrl+Click)</li>
+        <li>Right-click and choose "Add to Render Queue"</li>
+        <li>Configure settings for each item</li>
+        <li>Click "Start Batch Render"</li>
+      </ol>
+
+      <h3>Render Progress</h3>
+
+      <p>
+        Monitor rendering progress in the status bar. Click to open the detailed
+        progress panel showing:
+      </p>
+
+      <ul>
+        <li>Current frame / total frames</li>
+        <li>Estimated time remaining</li>
+        <li>Memory and CPU usage</li>
+        <li>Output file location</li>
+      </ul>
+
+      <h2 id="settings">Settings</h2>
+
+      <p>
+        Access settings via <strong>File &gt; Preferences</strong> or <kbd>Ctrl</kbd> + <kbd>,</kbd>.
+      </p>
+
+      <h3>Editor Settings</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Font Family</td>
+              <td>JetBrains Mono</td>
+              <td>Editor font</td>
+            </tr>
+            <tr>
+              <td>Font Size</td>
+              <td>14px</td>
+              <td>Editor font size</td>
+            </tr>
+            <tr>
+              <td>Tab Size</td>
+              <td>4</td>
+              <td>Spaces per tab</td>
+            </tr>
+            <tr>
+              <td>Word Wrap</td>
+              <td>Off</td>
+              <td>Wrap long lines</td>
+            </tr>
+            <tr>
+              <td>Line Numbers</td>
+              <td>On</td>
+              <td>Show line numbers</td>
+            </tr>
+            <tr>
+              <td>Minimap</td>
+              <td>On</td>
+              <td>Show code minimap</td>
+            </tr>
+            <tr>
+              <td>Auto Save</td>
+              <td>After Delay</td>
+              <td>Auto save behavior</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Theme Settings</h3>
+
+      <p>The editor uses the Tokyo Night theme by default. Additional themes:</p>
+
+      <ul>
+        <li><strong>Tokyo Night</strong> - Dark theme with purple/blue accents (default)</li>
+        <li><strong>Tokyo Night Storm</strong> - Slightly lighter variant</li>
+        <li><strong>Tokyo Night Light</strong> - Light theme variant</li>
+        <li><strong>One Dark</strong> - Atom One Dark inspired</li>
+        <li><strong>Dracula</strong> - Popular dark theme</li>
+      </ul>
+
+      <h3>Preview Settings</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Preview Quality</td>
+              <td>Standard</td>
+              <td>Preview render quality</td>
+            </tr>
+            <tr>
+              <td>Auto Preview</td>
+              <td>On</td>
+              <td>Update preview on save</td>
+            </tr>
+            <tr>
+              <td>Preview Delay</td>
+              <td>500ms</td>
+              <td>Debounce time for auto preview</td>
+            </tr>
+            <tr>
+              <td>Show Grid</td>
+              <td>Off</td>
+              <td>Show coordinate grid</td>
+            </tr>
+            <tr>
+              <td>Show Axes</td>
+              <td>Off</td>
+              <td>Show X/Y axes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="shortcuts">Keyboard Shortcuts</h2>
+
+      <h3>File Operations</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Windows/Linux</th>
+              <th>macOS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New File</td>
+              <td><kbd>Ctrl</kbd> + <kbd>N</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>N</kbd></td>
+            </tr>
+            <tr>
+              <td>Open File</td>
+              <td><kbd>Ctrl</kbd> + <kbd>O</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>O</kbd></td>
+            </tr>
+            <tr>
+              <td>Save</td>
+              <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>S</kbd></td>
+            </tr>
+            <tr>
+              <td>Save As</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td>
+            </tr>
+            <tr>
+              <td>Close Tab</td>
+              <td><kbd>Ctrl</kbd> + <kbd>W</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>W</kbd></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Editing</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Windows/Linux</th>
+              <th>macOS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Undo</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Z</kbd></td>
+            </tr>
+            <tr>
+              <td>Redo</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></td>
+            </tr>
+            <tr>
+              <td>Find</td>
+              <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>F</kbd></td>
+            </tr>
+            <tr>
+              <td>Replace</td>
+              <td><kbd>Ctrl</kbd> + <kbd>H</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>F</kbd></td>
+            </tr>
+            <tr>
+              <td>Comment Line</td>
+              <td><kbd>Ctrl</kbd> + <kbd>/</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>/</kbd></td>
+            </tr>
+            <tr>
+              <td>Duplicate Line</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></td>
+            </tr>
+            <tr>
+              <td>Move Line Up</td>
+              <td><kbd>Alt</kbd> + <kbd>Up</kbd></td>
+              <td><kbd>Option</kbd> + <kbd>Up</kbd></td>
+            </tr>
+            <tr>
+              <td>Move Line Down</td>
+              <td><kbd>Alt</kbd> + <kbd>Down</kbd></td>
+              <td><kbd>Option</kbd> + <kbd>Down</kbd></td>
+            </tr>
+            <tr>
+              <td>Format Document</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Navigation</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Windows/Linux</th>
+              <th>macOS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Go to Line</td>
+              <td><kbd>Ctrl</kbd> + <kbd>G</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>G</kbd></td>
+            </tr>
+            <tr>
+              <td>Go to File</td>
+              <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>P</kbd></td>
+            </tr>
+            <tr>
+              <td>Go to Symbol</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd></td>
+            </tr>
+            <tr>
+              <td>Command Palette</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></td>
+            </tr>
+            <tr>
+              <td>Toggle Sidebar</td>
+              <td><kbd>Ctrl</kbd> + <kbd>B</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>B</kbd></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Run & Preview</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Windows/Linux</th>
+              <th>macOS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Run/Preview</td>
+              <td><kbd>F5</kbd></td>
+              <td><kbd>F5</kbd></td>
+            </tr>
+            <tr>
+              <td>Render</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd></td>
+            </tr>
+            <tr>
+              <td>Stop</td>
+              <td><kbd>Shift</kbd> + <kbd>F5</kbd></td>
+              <td><kbd>Shift</kbd> + <kbd>F5</kbd></td>
+            </tr>
+            <tr>
+              <td>Toggle Preview</td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td>
+              <td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td>
+            </tr>
+            <tr>
+              <td>Play/Pause Preview</td>
+              <td><kbd>Space</kbd> (in preview)</td>
+              <td><kbd>Space</kbd> (in preview)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Troubleshooting</h2>
+
+      <h3>Preview Not Updating</h3>
+
+      <ul>
+        <li>Check that the file has no syntax errors (red underlines)</li>
+        <li>Ensure "Auto Preview" is enabled in settings</li>
+        <li>Try manually refreshing with <kbd>F5</kbd></li>
+        <li>Check the console for error messages (View &gt; Console)</li>
+      </ul>
+
+      <h3>Rendering Fails</h3>
+
+      <ul>
+        <li>Verify Manim is installed: <code>mathviz info --check-deps</code></li>
+        <li>Check available disk space in the output directory</li>
+        <li>Try rendering at a lower quality first</li>
+        <li>Review the render log for specific errors</li>
+      </ul>
+
+      <h3>Performance Issues</h3>
+
+      <ul>
+        <li>Lower preview quality in settings</li>
+        <li>Disable minimap for large files</li>
+        <li>Close unused tabs</li>
+        <li>Increase preview debounce delay</li>
+      </ul>
+
+      <h2>Next Steps</h2>
+
+      <ul>
+        <li><a href="getting-started.html">Getting Started</a> - Write your first program</li>
+        <li><a href="scenes.html">Scenes & Manim</a> - Create animations</li>
+        <li><a href="../examples/index.html">Examples</a> - Browse example code</li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>

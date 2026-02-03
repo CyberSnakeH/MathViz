@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenes & Manim - MathViz Documentation</title>
+  <meta name="description" content="Learn how to create Manim animations with MathViz scene blocks.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link active">Manim</a>
+        <a href="cli.html" class="nav-link">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Manim</div>
+        <nav class="sidebar-nav">
+          <a href="#scenes" class="sidebar-link">Scene Blocks</a>
+          <a href="#mobjects" class="sidebar-link">Mobjects</a>
+          <a href="#animations" class="sidebar-link">Animations</a>
+          <a href="#play-wait" class="sidebar-link">play() and wait()</a>
+          <a href="#positioning" class="sidebar-link">Positioning</a>
+          <a href="#colors" class="sidebar-link">Colors</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Getting Started</a>
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="modules.html" class="sidebar-link">Module System</a>
+          <a href="cli.html" class="sidebar-link">CLI Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="docs-content">
+      <h1>Scenes & Manim Integration</h1>
+
+      <p>
+        MathViz provides first-class support for <a href="https://www.manim.community/" target="_blank" rel="noopener">Manim</a>,
+        the mathematical animation engine. Scene blocks compile directly to Manim Scene classes.
+      </p>
+
+      <h2 id="scenes">Scene Blocks</h2>
+
+      <p>A <code>scene</code> block defines a Manim animation:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">scene MyAnimation {
+    fn construct(self) {
+        // Your animation code here
+        let circle = Circle()
+        play(Create(circle))
+        wait(1.0)
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <p>This compiles to:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Python</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>from manim import *
+
+class MyAnimation(Scene):
+    def construct(self):
+        circle = Circle()
+        self.play(Create(circle))
+        self.wait(1.0)</code></pre>
+        </div>
+      </div>
+
+      <h2 id="mobjects">Mobjects</h2>
+
+      <p>Mobjects (mathematical objects) are the building blocks of Manim animations:</p>
+
+      <h3>Shapes</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Basic shapes
+let circle = Circle(radius: 2.0)
+let square = Square(side_length: 2.0)
+let rectangle = Rectangle(width: 3.0, height: 2.0)
+let triangle = Triangle()
+let line = Line(start: [-2, 0, 0], end: [2, 0, 0])
+let arrow = Arrow(start: ORIGIN, end: RIGHT * 2)
+let dot = Dot(point: ORIGIN)
+
+// Polygons
+let polygon = Polygon([-1, 0, 0], [1, 0, 0], [0, 1, 0])
+let regular_polygon = RegularPolygon(n: 6)  // Hexagon</code></pre>
+        </div>
+      </div>
+
+      <h3>Text and Math</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Plain text
+let text = Text("Hello, World!")
+let large_text = Text("Big!", font_size: 72)
+
+// LaTeX math
+let equation = MathTex("E = mc^2")
+let integral = MathTex("\\int_0^1 x^2 dx = \\frac{1}{3}")
+let formula = MathTex("\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}")
+
+// Mixed text and math
+let mixed = Tex("The area is $A = \\pi r^2$")</code></pre>
+        </div>
+      </div>
+
+      <h3>Graphs and Axes</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Number line
+let number_line = NumberLine(x_range: [-5, 5, 1])
+
+// 2D axes
+let axes = Axes(
+    x_range: [-3, 3, 1],
+    y_range: [-2, 2, 1],
+    x_length: 6,
+    y_length: 4
+)
+
+// Plot a function
+let graph = axes.plot(|x| x ^ 2, color: BLUE)
+let sin_graph = axes.plot(|x| sin(x), color: RED)</code></pre>
+        </div>
+      </div>
+
+      <h2 id="animations">Animation Functions</h2>
+
+      <h3>Creation Animations</h3>
+      <table>
+        <thead>
+          <tr><th>Animation</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Create(mobject)</code></td><td>Draw the mobject from nothing</td></tr>
+          <tr><td><code>Write(text)</code></td><td>Write text character by character</td></tr>
+          <tr><td><code>FadeIn(mobject)</code></td><td>Fade in from transparent</td></tr>
+          <tr><td><code>GrowFromCenter(mobject)</code></td><td>Grow from center point</td></tr>
+          <tr><td><code>DrawBorderThenFill(mobject)</code></td><td>Draw border, then fill</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Transformation Animations</h3>
+      <table>
+        <thead>
+          <tr><th>Animation</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Transform(a, b)</code></td><td>Transform mobject a into b</td></tr>
+          <tr><td><code>ReplacementTransform(a, b)</code></td><td>Replace a with b</td></tr>
+          <tr><td><code>MoveToTarget(mobject)</code></td><td>Move to target copy</td></tr>
+          <tr><td><code>Rotate(mobject, angle)</code></td><td>Rotate by angle</td></tr>
+          <tr><td><code>ScaleInPlace(mobject, factor)</code></td><td>Scale in place</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Exit Animations</h3>
+      <table>
+        <thead>
+          <tr><th>Animation</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>FadeOut(mobject)</code></td><td>Fade to transparent</td></tr>
+          <tr><td><code>Uncreate(mobject)</code></td><td>Reverse of Create</td></tr>
+          <tr><td><code>ShrinkToCenter(mobject)</code></td><td>Shrink to center point</td></tr>
+        </tbody>
+      </table>
+
+      <h3>The animate Property</h3>
+      <p>Use <code>.animate</code> for method chaining animations:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">scene AnimateExample {
+    fn construct(self) {
+        let square = Square()
+
+        play(Create(square))
+
+        // Animate method calls
+        play(square.animate.shift(RIGHT * 2))
+        play(square.animate.scale(2))
+        play(square.animate.rotate(PI / 4))
+        play(square.animate.set_color(RED))
+
+        // Chain multiple transformations
+        play(
+            square.animate
+                .shift(LEFT * 4)
+                .scale(0.5)
+                .set_color(BLUE)
+        )
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="play-wait">play() and wait()</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">scene PlayWaitExample {
+    fn construct(self) {
+        let circle = Circle()
+        let square = Square()
+
+        // Play a single animation
+        play(Create(circle))
+
+        // Play with custom run_time
+        play(Transform(circle, square), run_time: 2.0)
+
+        // Play multiple animations simultaneously
+        play(
+            circle.animate.shift(LEFT * 2),
+            square.animate.shift(RIGHT * 2)
+        )
+
+        // Wait (pause)
+        wait()        // Default 1 second
+        wait(2.0)     // Wait 2 seconds
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="positioning">Positioning</h2>
+
+      <h3>Direction Constants</h3>
+      <table>
+        <thead>
+          <tr><th>Constant</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>ORIGIN</code></td><td>Center of screen</td></tr>
+          <tr><td><code>UP</code>, <code>DOWN</code></td><td>Vertical directions</td></tr>
+          <tr><td><code>LEFT</code>, <code>RIGHT</code></td><td>Horizontal directions</td></tr>
+          <tr><td><code>UL</code>, <code>UR</code></td><td>Upper left/right</td></tr>
+          <tr><td><code>DL</code>, <code>DR</code></td><td>Down left/right</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Positioning Methods</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">let circle = Circle()
+let text = Text("Hello")
+
+// Position relative to another mobject
+text.next_to(circle, DOWN)           // Below circle
+text.next_to(circle, RIGHT, buff: 0.5)  // Right with buffer
+
+// Move to specific location
+circle.move_to(ORIGIN)
+circle.move_to([2, 1, 0])
+
+// Shift by amount
+circle.shift(RIGHT * 2)
+circle.shift(UP + LEFT)
+
+// Align with edges
+circle.to_edge(LEFT)
+circle.to_corner(UL)</code></pre>
+        </div>
+      </div>
+
+      <h2 id="colors">Colors</h2>
+
+      <h3>Built-in Colors</h3>
+      <p>MathViz provides all Manim color constants:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Primary colors
+RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK, WHITE, BLACK
+
+// Shades
+BLUE_A, BLUE_B, BLUE_C, BLUE_D, BLUE_E  // Light to dark
+RED_A, RED_B, RED_C, RED_D, RED_E
+// ... same for other colors
+
+// Usage
+let circle = Circle()
+circle.set_color(BLUE)
+circle.set_fill(BLUE, opacity: 0.5)
+circle.set_stroke(WHITE, width: 2)</code></pre>
+        </div>
+      </div>
+
+      <h2>Complete Example</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// pythagorean.mviz - Visualize the Pythagorean theorem
+
+scene PythagoreanTheorem {
+    fn construct(self) {
+        // Create a right triangle
+        let triangle = Polygon(
+            [0, 0, 0],
+            [3, 0, 0],
+            [3, 4, 0]
+        )
+        triangle.set_stroke(WHITE, width: 2)
+
+        // Create squares on each side
+        let a_square = Square(side_length: 3)
+        a_square.set_fill(RED, opacity: 0.5)
+        a_square.next_to(triangle, DOWN, buff: 0)
+
+        let b_square = Square(side_length: 4)
+        b_square.set_fill(GREEN, opacity: 0.5)
+        b_square.next_to(triangle, RIGHT, buff: 0)
+
+        let c_square = Square(side_length: 5)
+        c_square.set_fill(BLUE, opacity: 0.5)
+        c_square.rotate(atan(4/3))
+        c_square.move_to([1.5, 2, 0])
+
+        // Labels
+        let a_label = MathTex("a^2 = 9")
+        let b_label = MathTex("b^2 = 16")
+        let c_label = MathTex("c^2 = 25")
+
+        a_label.next_to(a_square, DOWN)
+        b_label.next_to(b_square, RIGHT)
+        c_label.next_to(c_square, UP)
+
+        // Theorem text
+        let theorem = MathTex("a^2 + b^2 = c^2")
+        theorem.to_edge(UP)
+
+        // Animate!
+        play(Create(triangle))
+        wait(0.5)
+
+        play(FadeIn(a_square), Write(a_label))
+        play(FadeIn(b_square), Write(b_label))
+        play(FadeIn(c_square), Write(c_label))
+
+        wait(1.0)
+        play(Write(theorem))
+        wait(2.0)
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <p>Run with:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz run pythagorean.mviz -q h --preview</code></pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>

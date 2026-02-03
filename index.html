@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathViz - A Domain-Specific Language for Mathematical Animations</title>
+  <meta name="description" content="MathViz is a modern DSL that compiles to Python and integrates seamlessly with Manim for creating beautiful mathematical animations.">
+  <meta name="keywords" content="MathViz, DSL, programming language, Manim, mathematical animations, Python">
+  <meta name="author" content="CyberSnakeH">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="MathViz - Mathematical Animation Language">
+  <meta property="og:description" content="A modern DSL for mathematical animations that compiles to Python and integrates with Manim.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cybersnakeh.github.io/MathViz/">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+
+  <!-- Custom Tokyo Night theme in styles.css, no external Prism theme needed -->
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+
+      <nav class="nav-links">
+        <a href="docs/getting-started.html" class="nav-link">Docs</a>
+        <a href="docs/language-reference.html" class="nav-link">Language</a>
+        <a href="docs/scenes.html" class="nav-link">Manim</a>
+        <a href="docs/cli.html" class="nav-link">CLI</a>
+        <a href="examples/index.html" class="nav-link">Examples</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <button class="nav-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-text">
+          <span class="hero-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            DSL + Manim + Python
+          </span>
+
+          <h1 class="hero-title">
+            Write Math.<br>Animate It.
+          </h1>
+
+          <p class="hero-description">
+            MathViz is a modern domain-specific language designed for mathematical animations.
+            Write clean, expressive code that compiles to Python and integrates seamlessly with Manim.
+          </p>
+
+          <div class="hero-actions">
+            <a href="docs/getting-started.html" class="btn btn-primary btn-lg">
+              Get Started
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="docs/language-reference.html" class="btn btn-secondary btn-lg">
+              Language Guide
+            </a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-value">.mviz</div>
+              <div class="hero-stat-label">File Extension</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value">Python</div>
+              <div class="hero-stat-label">Compiles To</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value">Desktop</div>
+              <div class="hero-stat-label">Editor Available</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-code">
+          <div class="code-window">
+            <div class="code-window-header">
+              <div class="code-window-dots">
+                <span class="code-window-dot red"></span>
+                <span class="code-window-dot yellow"></span>
+                <span class="code-window-dot green"></span>
+              </div>
+              <span class="code-window-title">circle_animation.mviz</span>
+              <div class="code-window-actions"></div>
+            </div>
+            <div class="code-window-body">
+              <pre><code class="language-mviz">// Create an animated circle scene
+scene CircleAnimation {
+    fn construct(self) {
+        let circle = Circle(radius: 2.0)
+        circle.set_color(BLUE)
+
+        let label = MathTex("A = \\pi r^2")
+        label.next_to(circle, DOWN)
+
+        play(Create(circle))
+        play(Write(label))
+        wait(2.0)
+
+        play(circle.animate.scale(1.5))
+        play(FadeOut(circle, label))
+    }
+}
+
+fn main() {
+    println("MathViz Animation Ready!")
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Features</span>
+          <h2 class="section-title">Why MathViz?</h2>
+          <p class="section-description">
+            A production-ready language designed for clarity, performance, and seamless integration with the Python ecosystem.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon magenta">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Math-First Syntax</h3>
+            <p class="feature-description">
+              Unicode operators, set operations, and mathematical notation built into the language. Write code that reads like math.
+            </p>
+            <code class="feature-code">let A = {1, 2, 3} ∪ {3, 4, 5}</code>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+            <h3 class="feature-title">Compiles to Python</h3>
+            <p class="feature-description">
+              Generated Python code is clean and readable. Full interoperability with the entire Python ecosystem.
+            </p>
+            <code class="feature-code">mathviz compile file.mviz -o output.py</code>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon cyan">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <h3 class="feature-title">Manim Integration</h3>
+            <p class="feature-description">
+              Scene blocks compile directly to Manim classes. Create beautiful animations with a clean, declarative syntax.
+            </p>
+            <code class="feature-code">scene MyAnimation { ... }</code>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Complete Tooling</h3>
+            <p class="feature-description">
+              Type checking, linting, formatting, analysis, and watch mode. Everything you need to develop efficiently.
+            </p>
+            <code class="feature-code">mathviz watch src/</code>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon yellow">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </div>
+            <h3 class="feature-title">Module System</h3>
+            <p class="feature-description">
+              Organize code with modules. Use <code>pub</code> for exports, <code>use</code> for imports. Clean architecture for any project size.
+            </p>
+            <code class="feature-code">use geometry.distance</code>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon red">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+              </svg>
+            </div>
+            <h3 class="feature-title">Desktop Editor</h3>
+            <p class="feature-description">
+              Native desktop editor built with Tauri and Monaco. Syntax highlighting, preview, and integrated tooling.
+            </p>
+            <code class="feature-code">Win / macOS / Linux</code>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="section install-section" id="install">
+      <div class="container">
+        <div class="install-grid">
+          <div class="install-info">
+            <h2>Quick Installation</h2>
+            <p>
+              Install MathViz with a single command. Use <strong>pipx</strong> for isolated installation
+              or <strong>uv</strong> for development.
+            </p>
+
+            <div class="callout">
+              <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div class="callout-content">
+                <div class="callout-title">File Extension</div>
+                <p class="callout-text">MathViz source files use the <code>.mviz</code> extension.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="install-methods">
+            <div class="install-method">
+              <div class="install-method-header">
+                <span class="install-method-label">
+                  pipx
+                  <span class="badge">Recommended</span>
+                </span>
+              </div>
+              <div class="install-method-body">
+                <code>pipx install git+https://github.com/CyberSnakeH/MathViz.git</code>
+              </div>
+            </div>
+
+            <div class="install-method">
+              <div class="install-method-header">
+                <span class="install-method-label">uv (Development)</span>
+              </div>
+              <div class="install-method-body">
+                <code>git clone https://github.com/CyberSnakeH/MathViz.git && cd MathViz && uv sync --dev</code>
+              </div>
+            </div>
+
+            <div class="install-method">
+              <div class="install-method-header">
+                <span class="install-method-label">Verify Installation</span>
+              </div>
+              <div class="install-method-body">
+                <code>mathviz --version</code>
+              </div>
+            </div>
+
+            <div class="install-method">
+              <div class="install-method-header">
+                <span class="install-method-label">Run an Example</span>
+              </div>
+              <div class="install-method-body">
+                <code>mathviz run examples/hello_world.mviz</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editor Preview Section -->
+    <section class="section editor-preview" id="editor">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Editor</span>
+          <h2 class="section-title">MathViz Desktop Editor</h2>
+          <p class="section-description">
+            A native desktop editor with syntax highlighting, live preview, and integrated tooling.
+          </p>
+        </div>
+
+        <div class="editor-mockup">
+          <div class="editor-toolbar">
+            <div class="code-window-dots">
+              <span class="code-window-dot red"></span>
+              <span class="code-window-dot yellow"></span>
+              <span class="code-window-dot green"></span>
+            </div>
+            <div class="editor-tabs">
+              <button class="editor-tab active">main.mviz</button>
+              <button class="editor-tab">geometry.mviz</button>
+              <button class="editor-tab">output.py</button>
+            </div>
+            <div></div>
+          </div>
+          <div class="editor-content">
+            <div class="editor-pane">
+              <div class="editor-pane-title">Source Code</div>
+              <pre><code class="language-mviz">use geometry
+
+fn main() {
+    let d = geometry.distance(0, 0, 3, 4)
+    println("Distance: {}", d)
+
+    let area = PI * 5.0 ^ 2
+    println("Circle area: {}", area)
+}
+
+@njit(parallel=true)
+fn compute_sum(arr: List[Float]) -> Float {
+    let total = 0.0
+    for x in arr {
+        total += x * x
+    }
+    return total
+}</code></pre>
+            </div>
+            <div class="editor-pane">
+              <div class="editor-pane-title">Compiled Output</div>
+              <pre><code class="language-python">import numpy as np
+from numba import njit, prange
+
+def main():
+    d = geometry_distance(0, 0, 3, 4)
+    print(f"Distance: {d}")
+
+    area = np.pi * 5.0 ** 2
+    print(f"Circle area: {area}")
+
+@njit(parallel=True, cache=True)
+def compute_sum(arr):
+    total = 0.0
+    for x in prange(len(arr)):
+        total += arr[x] * arr[x]
+    return total</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-xl">
+          <a href="https://github.com/CyberSnakeH/MathViz/releases" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+            Download Editor
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLI Section -->
+    <section class="section" id="cli">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">CLI</span>
+          <h2 class="section-title">Powerful Command Line</h2>
+          <p class="section-description">
+            Everything you need to compile, run, analyze, and format your MathViz code.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2">
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Compile</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz compile animation.mviz -o output.py</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Run with Manim</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz run animation.mviz -q h --preview</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Type Check</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz typecheck src/*.mviz --strict</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Format</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz fmt src/ --write</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Analyze</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz analyze src/main.mviz --json</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Watch Mode</span>
+            </div>
+            <div class="code-block-body">
+              <pre><code>mathviz watch src/ -o build/</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-xl">
+          <a href="docs/cli.html" class="btn btn-secondary">
+            Full CLI Reference
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-brand-name">
+          <div class="nav-brand-icon">M</div>
+          MathViz
+        </div>
+        <p class="footer-brand-desc">
+          A domain-specific language for mathematical animations. Write clean code, create beautiful visualizations.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="footer-section-title">Documentation</h4>
+        <nav class="footer-links">
+          <a href="docs/getting-started.html" class="footer-link">Getting Started</a>
+          <a href="docs/language-reference.html" class="footer-link">Language Reference</a>
+          <a href="docs/scenes.html" class="footer-link">Scenes & Manim</a>
+          <a href="docs/cli.html" class="footer-link">CLI Reference</a>
+        </nav>
+      </div>
+
+      <div>
+        <h4 class="footer-section-title">Resources</h4>
+        <nav class="footer-links">
+          <a href="examples/index.html" class="footer-link">Examples</a>
+          <a href="docs/modules.html" class="footer-link">Module System</a>
+          <a href="docs/editor.html" class="footer-link">Desktop Editor</a>
+        </nav>
+      </div>
+
+      <div>
+        <h4 class="footer-section-title">Community</h4>
+        <nav class="footer-links">
+          <a href="https://github.com/CyberSnakeH/MathViz" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/CyberSnakeH/MathViz/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/CyberSnakeH/MathViz/releases" class="footer-link" target="_blank" rel="noopener">Releases</a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copyright">
+        MathViz - Open Source under MIT License
+      </p>
+      <div class="footer-social">
+        <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="assets/prism-mviz.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

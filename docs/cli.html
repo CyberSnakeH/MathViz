@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI Reference - MathViz Documentation</title>
+  <meta name="description" content="Complete reference for the MathViz command-line interface.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link">Manim</a>
+        <a href="cli.html" class="nav-link active">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Getting Started</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Introduction</a>
+          <a href="getting-started.html#installation" class="sidebar-link">Installation</a>
+          <a href="getting-started.html#first-program" class="sidebar-link">First Program</a>
+          <a href="getting-started.html#running" class="sidebar-link">Running Code</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="modules.html" class="sidebar-link">Module System</a>
+          <a href="cli.html" class="sidebar-link active">CLI Reference</a>
+          <a href="editor.html" class="sidebar-link">Desktop Editor</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Commands</div>
+        <nav class="sidebar-nav">
+          <a href="#compile" class="sidebar-link">compile</a>
+          <a href="#run" class="sidebar-link">run</a>
+          <a href="#exec" class="sidebar-link">exec</a>
+          <a href="#check" class="sidebar-link">check</a>
+          <a href="#analyze" class="sidebar-link">analyze</a>
+          <a href="#fmt" class="sidebar-link">fmt</a>
+          <a href="#lint" class="sidebar-link">lint</a>
+          <a href="#watch" class="sidebar-link">watch</a>
+          <a href="#info" class="sidebar-link">info</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>CLI Reference</h1>
+
+      <p>
+        The MathViz CLI provides commands for compiling, running, and managing your MathViz projects.
+        This reference covers all available commands and their options.
+      </p>
+
+      <h2>Installation</h2>
+
+      <p>Install MathViz using pipx (recommended) or uv:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Using pipx (recommended for CLI tools)
+pipx install git+https://github.com/CyberSnakeH/MathViz.git
+
+# Using uv for development
+git clone https://github.com/CyberSnakeH/MathViz.git
+cd MathViz
+uv sync --dev</code></pre>
+        </div>
+      </div>
+
+      <h2>Global Options</h2>
+
+      <p>These options are available for all commands:</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--help, -h</code></td>
+              <td>Show help message and exit</td>
+            </tr>
+            <tr>
+              <td><code>--version, -V</code></td>
+              <td>Show version number and exit</td>
+            </tr>
+            <tr>
+              <td><code>--verbose, -v</code></td>
+              <td>Enable verbose output</td>
+            </tr>
+            <tr>
+              <td><code>--quiet, -q</code></td>
+              <td>Suppress non-error output</td>
+            </tr>
+            <tr>
+              <td><code>--color</code></td>
+              <td>Control color output: auto, always, never</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="compile">mathviz compile</h2>
+
+      <p>Compile MathViz source files to Python.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz compile &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Arguments</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>input</code></td>
+              <td>Path to MathViz source file (.mviz)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>-o, --output</code></td>
+              <td>Output file path</td>
+              <td><code>&lt;input&gt;.py</code></td>
+            </tr>
+            <tr>
+              <td><code>--emit</code></td>
+              <td>Output format: py, ast, tokens</td>
+              <td><code>py</code></td>
+            </tr>
+            <tr>
+              <td><code>--optimize</code></td>
+              <td>Optimization level: 0, 1, 2, 3</td>
+              <td><code>1</code></td>
+            </tr>
+            <tr>
+              <td><code>--no-runtime</code></td>
+              <td>Don't include runtime library</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--stdout</code></td>
+              <td>Print output to stdout instead of file</td>
+              <td><code>false</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Compile to default output (hello.py)
+mathviz compile hello.mviz
+
+# Compile to specific output file
+mathviz compile hello.mviz -o output/hello.py
+
+# Compile with maximum optimization
+mathviz compile hello.mviz --optimize 3
+
+# Output AST for debugging
+mathviz compile hello.mviz --emit ast --stdout
+
+# Output tokens for debugging
+mathviz compile hello.mviz --emit tokens --stdout</code></pre>
+        </div>
+      </div>
+
+      <h2 id="run">mathviz run</h2>
+
+      <p>
+        Compile and run a MathViz file with Manim. This command is specifically for files
+        containing <code>scene</code> blocks.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz run &lt;input&gt; [scene] [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Arguments</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>input</code></td>
+              <td>Path to MathViz source file</td>
+            </tr>
+            <tr>
+              <td><code>scene</code></td>
+              <td>Scene name to render (optional, renders all if omitted)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>-q, --quality</code></td>
+              <td>Video quality: l (480p), m (720p), h (1080p), p (1440p), k (4K)</td>
+              <td><code>h</code></td>
+            </tr>
+            <tr>
+              <td><code>-p, --preview</code></td>
+              <td>Preview video after rendering</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--format</code></td>
+              <td>Output format: mp4, gif, webm, png</td>
+              <td><code>mp4</code></td>
+            </tr>
+            <tr>
+              <td><code>-o, --output</code></td>
+              <td>Output directory</td>
+              <td><code>./media</code></td>
+            </tr>
+            <tr>
+              <td><code>--fps</code></td>
+              <td>Frame rate</td>
+              <td><code>60</code></td>
+            </tr>
+            <tr>
+              <td><code>--transparent</code></td>
+              <td>Render with transparent background</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--save-last-frame</code></td>
+              <td>Save last frame as image</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--dry-run</code></td>
+              <td>Compile only, don't render</td>
+              <td><code>false</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Run with preview
+mathviz run animation.mviz --preview
+
+# Run specific scene at 720p
+mathviz run animation.mviz IntroScene -q m --preview
+
+# Render to GIF
+mathviz run animation.mviz --format gif -q l
+
+# High quality render without preview
+mathviz run animation.mviz -q k -o ./renders
+
+# Render with transparent background
+mathviz run animation.mviz --transparent --format webm
+
+# Save last frame as image
+mathviz run animation.mviz --save-last-frame</code></pre>
+        </div>
+      </div>
+
+      <h2 id="exec">mathviz exec</h2>
+
+      <p>
+        Execute a MathViz file directly without generating intermediate files.
+        Use this for scripts without Manim scenes.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz exec &lt;input&gt; [args...]</code></pre>
+        </div>
+      </div>
+
+      <h3>Arguments</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>input</code></td>
+              <td>Path to MathViz source file</td>
+            </tr>
+            <tr>
+              <td><code>args...</code></td>
+              <td>Arguments to pass to the program</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Execute a script
+mathviz exec script.mviz
+
+# Pass arguments to the script
+mathviz exec script.mviz --input data.json --verbose
+
+# Execute with verbose output
+mathviz exec -v script.mviz</code></pre>
+        </div>
+      </div>
+
+      <h2 id="check">mathviz check</h2>
+
+      <p>Check MathViz source files for errors without compiling.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz check &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--strict</code></td>
+              <td>Enable strict type checking</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--warnings</code></td>
+              <td>Show warnings</td>
+              <td><code>true</code></td>
+            </tr>
+            <tr>
+              <td><code>--json</code></td>
+              <td>Output diagnostics as JSON</td>
+              <td><code>false</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Check for errors
+mathviz check main.mviz
+
+# Strict mode with all warnings
+mathviz check main.mviz --strict
+
+# Output as JSON (for editor integration)
+mathviz check main.mviz --json
+
+# Check multiple files
+mathviz check src/*.mviz</code></pre>
+        </div>
+      </div>
+
+      <h2 id="analyze">mathviz analyze</h2>
+
+      <p>Perform static analysis on MathViz source files.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz analyze &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--complexity</code></td>
+              <td>Report cyclomatic complexity</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--dependencies</code></td>
+              <td>Show module dependencies</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--unused</code></td>
+              <td>Find unused code</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--all</code></td>
+              <td>Run all analyses</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--json</code></td>
+              <td>Output as JSON</td>
+              <td><code>false</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Full analysis
+mathviz analyze main.mviz --all
+
+# Check complexity only
+mathviz analyze main.mviz --complexity
+
+# Find unused code
+mathviz analyze src/ --unused
+
+# Export dependency graph
+mathviz analyze src/ --dependencies --json > deps.json</code></pre>
+        </div>
+      </div>
+
+      <h2 id="fmt">mathviz fmt</h2>
+
+      <p>Format MathViz source files according to the standard style guide.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz fmt &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--check</code></td>
+              <td>Check if files are formatted (don't modify)</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--diff</code></td>
+              <td>Show diff of changes</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--indent</code></td>
+              <td>Indentation size (spaces)</td>
+              <td><code>4</code></td>
+            </tr>
+            <tr>
+              <td><code>--line-width</code></td>
+              <td>Maximum line width</td>
+              <td><code>100</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Format a file in place
+mathviz fmt main.mviz
+
+# Format all files in directory
+mathviz fmt src/
+
+# Check formatting (CI/CD)
+mathviz fmt --check src/
+
+# Show what would change
+mathviz fmt --diff main.mviz
+
+# Custom formatting options
+mathviz fmt main.mviz --indent 2 --line-width 80</code></pre>
+        </div>
+      </div>
+
+      <h2 id="lint">mathviz lint</h2>
+
+      <p>Run the linter to find code quality issues and potential bugs.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz lint &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--fix</code></td>
+              <td>Automatically fix issues when possible</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>--select</code></td>
+              <td>Enable specific rules (comma-separated)</td>
+              <td>all</td>
+            </tr>
+            <tr>
+              <td><code>--ignore</code></td>
+              <td>Disable specific rules (comma-separated)</td>
+              <td>none</td>
+            </tr>
+            <tr>
+              <td><code>--config</code></td>
+              <td>Path to config file</td>
+              <td><code>mathviz.toml</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Lint Rules</h3>
+
+      <p>Common lint rule categories:</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Prefix</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Error</td>
+              <td><code>E</code></td>
+              <td>Syntax and semantic errors</td>
+            </tr>
+            <tr>
+              <td>Warning</td>
+              <td><code>W</code></td>
+              <td>Potential issues and bad practices</td>
+            </tr>
+            <tr>
+              <td>Style</td>
+              <td><code>S</code></td>
+              <td>Code style violations</td>
+            </tr>
+            <tr>
+              <td>Complexity</td>
+              <td><code>C</code></td>
+              <td>Code complexity issues</td>
+            </tr>
+            <tr>
+              <td>Performance</td>
+              <td><code>P</code></td>
+              <td>Performance suggestions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Lint a file
+mathviz lint main.mviz
+
+# Lint and auto-fix
+mathviz lint main.mviz --fix
+
+# Only check specific rules
+mathviz lint main.mviz --select E,W
+
+# Ignore style rules
+mathviz lint main.mviz --ignore S
+
+# Lint entire project
+mathviz lint src/</code></pre>
+        </div>
+      </div>
+
+      <h2 id="watch">mathviz watch</h2>
+
+      <p>Watch files for changes and automatically recompile or re-render.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz watch &lt;input&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--command</code></td>
+              <td>Command to run: compile, run, check</td>
+              <td><code>compile</code></td>
+            </tr>
+            <tr>
+              <td><code>--debounce</code></td>
+              <td>Debounce time in milliseconds</td>
+              <td><code>300</code></td>
+            </tr>
+            <tr>
+              <td><code>--clear</code></td>
+              <td>Clear terminal before each run</td>
+              <td><code>true</code></td>
+            </tr>
+            <tr>
+              <td><code>--notify</code></td>
+              <td>Show desktop notifications</td>
+              <td><code>false</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Watch and compile on changes
+mathviz watch src/
+
+# Watch and run animation on changes
+mathviz watch animation.mviz --command run
+
+# Watch with notifications
+mathviz watch src/ --notify
+
+# Watch with custom debounce
+mathviz watch src/ --debounce 500</code></pre>
+        </div>
+      </div>
+
+      <h2 id="info">mathviz info</h2>
+
+      <p>Display information about the MathViz installation and environment.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz info [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--json</code></td>
+              <td>Output as JSON</td>
+            </tr>
+            <tr>
+              <td><code>--check-deps</code></td>
+              <td>Check if all dependencies are installed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Example Output</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>$ mathviz info
+MathViz 1.0.0
+
+Environment:
+  Python: 3.11.5
+  Manim: 0.18.0
+  Platform: linux (x86_64)
+
+Paths:
+  Config: ~/.config/mathviz/config.toml
+  Cache: ~/.cache/mathviz
+
+Dependencies:
+  numpy: 1.24.0
+  scipy: 1.11.0
+  numba: 0.58.0 (JIT enabled)</code></pre>
+        </div>
+      </div>
+
+      <h2>Configuration File</h2>
+
+      <p>
+        Configure default options in <code>mathviz.toml</code> in your project root:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">TOML</span>
+          <span class="code-block-filename">mathviz.toml</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>[project]
+name = "my-animation"
+version = "1.0.0"
+entry = "src/main.mviz"
+
+[compile]
+optimize = 2
+output_dir = "build"
+
+[run]
+quality = "h"
+preview = true
+output_dir = "media"
+
+[fmt]
+indent = 4
+line_width = 100
+
+[lint]
+select = ["E", "W", "C"]
+ignore = ["S001"]</code></pre>
+        </div>
+      </div>
+
+      <h2>Exit Codes</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>0</code></td>
+              <td>Success</td>
+            </tr>
+            <tr>
+              <td><code>1</code></td>
+              <td>General error</td>
+            </tr>
+            <tr>
+              <td><code>2</code></td>
+              <td>Syntax error in source file</td>
+            </tr>
+            <tr>
+              <td><code>3</code></td>
+              <td>Type error</td>
+            </tr>
+            <tr>
+              <td><code>4</code></td>
+              <td>Runtime error</td>
+            </tr>
+            <tr>
+              <td><code>5</code></td>
+              <td>File not found</td>
+            </tr>
+            <tr>
+              <td><code>10</code></td>
+              <td>Lint errors found (with --check)</td>
+            </tr>
+            <tr>
+              <td><code>11</code></td>
+              <td>Format check failed (with --check)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Next Steps</h2>
+
+      <ul>
+        <li><a href="getting-started.html">Getting Started</a> - Installation and first program</li>
+        <li><a href="editor.html">Desktop Editor</a> - Use the graphical editor</li>
+        <li><a href="../examples/index.html">Examples</a> - Browse example code</li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started - MathViz Documentation</title>
+  <meta name="description" content="Learn how to install MathViz and write your first program.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link active">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link">Manim</a>
+        <a href="cli.html" class="nav-link">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Getting Started</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link active">Introduction</a>
+          <a href="getting-started.html#installation" class="sidebar-link">Installation</a>
+          <a href="getting-started.html#first-program" class="sidebar-link">First Program</a>
+          <a href="getting-started.html#running" class="sidebar-link">Running Code</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="modules.html" class="sidebar-link">Module System</a>
+          <a href="cli.html" class="sidebar-link">CLI Reference</a>
+          <a href="editor.html" class="sidebar-link">Desktop Editor</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Getting Started with MathViz</h1>
+
+      <p>
+        MathViz is a domain-specific language designed for creating mathematical animations.
+        It compiles to Python and integrates seamlessly with Manim, the mathematical animation engine.
+      </p>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Prerequisites</div>
+          <p class="callout-text">MathViz requires Python 3.10 or later. For animations, you'll also need Manim installed.</p>
+        </div>
+      </div>
+
+      <h2 id="installation">Installation</h2>
+
+      <h3>Using pipx (Recommended)</h3>
+      <p>
+        The recommended way to install MathViz is using <code>pipx</code>, which installs the CLI
+        in an isolated environment:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>pipx install git+https://github.com/CyberSnakeH/MathViz.git</code></pre>
+        </div>
+      </div>
+
+      <h3>Using uv (Development)</h3>
+      <p>
+        For development or contributing to MathViz, clone the repository and use <code>uv</code>:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>git clone https://github.com/CyberSnakeH/MathViz.git
+cd MathViz
+uv sync --dev</code></pre>
+        </div>
+      </div>
+
+      <h3>Verify Installation</h3>
+      <p>After installation, verify MathViz is working:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz --version
+mathviz info</code></pre>
+        </div>
+      </div>
+
+      <h2 id="first-program">Your First Program</h2>
+
+      <p>Create a new file called <code>hello.mviz</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// hello.mviz - Your first MathViz program
+
+fn main() {
+    let message = "Hello, MathViz!"
+    println(message)
+
+    // Basic math
+    let x = 2 ^ 10
+    println("2^10 = {}", x)
+
+    // A simple function
+    let result = add(5, 3)
+    println("5 + 3 = {}", result)
+}
+
+fn add(a: Int, b: Int) -> Int {
+    return a + b
+}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="running">Running Your Code</h2>
+
+      <h3>Execute Directly</h3>
+      <p>Run your MathViz code directly without generating a Python file:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz exec hello.mviz</code></pre>
+        </div>
+      </div>
+
+      <h3>Compile to Python</h3>
+      <p>Compile your MathViz code to a Python file:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz compile hello.mviz -o hello.py</code></pre>
+        </div>
+      </div>
+
+      <h3>Run with Manim</h3>
+      <p>If your file contains a <code>scene</code> block, run it with Manim:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz run animation.mviz -q m --preview</code></pre>
+        </div>
+      </div>
+
+      <h2 id="creating-animation">Creating Your First Animation</h2>
+
+      <p>Create a file called <code>circle.mviz</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// circle.mviz - A simple animation
+
+scene CircleDemo {
+    fn construct(self) {
+        // Create a circle
+        let circle = Circle(radius: 2.0)
+        circle.set_color(BLUE)
+
+        // Create a label
+        let label = Text("MathViz")
+        label.next_to(circle, DOWN)
+
+        // Animate!
+        play(Create(circle))
+        play(FadeIn(label))
+        wait(2.0)
+        play(FadeOut(circle, label))
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <p>Run the animation:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz run circle.mviz --preview</code></pre>
+        </div>
+      </div>
+
+      <h2>Next Steps</h2>
+
+      <ul>
+        <li><a href="language-reference.html">Language Reference</a> - Learn the full syntax</li>
+        <li><a href="scenes.html">Scenes & Manim</a> - Create animations</li>
+        <li><a href="cli.html">CLI Reference</a> - All available commands</li>
+        <li><a href="../examples/index.html">Examples</a> - Browse example code</li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module System - MathViz Documentation</title>
+  <meta name="description" content="Learn about MathViz's module system for organizing and reusing code.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link">Manim</a>
+        <a href="cli.html" class="nav-link">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Getting Started</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Introduction</a>
+          <a href="getting-started.html#installation" class="sidebar-link">Installation</a>
+          <a href="getting-started.html#first-program" class="sidebar-link">First Program</a>
+          <a href="getting-started.html#running" class="sidebar-link">Running Code</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="modules.html" class="sidebar-link active">Module System</a>
+          <a href="cli.html" class="sidebar-link">CLI Reference</a>
+          <a href="editor.html" class="sidebar-link">Desktop Editor</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">On This Page</div>
+        <nav class="sidebar-nav">
+          <a href="#overview" class="sidebar-link">Overview</a>
+          <a href="#use-statements" class="sidebar-link">Use Statements</a>
+          <a href="#pub-keyword" class="sidebar-link">Public Exports</a>
+          <a href="#module-resolution" class="sidebar-link">Module Resolution</a>
+          <a href="#multi-file" class="sidebar-link">Multi-File Projects</a>
+          <a href="#best-practices" class="sidebar-link">Best Practices</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Module System</h1>
+
+      <p>
+        MathViz provides a powerful module system for organizing code into reusable,
+        maintainable components. The module system supports importing from the standard
+        library, external packages, and your own project files.
+      </p>
+
+      <h2 id="overview">Overview</h2>
+
+      <p>The module system is built around three core concepts:</p>
+
+      <ul>
+        <li><strong>use</strong> - Import items from other modules</li>
+        <li><strong>mod</strong> - Declare a submodule</li>
+        <li><strong>pub</strong> - Export items for external use</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Import specific items
+use math::{sin, cos, PI}
+use collections::HashMap
+
+// Import everything from a module
+use geometry::*
+
+// Import with alias
+use statistics::mean as average
+
+// Declare a submodule
+mod helpers
+
+fn main() {
+    let angle = PI / 4.0
+    println("sin({}) = {}", angle, sin(angle))
+}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="use-statements">Use Statements</h2>
+
+      <h3>Basic Imports</h3>
+
+      <p>Import specific items from a module using the <code>use</code> keyword:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Import a single item
+use math::sqrt
+
+// Import multiple items with braces
+use math::{sin, cos, tan, PI, E}
+
+// Import from nested modules
+use graphics::shapes::Circle
+use graphics::colors::{RED, BLUE, GREEN}</code></pre>
+        </div>
+      </div>
+
+      <h3>Glob Imports</h3>
+
+      <p>Import all public items from a module using <code>*</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Import everything from the math module
+use math::*
+
+// Now you can use sin, cos, sqrt, etc. directly
+fn main() {
+    let result = sqrt(16.0) + sin(PI / 2.0)
+    println("Result: {}", result)
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Use Glob Imports Sparingly</div>
+          <p class="callout-text">
+            Glob imports can make it unclear where names come from. Prefer explicit imports
+            for clarity, except for prelude-like modules designed for glob import.
+          </p>
+        </div>
+      </div>
+
+      <h3>Aliased Imports</h3>
+
+      <p>Rename imports to avoid conflicts or improve readability:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Rename to avoid conflicts
+use graphics::Circle as GraphicsCircle
+use geometry::Circle as GeoCircle
+
+// Rename for brevity
+use collections::HashMap as Map
+use statistics::standard_deviation as std_dev
+
+fn main() {
+    let visual = GraphicsCircle(radius: 2.0)
+    let mathematical = GeoCircle::unit()
+
+    let data = Map::new()
+    let deviation = std_dev([1.0, 2.0, 3.0, 4.0, 5.0])
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Standard Library Imports</h3>
+
+      <p>MathViz includes a standard library with common functionality:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Math functions and constants
+use math::{sin, cos, tan, sqrt, abs, floor, ceil, PI, E, TAU}
+
+// Collection types
+use collections::{HashMap, HashSet, Vec, Deque}
+
+// String utilities
+use strings::{split, join, trim, replace}
+
+// File I/O
+use io::{read_file, write_file, File}
+
+// Random numbers
+use random::{rand, randint, choice, shuffle}
+
+// Date and time
+use datetime::{now, Date, Time, Duration}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="pub-keyword">Public Exports (pub)</h2>
+
+      <p>
+        By default, all items in a module are private. Use the <code>pub</code> keyword
+        to make items available for import by other modules.
+      </p>
+
+      <h3>Exporting Functions</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">math_utils.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Public function - can be imported
+pub fn factorial(n: Int) -> Int {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+// Public function
+pub fn fibonacci(n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// Private helper - cannot be imported
+fn validate_positive(n: Int) -> Bool {
+    return n >= 0
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Exporting Types</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">geometry.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Public struct
+pub struct Point {
+    x: Float,
+    y: Float
+}
+
+// Public enum
+pub enum Shape {
+    Circle(radius: Float),
+    Rectangle(width: Float, height: Float),
+    Triangle(a: Float, b: Float, c: Float)
+}
+
+// Public trait
+pub trait Drawable {
+    fn draw(self)
+    fn bounds(self) -> (Float, Float, Float, Float)
+}
+
+// Implementation can also be public
+pub impl Point {
+    pub fn new(x: Float, y: Float) -> Point {
+        return Point { x, y }
+    }
+
+    pub fn distance_to(self, other: Point) -> Float {
+        let dx = self.x - other.x
+        let dy = self.y - other.y
+        return sqrt(dx^2 + dy^2)
+    }
+
+    // Private method
+    fn validate(self) -> Bool {
+        return true
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Exporting Constants</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">constants.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Public constants
+pub const MAX_ITERATIONS: Int = 1000
+pub const TOLERANCE: Float = 1e-10
+pub const DEFAULT_COLOR: String = "#7aa2f7"
+
+// Public list of colors
+pub const PALETTE: [String] = [
+    "#f7768e",  // Red
+    "#9ece6a",  // Green
+    "#7aa2f7",  // Blue
+    "#bb9af7",  // Purple
+    "#e0af68"   // Yellow
+]</code></pre>
+        </div>
+      </div>
+
+      <h2 id="module-resolution">Module Resolution</h2>
+
+      <p>
+        MathViz resolves module paths in a specific order, allowing flexibility
+        in how you organize your code.
+      </p>
+
+      <h3>Resolution Order</h3>
+
+      <ol>
+        <li><strong>Standard Library</strong> - Built-in modules like <code>math</code>, <code>collections</code></li>
+        <li><strong>Project Root</strong> - Modules in your project's root directory</li>
+        <li><strong>Relative Path</strong> - Modules relative to the current file</li>
+        <li><strong>Installed Packages</strong> - External packages installed via package manager</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Standard library (always available)
+use math::sqrt
+
+// From project root (src/utils.mviz)
+use utils::helper_function
+
+// Relative import (./local_module.mviz)
+use self::local_module::LocalType
+
+// Parent directory (../shared/common.mviz)
+use super::shared::common::SharedType
+
+// External package
+use external_pkg::feature</code></pre>
+        </div>
+      </div>
+
+      <h3>File to Module Mapping</h3>
+
+      <p>MathViz maps file paths to module paths:</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>File Path</th>
+              <th>Module Path</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>src/main.mviz</code></td>
+              <td>Root module</td>
+            </tr>
+            <tr>
+              <td><code>src/utils.mviz</code></td>
+              <td><code>utils</code></td>
+            </tr>
+            <tr>
+              <td><code>src/math/vector.mviz</code></td>
+              <td><code>math::vector</code></td>
+            </tr>
+            <tr>
+              <td><code>src/math/mod.mviz</code></td>
+              <td><code>math</code> (module root)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The mod.mviz File</h3>
+
+      <p>
+        For directories containing multiple modules, create a <code>mod.mviz</code> file
+        to define the module's public interface:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/geometry/mod.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Declare submodules
+mod point
+mod vector
+mod shapes
+
+// Re-export commonly used items
+pub use point::Point
+pub use vector::Vector
+pub use shapes::{Circle, Rectangle, Triangle}
+
+// Module-level documentation and shared code
+pub const ORIGIN: Point = Point { x: 0.0, y: 0.0 }</code></pre>
+        </div>
+      </div>
+
+      <h2 id="multi-file">Multi-File Projects</h2>
+
+      <h3>Project Structure</h3>
+
+      <p>A typical MathViz project structure:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Text</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>my_project/
+├── mathviz.toml           # Project configuration
+├── src/
+│   ├── main.mviz          # Entry point
+│   ├── config.mviz        # Configuration
+│   ├── utils.mviz         # Utility functions
+│   ├── models/
+│   │   ├── mod.mviz       # Module declaration
+│   │   ├── user.mviz
+│   │   └── data.mviz
+│   ├── services/
+│   │   ├── mod.mviz
+│   │   ├── auth.mviz
+│   │   └── api.mviz
+│   └── scenes/
+│       ├── mod.mviz
+│       ├── intro.mviz
+│       └── main_animation.mviz
+└── tests/
+    ├── test_utils.mviz
+    └── test_models.mviz</code></pre>
+        </div>
+      </div>
+
+      <h3>Example: Multi-File Animation Project</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/main.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Main entry point
+use scenes::IntroScene
+use scenes::MainAnimation
+use config::SETTINGS
+
+fn main() {
+    println("Starting animation project...")
+    println("Quality: {}", SETTINGS.quality)
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/config.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">pub struct Settings {
+    quality: String,
+    frame_rate: Int,
+    output_dir: String
+}
+
+pub const SETTINGS: Settings = Settings {
+    quality: "high",
+    frame_rate: 60,
+    output_dir: "./output"
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/scenes/mod.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Declare scene modules
+mod intro
+mod main_animation
+
+// Re-export scene classes
+pub use intro::IntroScene
+pub use main_animation::MainAnimation
+
+// Shared utilities for all scenes
+pub fn create_title(text: String) -> Text {
+    let title = Text(text)
+    title.scale(1.5)
+    title.to_edge(UP)
+    return title
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/scenes/intro.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">use super::create_title
+
+pub scene IntroScene {
+    fn construct(self) {
+        let title = create_title("Welcome to MathViz")
+
+        play(Write(title))
+        wait(2.0)
+        play(FadeOut(title))
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/scenes/main_animation.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">use super::create_title
+use config::SETTINGS
+
+pub scene MainAnimation {
+    fn construct(self) {
+        let title = create_title("Main Content")
+
+        // Create shapes
+        let circle = Circle(radius: 1.0)
+        circle.set_color(BLUE)
+
+        let square = Square(side_length: 2.0)
+        square.set_color(RED)
+        square.next_to(circle, RIGHT, buff: 1.0)
+
+        // Animate
+        play(Write(title))
+        play(Create(circle), Create(square))
+        wait(1.0)
+
+        // Transform
+        play(Transform(circle, square.copy()))
+        wait(2.0)
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h2 id="best-practices">Best Practices</h2>
+
+      <h3>Module Organization</h3>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>One Concept Per File</h4>
+          <p>Keep each file focused on a single struct, trait, or related set of functions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>Explicit Exports</h4>
+          <p>Only export what's needed. Use <code>pub</code> intentionally to create clean APIs.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>Re-export at Module Root</h4>
+          <p>Use <code>mod.mviz</code> to create a clean public interface for module directories.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>Avoid Circular Dependencies</h4>
+          <p>Structure modules in a hierarchy where dependencies flow one direction.</p>
+        </div>
+      </div>
+
+      <h3>Import Style Guide</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Good: Group imports by source
+// Standard library
+use math::{sin, cos, PI}
+use collections::HashMap
+
+// Project modules
+use models::User
+use services::{AuthService, ApiClient}
+
+// Local modules
+use self::helpers::validate
+
+// Bad: Mixed, unorganized imports
+use services::AuthService
+use math::sin
+use self::helpers::validate
+use models::User
+use math::cos</code></pre>
+        </div>
+      </div>
+
+      <h3>Prelude Pattern</h3>
+
+      <p>
+        For commonly used items, create a prelude module that can be glob-imported:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/prelude.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Re-export commonly used items
+pub use math::{PI, E, sqrt, sin, cos}
+pub use collections::{Vec, HashMap}
+pub use models::{Point, Vector}
+pub use traits::{Drawable, Animatable}
+pub use constants::{COLORS, DEFAULT_SETTINGS}</code></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">src/main.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Import everything commonly needed
+use prelude::*
+
+fn main() {
+    let p = Point::new(cos(PI/4), sin(PI/4))
+    let v = Vector::from_point(p)
+    println("Vector: {:?}", v)
+}</code></pre>
+        </div>
+      </div>
+
+      <h2>Next Steps</h2>
+
+      <ul>
+        <li><a href="cli.html">CLI Reference</a> - Learn about the command-line interface</li>
+        <li><a href="language-reference.html">Language Reference</a> - Complete syntax documentation</li>
+        <li><a href="../examples/index.html">Examples</a> - See multi-file project examples</li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>
