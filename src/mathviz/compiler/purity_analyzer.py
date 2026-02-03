@@ -16,34 +16,25 @@ for the same inputs. Impure functions may:
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional
 
 from mathviz.compiler.ast_nodes import (
-    ASTNode,
     AssignmentStatement,
     BaseASTVisitor,
-    Block,
     CallExpression,
     CompoundAssignment,
-    ConditionalExpression,
     Expression,
-    ExpressionStatement,
     ForStatement,
     FunctionDef,
     Identifier,
-    IfStatement,
     IndexExpression,
     LambdaExpression,
     LetStatement,
     MemberAccess,
-    Parameter,
     PlayStatement,
     PrintStatement,
     Program,
-    ReturnStatement,
     SceneDef,
     WaitStatement,
-    WhileStatement,
 )
 from mathviz.utils.errors import SourceLocation
 
@@ -134,7 +125,7 @@ class SideEffect:
 
     kind: SideEffectKind
     name: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
     description: str = ""
 
     def __str__(self) -> str:
@@ -490,7 +481,7 @@ class PurityAnalyzer(BaseASTVisitor):
         self._analyze_assignment_target(node.target, node.location)
 
     def _analyze_assignment_target(
-        self, target: Expression, location: Optional[SourceLocation]
+        self, target: Expression, location: SourceLocation | None
     ) -> None:
         """
         Analyze an assignment target for side effects.
@@ -644,7 +635,7 @@ class PurityAnalyzer(BaseASTVisitor):
         for arg in node.arguments:
             self.visit(arg)
 
-    def _get_call_name(self, callee: Expression) -> Optional[str]:
+    def _get_call_name(self, callee: Expression) -> str | None:
         """Extract the function name from a callee expression."""
         if isinstance(callee, Identifier):
             return callee.name
@@ -655,20 +646,18 @@ class PurityAnalyzer(BaseASTVisitor):
             return callee.member
         return None
 
-    def _get_base_identifier(self, expr: Expression) -> Optional[str]:
+    def _get_base_identifier(self, expr: Expression) -> str | None:
         """Get the base identifier from a potentially nested expression."""
         if isinstance(expr, Identifier):
             return expr.name
-        elif isinstance(expr, MemberAccess):
-            return self._get_base_identifier(expr.object)
-        elif isinstance(expr, IndexExpression):
+        elif isinstance(expr, (MemberAccess, IndexExpression)):
             return self._get_base_identifier(expr.object)
         return None
 
     def _analyze_call(
         self,
         call_name: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
         callee: Expression,
     ) -> None:
         """
@@ -782,7 +771,7 @@ class PurityAnalyzer(BaseASTVisitor):
         self,
         kind: SideEffectKind,
         name: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
         description: str = "",
     ) -> None:
         """Add a side effect to the current analysis."""

@@ -26,36 +26,33 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional
 
 from mathviz.compiler.ast_nodes import (
+    AssignmentStatement,
     # AST base classes
     ASTNode,
     BaseASTVisitor,
-    Expression,
-    Statement,
+    BinaryExpression,
+    BinaryOperator,
     Block,
+    CallExpression,
+    CompoundAssignment,
+    ConditionalExpression,
+    Expression,
+    ForStatement,
+    FunctionDef,
     # Expressions
     Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
+    IfStatement,
     IndexExpression,
-    ConditionalExpression,
-    RangeExpression,
-    BinaryOperator,
+    IntegerLiteral,
     # Statements
     LetStatement,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    ForStatement,
+    MemberAccess,
+    RangeExpression,
+    Statement,
+    UnaryExpression,
     WhileStatement,
-    IfStatement,
-    ReturnStatement,
 )
 
 
@@ -108,8 +105,8 @@ class DataDependency:
     variable: str
     dep_type: DependencyType
     from_iteration: bool
-    source_stmt: Optional[Statement] = None
-    sink_stmt: Optional[Statement] = None
+    source_stmt: Statement | None = None
+    sink_stmt: Statement | None = None
     description: str = ""
 
     def __str__(self) -> str:
@@ -131,7 +128,7 @@ class ReductionVariable:
 
     name: str
     operator: ReductionOperator
-    init_value: Optional[Expression] = None
+    init_value: Expression | None = None
 
     def __str__(self) -> str:
         return f"reduction({self.operator.name.lower()}: {self.name})"
@@ -206,11 +203,11 @@ class MemoryAccess:
     """
 
     variable: str
-    index_expr: Optional[Expression] = None
+    index_expr: Expression | None = None
     is_write: bool = False
     depends_on_loop_var: bool = False
     index_offset: int = 0  # e.g., arr[i-1] has offset -1
-    statement: Optional[Statement] = None
+    statement: Statement | None = None
 
 
 class VariableCollector(BaseASTVisitor):
@@ -287,7 +284,7 @@ class IndexAnalyzer(BaseASTVisitor):
         self._analyze_expr(index_expr)
         return self.depends_on_loop_var, self.offset
 
-    def _analyze_expr(self, expr: Expression) -> Optional[int]:
+    def _analyze_expr(self, expr: Expression) -> int | None:
         """
         Recursively analyze expression, returning constant value if computable.
 
@@ -364,7 +361,7 @@ class LoopBodyAnalyzer(BaseASTVisitor):
         self.has_break_continue: bool = False
         self.has_function_calls: bool = False
         self.has_nested_loops: bool = False
-        self._current_statement: Optional[Statement] = None
+        self._current_statement: Statement | None = None
         self._collector = VariableCollector()
         self._index_analyzer = IndexAnalyzer(loop_variable)
 
@@ -588,7 +585,7 @@ class ParallelAnalyzer(BaseASTVisitor):
     def __init__(self) -> None:
         """Initialize the parallel analyzer."""
         self._loop_analyses: list[tuple[ForStatement, LoopAnalysis]] = []
-        self._current_function: Optional[FunctionDef] = None
+        self._current_function: FunctionDef | None = None
         self._function_params: set[str] = set()
 
     def analyze_loop(self, loop: ForStatement) -> LoopAnalysis:
@@ -776,9 +773,8 @@ class ParallelAnalyzer(BaseASTVisitor):
             return True
 
         # Call to range() function
-        if isinstance(iterable, CallExpression):
-            if isinstance(iterable.callee, Identifier):
-                return iterable.callee.name == "range"
+        if isinstance(iterable, CallExpression) and isinstance(iterable.callee, Identifier):
+            return iterable.callee.name == "range"
 
         return False
 
@@ -799,7 +795,7 @@ class ParallelAnalyzer(BaseASTVisitor):
         reductions: list[ReductionVariable] = []
         seen_vars: set[str] = set()
 
-        for var_name, operator, value_expr in compound_assignments:
+        for var_name, operator, _value_expr in compound_assignments:
             # Skip if already identified as reduction
             if var_name in seen_vars:
                 continue

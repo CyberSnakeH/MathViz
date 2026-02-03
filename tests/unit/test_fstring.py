@@ -10,19 +10,18 @@ Tests cover:
 
 import pytest
 
+from mathviz.compiler.ast_nodes import (
+    BinaryExpression,
+    BinaryOperator,
+    FString,
+    FStringExpression,
+    FStringLiteral,
+    Identifier,
+)
+from mathviz.compiler.codegen import CodeGenerator
 from mathviz.compiler.lexer import Lexer
 from mathviz.compiler.parser import Parser
 from mathviz.compiler.tokens import TokenType
-from mathviz.compiler.ast_nodes import (
-    FString,
-    FStringLiteral,
-    FStringExpression,
-    Identifier,
-    IntegerLiteral,
-    BinaryExpression,
-    BinaryOperator,
-)
-from mathviz.compiler.codegen import CodeGenerator
 from mathviz.utils.errors import LexerError
 
 

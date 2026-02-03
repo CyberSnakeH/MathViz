@@ -9,12 +9,13 @@ Provides a test framework for MathViz programs with:
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import List, Callable, Optional, Any, Dict
-from enum import Enum
+
 import time
 import traceback
-import sys
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
 
 
 class TestStatus(Enum):
@@ -33,9 +34,9 @@ class TestResult:
     name: str
     status: TestStatus
     duration: float  # seconds
-    message: Optional[str] = None
-    location: Optional[str] = None
-    traceback: Optional[str] = None
+    message: str | None = None
+    location: str | None = None
+    traceback: str | None = None
 
 
 @dataclass
@@ -43,7 +44,7 @@ class TestSuite:
     """Collection of test results."""
 
     name: str
-    results: List[TestResult] = field(default_factory=list)
+    results: list[TestResult] = field(default_factory=list)
     duration: float = 0.0
 
     @property
@@ -210,7 +211,7 @@ class TestRunner:
 
     def __init__(self, verbose: bool = True) -> None:
         self.verbose = verbose
-        self._tests: List[tuple[str, Callable, Dict[str, Any]]] = []
+        self._tests: list[tuple[str, Callable, dict[str, Any]]] = []
 
     def add_test(self, name: str, func: Callable, **options) -> None:
         """Add a test to run."""
@@ -235,7 +236,7 @@ class TestRunner:
 
         return suite
 
-    def _run_single_test(self, name: str, func: Callable, options: Dict[str, Any]) -> TestResult:
+    def _run_single_test(self, name: str, func: Callable, options: dict[str, Any]) -> TestResult:
         """Run a single test and return result."""
         should_panic = options.get("should_panic", False)
         skip = options.get("skip", False)
@@ -364,7 +365,7 @@ def run_tests(test_module: Any, verbose: bool = True) -> TestSuite:
 
 
 def test(
-    func: Optional[Callable] = None,
+    func: Callable | None = None,
     *,
     should_panic: bool = False,
     skip: bool = False,

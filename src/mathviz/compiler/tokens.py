@@ -7,7 +7,7 @@ including keywords, operators (both standard and mathematical), and literals.
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Optional
+from typing import Any
 
 from mathviz.utils.errors import SourceLocation
 

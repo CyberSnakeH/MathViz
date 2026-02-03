@@ -14,26 +14,25 @@ Features:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
-from typing import Any, Optional, Union
+from dataclasses import dataclass
+from typing import Any
 
 from mathviz.compiler.ast_nodes import (
-    Expression,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    Identifier,
     BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
-    ListLiteral,
-    TupleLiteral,
     BinaryOperator,
-    UnaryOperator,
+    BooleanLiteral,
+    CallExpression,
     ConstDeclaration,
+    Expression,
+    FloatLiteral,
+    Identifier,
+    IntegerLiteral,
+    ListLiteral,
+    NoneLiteral,
+    StringLiteral,
+    TupleLiteral,
+    UnaryExpression,
+    UnaryOperator,
 )
 from mathviz.utils.errors import SourceLocation
 
@@ -44,7 +43,7 @@ class ConstEvalError(Exception):
     def __init__(
         self,
         message: str,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
     ) -> None:
         self.message = message
         self.location = location
@@ -52,7 +51,7 @@ class ConstEvalError(Exception):
 
 
 # Built-in mathematical constants
-BUILTIN_CONSTANTS: dict[str, Union[int, float, bool, str]] = {
+BUILTIN_CONSTANTS: dict[str, int | float | bool | str] = {
     # Mathematical constants
     "PI": 3.14159265358979323846,
     "E": 2.71828182845904523536,
@@ -115,8 +114,8 @@ class ConstantInfo:
 
     name: str
     value: Any
-    type_name: Optional[str] = None
-    location: Optional[SourceLocation] = None
+    type_name: str | None = None
+    location: SourceLocation | None = None
 
 
 class ConstEvaluator:
@@ -145,7 +144,7 @@ class ConstEvaluator:
         self,
         name: str,
         value: Any,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
     ) -> None:
         """
         Register a user-defined constant.
@@ -375,7 +374,7 @@ class ConstEvaluator:
         finally:
             self._evaluating.discard(decl.name)
 
-    def get_constant(self, name: str) -> Optional[Any]:
+    def get_constant(self, name: str) -> Any | None:
         """
         Get the value of a constant by name.
 

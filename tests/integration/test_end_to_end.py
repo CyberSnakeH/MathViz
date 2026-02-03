@@ -6,8 +6,6 @@ and produce executable Python code.
 """
 
 import pytest
-import sys
-from io import StringIO
 
 from mathviz import compile_source
 

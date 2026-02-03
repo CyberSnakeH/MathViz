@@ -28,52 +28,43 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mathviz.compiler.purity_analyzer import PurityInfo
     from mathviz.compiler.complexity_analyzer import ComplexityInfo
     from mathviz.compiler.parallel_analyzer import LoopAnalysis
+    from mathviz.compiler.purity_analyzer import PurityInfo
 
 from mathviz.compiler.ast_nodes import (
+    AssignmentStatement,
     ASTNode,
     BaseASTVisitor,
-    Block,
-    Expression,
-    Statement,
-    # Expressions
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
     BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    RangeExpression,
-    ListLiteral,
     BinaryOperator,
-    UnaryOperator,
-    # Statements
-    FunctionDef,
-    ForStatement,
-    WhileStatement,
-    IfStatement,
-    LetStatement,
-    AssignmentStatement,
+    CallExpression,
     CompoundAssignment,
-    ReturnStatement,
-    # Types
-    TypeAnnotation,
-    SimpleType,
+    ConditionalExpression,
+    Expression,
+    FloatLiteral,
+    ForStatement,
+    FunctionDef,
     GenericType,
-    Parameter,
+    Identifier,
+    IfStatement,
+    IndexExpression,
+    IntegerLiteral,
     JitMode,
     JitOptions,
+    LetStatement,
+    RangeExpression,
+    ReturnStatement,
+    SimpleType,
+    # Types
+    TypeAnnotation,
+    UnaryExpression,
+    WhileStatement,
 )
 from mathviz.utils.errors import SourceLocation
-
 
 # =============================================================================
 # JIT Strategy Types
@@ -180,7 +171,7 @@ class JitDecision:
     confidence: float = 0.0
     reasons: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
-    estimated_speedup: Optional[float] = None
+    estimated_speedup: float | None = None
     alternative_strategies: list[JitStrategy] = field(default_factory=list)
 
     def __str__(self) -> str:
@@ -234,7 +225,7 @@ class VectorizableOp:
     element_type: str
     operation: str
     estimated_simd_lanes: int = 4
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(slots=True)
@@ -254,7 +245,7 @@ class ReductionInfo:
 
     variable: str
     operator: str  # "sum", "product", "max", "min", "and", "or"
-    init_value: Optional[Expression] = None
+    init_value: Expression | None = None
     is_parallel_safe: bool = True
 
 
@@ -287,7 +278,7 @@ class VectorizationInfo:
     is_vectorizable: bool = False
     vectorizable_ops: list[VectorizableOp] = field(default_factory=list)
     blocking_reasons: list[str] = field(default_factory=list)
-    recommended_strategy: Optional[str] = None  # "numpy_vectorize", "numba_vectorize", "ufunc"
+    recommended_strategy: str | None = None  # "numpy_vectorize", "numba_vectorize", "ufunc"
     estimated_simd_speedup: float = 1.0
 
 
@@ -422,7 +413,6 @@ NUMBA_SUPPORTED_BUILTINS: frozenset[str] = frozenset(
         "mean",
         "std",
         "var",
-        "sum",
         "prod",
         "argmax",
         "argmin",
@@ -532,9 +522,9 @@ class JitAnalyzer:
 
     def __init__(
         self,
-        purity_info: Optional[dict[str, PurityInfo]] = None,
-        complexity_info: Optional[dict[str, ComplexityInfo]] = None,
-        parallel_info: Optional[dict[str, list[LoopAnalysis]]] = None,
+        purity_info: dict[str, PurityInfo] | None = None,
+        complexity_info: dict[str, ComplexityInfo] | None = None,
+        parallel_info: dict[str, list[LoopAnalysis]] | None = None,
     ) -> None:
         """
         Initialize the JIT analyzer.
@@ -686,9 +676,8 @@ class JitAnalyzer:
                     reasons.append(f"Parameter '{param.name}' has incompatible type")
 
         # Check return type
-        if func.return_type:
-            if not self._is_numba_compatible_type(func.return_type):
-                reasons.append("Return type is not Numba-compatible")
+        if func.return_type and not self._is_numba_compatible_type(func.return_type):
+            reasons.append("Return type is not Numba-compatible")
 
         # Check function body for incompatible constructs
         if func.body:
@@ -754,14 +743,13 @@ class JitAnalyzer:
         reasons: list[str] = []
 
         # Check for vectorization opportunity
-        if vectorization.is_vectorizable:
-            if len(func.parameters) == 1:
-                # Unary function - good candidate for @vectorize
-                return (
-                    JitStrategy.VECTORIZE,
-                    0.85,
-                    ["Function is element-wise with single input", "Ideal for @vectorize"],
-                )
+        if vectorization.is_vectorizable and len(func.parameters) == 1:
+            # Unary function - good candidate for @vectorize
+            return (
+                JitStrategy.VECTORIZE,
+                0.85,
+                ["Function is element-wise with single input", "Ideal for @vectorize"],
+            )
 
         # Check for parallel loops
         has_parallel_loops = any(la.can_use_prange for la in loop_analysis)
@@ -966,23 +954,21 @@ class LoopOptimizer:
                 )
 
             # Check for loop fusion with adjacent loop
-            if i + 1 < len(loops):
-                if self._can_fuse_loops(loops[i], loops[i + 1]):
-                    transformations.append(
-                        LoopTransformation(
-                            loop=loop,
-                            transformation="fuse",
-                            description="Fuse with following loop to improve locality",
-                            expected_benefit="Reduced memory traffic",
-                            prerequisites=["Same iteration space", "No dependencies"],
-                        )
+            if i + 1 < len(loops) and self._can_fuse_loops(loops[i], loops[i + 1]):
+                transformations.append(
+                    LoopTransformation(
+                        loop=loop,
+                        transformation="fuse",
+                        description="Fuse with following loop to improve locality",
+                        expected_benefit="Reduced memory traffic",
+                        prerequisites=["Same iteration space", "No dependencies"],
                     )
+                )
 
         return transformations
 
     def _collect_loops(self, node: ASTNode) -> list[ForStatement]:
         """Collect all for loops in order of appearance."""
-        loops: list[ForStatement] = []
         collector = _LoopCollector()
         collector.visit(node)
         return collector.loops
@@ -995,7 +981,7 @@ class LoopOptimizer:
         analysis = analyzer.analyze_loop(loop)
         return analysis.can_use_prange
 
-    def _detect_reduction(self, loop: ForStatement) -> Optional[ReductionInfo]:
+    def _detect_reduction(self, loop: ForStatement) -> ReductionInfo | None:
         """Detect reduction patterns in a loop."""
         detector = _ReductionDetector(loop.variable)
         detector.visit(loop.body)
@@ -1043,12 +1029,12 @@ class LoopOptimizer:
                     if len(iter1.arguments) == len(iter2.arguments):
                         return all(
                             self._same_expr(a1, a2)
-                            for a1, a2 in zip(iter1.arguments, iter2.arguments)
+                            for a1, a2 in zip(iter1.arguments, iter2.arguments, strict=False)
                         )
 
         return False
 
-    def _same_expr(self, e1: Optional[Expression], e2: Optional[Expression]) -> bool:
+    def _same_expr(self, e1: Expression | None, e2: Expression | None) -> bool:
         """Check if two expressions are structurally the same."""
         if e1 is None and e2 is None:
             return True
@@ -1076,7 +1062,7 @@ class LoopOptimizer:
         collector.visit(loop.body)
         return collector.read
 
-    def _can_tile_loop(self, loop: ForStatement) -> Optional[TilingInfo]:
+    def _can_tile_loop(self, loop: ForStatement) -> TilingInfo | None:
         """Check if loop benefits from cache tiling."""
         # Analyze array accesses in loop body
         access_analyzer = _ArrayAccessAnalyzer(loop.variable)
@@ -1194,11 +1180,10 @@ class VectorizationAnalyzer:
         if isinstance(expr, UnaryExpression):
             return self._is_element_wise(expr.operand)
 
-        if isinstance(expr, CallExpression):
-            if isinstance(expr.callee, Identifier):
-                # Math functions are element-wise
-                if expr.callee.name in NUMBA_SUPPORTED_BUILTINS:
-                    return all(self._is_element_wise(arg) for arg in expr.arguments)
+        if isinstance(expr, CallExpression) and isinstance(expr.callee, Identifier):
+            # Math functions are element-wise
+            if expr.callee.name in NUMBA_SUPPORTED_BUILTINS:
+                return all(self._is_element_wise(arg) for arg in expr.arguments)
 
         if isinstance(expr, ConditionalExpression):
             return (
@@ -1228,10 +1213,9 @@ class VectorizationAnalyzer:
         """Check if function can use @vectorize decorator."""
         # Numba vectorize requires scalar signature
         for param in func.parameters:
-            if param.type_annotation:
-                if isinstance(param.type_annotation, GenericType):
-                    # Array parameter - can't use @vectorize directly
-                    return False
+            if param.type_annotation and isinstance(param.type_annotation, GenericType):
+                # Array parameter - can't use @vectorize directly
+                return False
 
         return self._is_element_wise_function(func)
 
@@ -1348,7 +1332,7 @@ class CostModel:
     def estimate_execution_time(
         self,
         func: FunctionDef,
-        input_sizes: Optional[dict[str, int]] = None,
+        input_sizes: dict[str, int] | None = None,
     ) -> float:
         """
         Estimate relative execution time.
@@ -1462,7 +1446,7 @@ def generate_optimized_function(func: FunctionDef, decision: JitDecision) -> str
     return "\n".join(lines)
 
 
-def _generate_decorator(decision: JitDecision) -> Optional[str]:
+def _generate_decorator(decision: JitDecision) -> str | None:
     """Generate the appropriate Numba decorator."""
     if decision.strategy == JitStrategy.NONE:
         return None
@@ -1702,9 +1686,8 @@ class _ReductionDetector(BaseASTVisitor):
     def visit_compound_assignment(self, node: CompoundAssignment) -> None:
         if isinstance(node.target, Identifier):
             var_name = node.target.name
-            if var_name != self.loop_var:
-                if node.operator in self.REDUCTION_OPS:
-                    self.reductions.append((var_name, self.REDUCTION_OPS[node.operator]))
+            if var_name != self.loop_var and node.operator in self.REDUCTION_OPS:
+                self.reductions.append((var_name, self.REDUCTION_OPS[node.operator]))
 
 
 class _WriteCollector(BaseASTVisitor):
@@ -1899,9 +1882,9 @@ class _JitBenefitAnalyzer(BaseASTVisitor):
 
 def analyze_jit_decision(
     func: FunctionDef,
-    purity_info: Optional[dict[str, PurityInfo]] = None,
-    complexity_info: Optional[dict[str, ComplexityInfo]] = None,
-    parallel_info: Optional[dict[str, list[LoopAnalysis]]] = None,
+    purity_info: dict[str, PurityInfo] | None = None,
+    complexity_info: dict[str, ComplexityInfo] | None = None,
+    parallel_info: dict[str, list[LoopAnalysis]] | None = None,
 ) -> JitDecision:
     """
     Convenience function to analyze a function for JIT optimization.

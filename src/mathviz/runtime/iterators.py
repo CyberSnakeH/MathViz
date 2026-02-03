@@ -8,16 +8,11 @@ data transformations like map, filter, reduce, etc.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
 from functools import reduce as functools_reduce
 from typing import (
     Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Optional,
     TypeVar,
-    Sequence,
-    overload,
 )
 
 T = TypeVar("T")
@@ -84,7 +79,7 @@ def iter_flat_map(iterable: Iterable[T], func: Callable[[T], Iterable[U]]) -> li
     return result
 
 
-def iter_flatten(iterable: Iterable[Iterable[T]]) -> list[T]:
+def iter_flatten[T](iterable: Iterable[Iterable[T]]) -> list[T]:
     """
     Flatten a nested iterable by one level.
 
@@ -102,7 +97,7 @@ def iter_flatten(iterable: Iterable[Iterable[T]]) -> list[T]:
 # =============================================================================
 
 
-def iter_first(iterable: Iterable[T]) -> Optional[T]:
+def iter_first[T](iterable: Iterable[T]) -> T | None:
     """
     Return the first element, or None if empty.
 
@@ -115,7 +110,7 @@ def iter_first(iterable: Iterable[T]) -> Optional[T]:
     return None
 
 
-def iter_last(iterable: Iterable[T]) -> Optional[T]:
+def iter_last[T](iterable: Iterable[T]) -> T | None:
     """
     Return the last element, or None if empty.
 
@@ -123,13 +118,13 @@ def iter_last(iterable: Iterable[T]) -> Optional[T]:
         iter_last([1, 2, 3]) -> 3
         iter_last([]) -> None
     """
-    result: Optional[T] = None
+    result: T | None = None
     for item in iterable:
         result = item
     return result
 
 
-def iter_nth(iterable: Iterable[T], n: int) -> Optional[T]:
+def iter_nth[T](iterable: Iterable[T], n: int) -> T | None:
     """
     Return the nth element (0-indexed), or None if out of bounds.
 
@@ -143,7 +138,7 @@ def iter_nth(iterable: Iterable[T], n: int) -> Optional[T]:
     return None
 
 
-def iter_find(iterable: Iterable[T], predicate: Callable[[T], bool]) -> Optional[T]:
+def iter_find(iterable: Iterable[T], predicate: Callable[[T], bool]) -> T | None:
     """
     Find the first element that satisfies the predicate.
 
@@ -156,7 +151,7 @@ def iter_find(iterable: Iterable[T], predicate: Callable[[T], bool]) -> Optional
     return None
 
 
-def iter_position(iterable: Iterable[T], predicate: Callable[[T], bool]) -> Optional[int]:
+def iter_position(iterable: Iterable[T], predicate: Callable[[T], bool]) -> int | None:
     """
     Find the index of the first element that satisfies the predicate.
 
@@ -204,7 +199,7 @@ def iter_none(iterable: Iterable[T], predicate: Callable[[T], bool]) -> bool:
     return not any(predicate(item) for item in iterable)
 
 
-def iter_count(iterable: Iterable[T]) -> int:
+def iter_count[T](iterable: Iterable[T]) -> int:
     """
     Count the number of elements.
 
@@ -252,7 +247,7 @@ def iter_product(iterable: Iterable[Any]) -> Any:
     return result
 
 
-def iter_min(iterable: Iterable[T]) -> Optional[T]:
+def iter_min[T](iterable: Iterable[T]) -> T | None:
     """
     Find the minimum element.
 
@@ -265,7 +260,7 @@ def iter_min(iterable: Iterable[T]) -> Optional[T]:
     return min(items)
 
 
-def iter_max(iterable: Iterable[T]) -> Optional[T]:
+def iter_max[T](iterable: Iterable[T]) -> T | None:
     """
     Find the maximum element.
 
@@ -278,7 +273,7 @@ def iter_max(iterable: Iterable[T]) -> Optional[T]:
     return max(items)
 
 
-def iter_average(iterable: Iterable[Any]) -> Optional[float]:
+def iter_average(iterable: Iterable[Any]) -> float | None:
     """
     Calculate the average of all elements.
 
@@ -291,7 +286,7 @@ def iter_average(iterable: Iterable[Any]) -> Optional[float]:
     return sum(items) / len(items)
 
 
-def iter_min_by(iterable: Iterable[T], key: Callable[[T], Any]) -> Optional[T]:
+def iter_min_by(iterable: Iterable[T], key: Callable[[T], Any]) -> T | None:
     """
     Find the minimum element by a key function.
 
@@ -304,7 +299,7 @@ def iter_min_by(iterable: Iterable[T], key: Callable[[T], Any]) -> Optional[T]:
     return min(items, key=key)
 
 
-def iter_max_by(iterable: Iterable[T], key: Callable[[T], Any]) -> Optional[T]:
+def iter_max_by(iterable: Iterable[T], key: Callable[[T], Any]) -> T | None:
     """
     Find the maximum element by a key function.
 
@@ -322,7 +317,7 @@ def iter_max_by(iterable: Iterable[T], key: Callable[[T], Any]) -> Optional[T]:
 # =============================================================================
 
 
-def iter_take(iterable: Iterable[T], n: int) -> list[T]:
+def iter_take[T](iterable: Iterable[T], n: int) -> list[T]:
     """
     Take the first n elements.
 
@@ -337,7 +332,7 @@ def iter_take(iterable: Iterable[T], n: int) -> list[T]:
     return result
 
 
-def iter_skip(iterable: Iterable[T], n: int) -> list[T]:
+def iter_skip[T](iterable: Iterable[T], n: int) -> list[T]:
     """
     Skip the first n elements.
 
@@ -388,7 +383,7 @@ def iter_skip_while(iterable: Iterable[T], predicate: Callable[[T], bool]) -> li
 # =============================================================================
 
 
-def iter_sorted(iterable: Iterable[T]) -> list[T]:
+def iter_sorted[T](iterable: Iterable[T]) -> list[T]:
     """
     Return a sorted list of elements.
 
@@ -418,7 +413,7 @@ def iter_sorted_by_desc(iterable: Iterable[T], key: Callable[[T], Any]) -> list[
     return sorted(iterable, key=key, reverse=True)
 
 
-def iter_reversed(iterable: Iterable[T]) -> list[T]:
+def iter_reversed[T](iterable: Iterable[T]) -> list[T]:
     """
     Return a reversed list of elements.
 
@@ -434,17 +429,17 @@ def iter_reversed(iterable: Iterable[T]) -> list[T]:
 # =============================================================================
 
 
-def iter_zip(iterable1: Iterable[T], iterable2: Iterable[U]) -> list[tuple[T, U]]:
+def iter_zip[T, U](iterable1: Iterable[T], iterable2: Iterable[U]) -> list[tuple[T, U]]:
     """
     Zip two iterables together.
 
     Example:
         iter_zip([1, 2, 3], ["a", "b", "c"]) -> [(1, "a"), (2, "b"), (3, "c")]
     """
-    return list(zip(iterable1, iterable2))
+    return list(zip(iterable1, iterable2, strict=False))
 
 
-def iter_enumerate(iterable: Iterable[T]) -> list[tuple[int, T]]:
+def iter_enumerate[T](iterable: Iterable[T]) -> list[tuple[int, T]]:
     """
     Enumerate the elements with their indices.
 
@@ -454,7 +449,7 @@ def iter_enumerate(iterable: Iterable[T]) -> list[tuple[int, T]]:
     return list(enumerate(iterable))
 
 
-def iter_chain(*iterables: Iterable[T]) -> list[T]:
+def iter_chain[T](*iterables: Iterable[T]) -> list[T]:
     """
     Chain multiple iterables together.
 
@@ -467,7 +462,7 @@ def iter_chain(*iterables: Iterable[T]) -> list[T]:
     return result
 
 
-def iter_chunk(iterable: Iterable[T], size: int) -> list[list[T]]:
+def iter_chunk[T](iterable: Iterable[T], size: int) -> list[list[T]]:
     """
     Split the iterable into chunks of the given size.
 
@@ -478,7 +473,7 @@ def iter_chunk(iterable: Iterable[T], size: int) -> list[list[T]]:
     return [items[i : i + size] for i in range(0, len(items), size)]
 
 
-def iter_unique(iterable: Iterable[T]) -> list[T]:
+def iter_unique[T](iterable: Iterable[T]) -> list[T]:
     """
     Return unique elements while preserving order.
 
@@ -499,7 +494,7 @@ def iter_unique(iterable: Iterable[T]) -> list[T]:
 # =============================================================================
 
 
-def iter_collect_list(iterable: Iterable[T]) -> list[T]:
+def iter_collect_list[T](iterable: Iterable[T]) -> list[T]:
     """
     Collect elements into a list.
 
@@ -509,7 +504,7 @@ def iter_collect_list(iterable: Iterable[T]) -> list[T]:
     return list(iterable)
 
 
-def iter_collect_set(iterable: Iterable[T]) -> set[T]:
+def iter_collect_set[T](iterable: Iterable[T]) -> set[T]:
     """
     Collect elements into a set.
 
@@ -519,7 +514,7 @@ def iter_collect_set(iterable: Iterable[T]) -> set[T]:
     return set(iterable)
 
 
-def iter_collect_dict(iterable: Iterable[tuple[K, V]]) -> dict[K, V]:
+def iter_collect_dict[K, V](iterable: Iterable[tuple[K, V]]) -> dict[K, V]:
     """
     Collect key-value pairs into a dict.
 
@@ -581,17 +576,17 @@ def iter_partition(
 # =============================================================================
 
 
-def dict_keys(d: dict[K, V]) -> list[K]:
+def dict_keys[K, V](d: dict[K, V]) -> list[K]:
     """Return the keys of a dictionary as a list."""
     return list(d.keys())
 
 
-def dict_values(d: dict[K, V]) -> list[V]:
+def dict_values[K, V](d: dict[K, V]) -> list[V]:
     """Return the values of a dictionary as a list."""
     return list(d.values())
 
 
-def dict_items(d: dict[K, V]) -> list[tuple[K, V]]:
+def dict_items[K, V](d: dict[K, V]) -> list[tuple[K, V]]:
     """Return the key-value pairs of a dictionary as a list of tuples."""
     return list(d.items())
 

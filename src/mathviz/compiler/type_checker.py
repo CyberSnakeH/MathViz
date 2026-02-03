@@ -19,104 +19,94 @@ The type system supports:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Union, Sequence
 
 from mathviz.compiler.ast_nodes import (
-    # Program and base
-    Program,
-    ASTNode,
+    AssignmentStatement,
     BaseASTVisitor,
+    BinaryExpression,
+    BinaryOperator,
+    BindingPattern,
     Block,
-    # Type annotations
-    TypeAnnotation,
-    SimpleType,
-    GenericType,
-    FunctionType as ASTFunctionType,
+    BooleanLiteral,
+    BreakStatement,
+    CallExpression,
+    ClassDef,
+    CompoundAssignment,
+    ConditionalExpression,
+    ConstDeclaration,
+    ConstructorPattern,
+    ContinueStatement,
+    DictLiteral,
+    EnumDef,
+    EnumPattern,
+    EnumVariantAccess,
+    ErrExpression,
     # Expressions
     Expression,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    TupleLiteral,
-    SomeExpression,
-    OkExpression,
-    ErrExpression,
-    UnwrapExpression,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
-    BinaryOperator,
-    UnaryOperator,
-    # Pattern matching
-    Pattern,
-    LiteralPattern,
-    IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
-    RangePattern,
-    OrPattern,
-    BindingPattern,
-    RestPattern,
-    ListPattern,
-    MatchArm,
-    MatchExpression,
-    # F-strings
-    FStringPart,
-    FStringLiteral,
-    FStringExpression,
-    FString,
-    # Statements
-    Statement,
     ExpressionStatement,
-    LetStatement,
-    ConstDeclaration,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    ClassDef,
-    SceneDef,
-    IfStatement,
+    FloatLiteral,
     ForStatement,
-    WhileStatement,
-    ReturnStatement,
-    BreakStatement,
-    ContinueStatement,
-    PassStatement,
-    ImportStatement,
-    PrintStatement,
-    UseStatement,
-    ModuleDecl,
-    PlayStatement,
-    WaitStatement,
-    Parameter,
-    # OOP constructs
-    Visibility,
-    StructField,
-    StructDef,
-    Method,
+    FString,
+    FStringExpression,
+    FunctionDef,
+    GenericType,
+    Identifier,
+    IdentifierPattern,
+    IfLetStatement,
+    IfStatement,
     ImplBlock,
-    AssociatedType,
-    TraitMethod,
-    TraitDef,
-    EnumVariant,
-    EnumDef,
+    ImportStatement,
+    IndexExpression,
+    IntegerLiteral,
+    LambdaExpression,
+    LetStatement,
+    ListLiteral,
+    ListPattern,
+    LiteralPattern,
+    MatchExpression,
+    MemberAccess,
+    Method,
+    ModuleDecl,
+    NoneLiteral,
+    OkExpression,
+    OrPattern,
+    Pattern,
+    PlayStatement,
+    PrintStatement,
+    # Program and base
+    Program,
+    RangeExpression,
+    RangePattern,
+    RestPattern,
+    ReturnStatement,
+    SceneDef,
     SelfExpression,
-    EnumVariantAccess,
+    SetLiteral,
+    SimpleType,
+    SomeExpression,
+    # Statements
+    StringLiteral,
+    StructDef,
     StructLiteral,
-    EnumPattern,
+    TraitDef,
+    TupleLiteral,
+    TuplePattern,
+    # Type annotations
+    TypeAnnotation,
+    UnaryExpression,
+    UnaryOperator,
+    UnwrapExpression,
+    UseStatement,
+    # OOP constructs
+    WaitStatement,
+    WhileLetStatement,
+    WhileStatement,
+)
+from mathviz.compiler.ast_nodes import (
+    FunctionType as ASTFunctionType,
 )
 from mathviz.compiler.operators import (
     OPERATOR_TRAITS,
@@ -125,23 +115,21 @@ from mathviz.compiler.operators import (
     get_trait_for_unary_operator,
     is_operator_trait,
 )
-from mathviz.utils.errors import SourceLocation, TypeError as MathVizTypeError
 from mathviz.utils.diagnostics import (
-    DiagnosticEmitter,
-    DiagnosticLevel,
-    SourceSpan,
     Diagnostic,
+    DiagnosticEmitter,
     ErrorCode,
+    SourceSpan,
     VariableInfo,
-    suggest_similar,
-    create_undefined_variable_diagnostic,
-    create_type_mismatch_diagnostic,
-    create_undefined_function_diagnostic,
-    create_wrong_arguments_diagnostic,
     create_break_outside_loop_diagnostic,
     create_return_outside_function_diagnostic,
+    create_type_mismatch_diagnostic,
+    create_undefined_function_diagnostic,
+    create_undefined_variable_diagnostic,
+    create_wrong_arguments_diagnostic,
 )
-
+from mathviz.utils.errors import SourceLocation
+from mathviz.utils.errors import TypeError as MathVizTypeError
 
 # =============================================================================
 # Type System Representation
@@ -184,9 +172,7 @@ class Type(ABC):
             return True
         if isinstance(other, UnknownType) or isinstance(self, UnknownType):
             return True
-        if isinstance(other, AnyType) or isinstance(self, AnyType):
-            return True
-        return False
+        return bool(isinstance(other, AnyType) or isinstance(self, AnyType))
 
 
 @dataclass(frozen=True)
@@ -217,9 +203,9 @@ class PrimitiveType(Type):
         if super().is_compatible_with(other):
             return True
         # Int is compatible with Float (implicit widening conversion)
-        if self.name == "Int" and isinstance(other, PrimitiveType) and other.name == "Float":
-            return True
-        return False
+        return bool(
+            self.name == "Int" and isinstance(other, PrimitiveType) and other.name == "Float"
+        )
 
 
 # Singleton instances for primitive types
@@ -264,7 +250,7 @@ class GenericTypeInstance(Type):
             # Covariant check for element types
             return all(
                 self_arg.is_compatible_with(other_arg)
-                for self_arg, other_arg in zip(self.type_args, other.type_args)
+                for self_arg, other_arg in zip(self.type_args, other.type_args, strict=False)
             )
         return False
 
@@ -278,8 +264,8 @@ class ArrayType(Type):
     """
 
     name: str  # "Array", "Vec", or "Mat"
-    element_type: Optional[Type] = None
-    dimensions: Optional[tuple[int, ...]] = None
+    element_type: Type | None = None
+    dimensions: tuple[int, ...] | None = None
 
     def __str__(self) -> str:
         if self.element_type is None:
@@ -367,7 +353,7 @@ class FunctionType(Type):
             if len(self.param_types) != len(other.param_types):
                 return False
             # Parameters are contravariant
-            for other_param, self_param in zip(other.param_types, self.param_types):
+            for other_param, self_param in zip(other.param_types, self.param_types, strict=False):
                 if not other_param.is_compatible_with(self_param):
                     return False
             # Return type is covariant
@@ -428,7 +414,7 @@ class StructType(Type):
     def __hash__(self) -> int:
         return hash(("struct", self.name))
 
-    def get_field_type(self, field_name: str) -> Optional[Type]:
+    def get_field_type(self, field_name: str) -> Type | None:
         """Get the type of a field by name."""
         for name, type_ in self.fields:
             if name == field_name:
@@ -483,7 +469,7 @@ class EnumType(Type):
     def __hash__(self) -> int:
         return hash(("enum", self.name))
 
-    def get_variant(self, variant_name: str) -> Optional[tuple[Type, ...]]:
+    def get_variant(self, variant_name: str) -> tuple[Type, ...] | None:
         """Get the associated types for a variant by name."""
         for name, types in self.variants:
             if name == variant_name:
@@ -629,7 +615,9 @@ class TupleType(Type):
                 return False
             return all(
                 self_elem.is_compatible_with(other_elem)
-                for self_elem, other_elem in zip(self.element_types, other.element_types)
+                for self_elem, other_elem in zip(
+                    self.element_types, other.element_types, strict=False
+                )
             )
         return False
 
@@ -796,10 +784,7 @@ class TypeVariable(Type):
         type_name = str(concrete_type)
         implemented_traits = trait_registry.get(type_name, set())
 
-        for bound in self.bounds:
-            if bound not in implemented_traits:
-                return False
-        return True
+        return all(bound in implemented_traits for bound in self.bounds)
 
 
 class GenericFunctionType(Type):
@@ -1021,7 +1006,7 @@ class FunctionSignature:
     param_names: list[str]
     return_type: Type
     has_defaults: list[bool] = field(default_factory=list)
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def to_function_type(self) -> FunctionType:
         """Convert to a FunctionType for type checking."""
@@ -1065,7 +1050,7 @@ class ConversionInfo:
     from_type: Type
     to_type: Type
     conversion: TypeConversion
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 # =============================================================================
@@ -1082,7 +1067,7 @@ class SymbolInfo:
     """
 
     type_: Type
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
     is_parameter: bool = False
     is_mutable: bool = True
 
@@ -1096,15 +1081,15 @@ class Scope:
     """
 
     symbols: dict[str, SymbolInfo] = field(default_factory=dict)
-    parent: Optional["Scope"] = None
+    parent: Scope | None = None
     name: str = ""  # For debugging (e.g., "function:add", "block", "global")
 
-    def lookup(self, name: str) -> Optional[Type]:
+    def lookup(self, name: str) -> Type | None:
         """Look up a symbol type in this scope or parent scopes."""
         info = self.lookup_info(name)
         return info.type_ if info else None
 
-    def lookup_info(self, name: str) -> Optional[SymbolInfo]:
+    def lookup_info(self, name: str) -> SymbolInfo | None:
         """Look up complete symbol info in this scope or parent scopes."""
         if name in self.symbols:
             return self.symbols[name]
@@ -1116,7 +1101,7 @@ class Scope:
         self,
         name: str,
         type_: Type,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
         is_parameter: bool = False,
         is_mutable: bool = True,
     ) -> None:
@@ -1162,11 +1147,11 @@ class SymbolTable:
             self._current_scope = self._current_scope.parent
         # Don't exit global scope
 
-    def lookup(self, name: str) -> Optional[Type]:
+    def lookup(self, name: str) -> Type | None:
         """Look up a symbol in the current scope chain."""
         return self._current_scope.lookup(name)
 
-    def lookup_info(self, name: str) -> Optional[SymbolInfo]:
+    def lookup_info(self, name: str) -> SymbolInfo | None:
         """Look up complete symbol info in the current scope chain."""
         return self._current_scope.lookup_info(name)
 
@@ -1174,7 +1159,7 @@ class SymbolTable:
         self,
         name: str,
         type_: Type,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
         is_parameter: bool = False,
         is_mutable: bool = True,
     ) -> None:
@@ -1188,7 +1173,7 @@ class SymbolTable:
     def get_all_symbols(self) -> dict[str, Type]:
         """Get all symbols visible from the current scope."""
         result: dict[str, Type] = {}
-        scope: Optional[Scope] = self._current_scope
+        scope: Scope | None = self._current_scope
         while scope:
             for name, info in scope.symbols.items():
                 if name not in result:  # Inner scopes shadow outer
@@ -1200,7 +1185,7 @@ class SymbolTable:
         """Get all symbol names visible from the current scope."""
         return self._current_scope.get_all_names()
 
-    def get_variable_info(self, name: str) -> Optional[VariableInfo]:
+    def get_variable_info(self, name: str) -> VariableInfo | None:
         """Get VariableInfo for a symbol for diagnostics."""
         info = self.lookup_info(name)
         if info and info.location:
@@ -1222,7 +1207,7 @@ class SymbolTable:
     def get_all_variable_info(self) -> dict[str, VariableInfo]:
         """Get VariableInfo for all visible symbols."""
         result: dict[str, VariableInfo] = {}
-        scope: Optional[Scope] = self._current_scope
+        scope: Scope | None = self._current_scope
         while scope:
             for name, info in scope.symbols.items():
                 if name not in result and info.location:
@@ -1288,12 +1273,12 @@ class TypeChecker(BaseASTVisitor):
         self.source = source
         self.filename = filename
         self.diagnostics: list[Diagnostic] = []
-        self._emitter: Optional[DiagnosticEmitter] = None
+        self._emitter: DiagnosticEmitter | None = None
 
         # Type inference state
         self._unknown_type_counter = 0
         self._type_var_counter = 0
-        self._current_function_return_type: Optional[Type] = None
+        self._current_function_return_type: Type | None = None
         self._in_loop = False
 
         # Generic type parameter scope
@@ -1310,7 +1295,7 @@ class TypeChecker(BaseASTVisitor):
 
         # Operator overloading registry: (type_name, trait_name) -> (method_signature, output_type)
         # For binary operators, trait_name might include type arg (e.g., "Mul<Float>")
-        self.operator_impls: dict[tuple[str, str], tuple[FunctionType, Optional[Type]]] = {}
+        self.operator_impls: dict[tuple[str, str], tuple[FunctionType, Type | None]] = {}
 
         # Initialize built-in functions and types
         self._register_builtins()
@@ -1464,8 +1449,8 @@ class TypeChecker(BaseASTVisitor):
         return self._emitter
 
     def _location_to_span(
-        self, location: Optional[SourceLocation], length: int = 1
-    ) -> Optional[SourceSpan]:
+        self, location: SourceLocation | None, length: int = 1
+    ) -> SourceSpan | None:
         """Convert a SourceLocation to a SourceSpan."""
         if location is None:
             return None
@@ -1479,7 +1464,7 @@ class TypeChecker(BaseASTVisitor):
     def _error(
         self,
         message: str,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
     ) -> None:
         """Record a type error (legacy simple error interface)."""
         self.errors.append(MathVizTypeError(message, location))
@@ -1490,7 +1475,7 @@ class TypeChecker(BaseASTVisitor):
     def _error_undefined_variable(
         self,
         name: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Record an undefined variable error with suggestions."""
         span = self._location_to_span(location, len(name))
@@ -1514,7 +1499,7 @@ class TypeChecker(BaseASTVisitor):
     def _error_undefined_function(
         self,
         name: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Record an undefined function error with suggestions."""
         span = self._location_to_span(location, len(name))
@@ -1536,7 +1521,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         expected: Type,
         actual: Type,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
         context: str = "",
     ) -> None:
         """Record a type mismatch error with conversion suggestions."""
@@ -1562,7 +1547,7 @@ class TypeChecker(BaseASTVisitor):
         expected_min: int,
         expected_max: int,
         actual: int,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Record a wrong number of arguments error."""
         span = self._location_to_span(location)
@@ -1593,7 +1578,7 @@ class TypeChecker(BaseASTVisitor):
         from_type: Type,
         to_type: Type,
         conversion: TypeConversion,
-        location: Optional[SourceLocation] = None,
+        location: SourceLocation | None = None,
     ) -> None:
         """Record an implicit type conversion."""
         if conversion != TypeConversion.NONE:
@@ -1744,7 +1729,7 @@ class TypeChecker(BaseASTVisitor):
         if self._type_param_scopes:
             self._type_param_scopes.pop()
 
-    def _lookup_type_param(self, name: str) -> Optional[TypeVariable]:
+    def _lookup_type_param(self, name: str) -> TypeVariable | None:
         """
         Look up a type parameter in the current scope stack.
 
@@ -2037,7 +2022,7 @@ class TypeChecker(BaseASTVisitor):
         left_type: Type,
         right_type: Type,
         op: BinaryOperator,
-    ) -> Optional[Type]:
+    ) -> Type | None:
         """
         Check if a binary operator has an overloaded implementation for the given types.
 
@@ -2068,7 +2053,7 @@ class TypeChecker(BaseASTVisitor):
 
         return None
 
-    def _get_type_name_for_operator(self, type_: Type) -> Optional[str]:
+    def _get_type_name_for_operator(self, type_: Type) -> str | None:
         """Get the type name for operator overload lookup."""
         if isinstance(type_, StructType):
             return type_.name
@@ -2085,7 +2070,7 @@ class TypeChecker(BaseASTVisitor):
         left_type: Type,
         right_type: Type,
         op: BinaryOperator,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> Type:
         """Determine the result type of an arithmetic operation."""
         # Check that both operands are numeric
@@ -2148,7 +2133,7 @@ class TypeChecker(BaseASTVisitor):
         left_type: Type,
         right_type: Type,
         op: BinaryOperator,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check that comparison operands are compatible."""
         if not left_type.is_compatible_with(right_type) and not right_type.is_compatible_with(
@@ -2163,7 +2148,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         type_: Type,
         context: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check that an operand can be used as a boolean."""
         if type_ != BOOL_TYPE and not isinstance(type_, (UnknownType, AnyType)):
@@ -2173,7 +2158,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         type_: Type,
         context: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check that an operand is a set type."""
         if isinstance(type_, GenericTypeInstance) and type_.base_name == "Set":
@@ -2219,7 +2204,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         operand_type: Type,
         op: UnaryOperator,
-    ) -> Optional[Type]:
+    ) -> Type | None:
         """
         Check if a unary operator has an overloaded implementation for the given type.
 
@@ -2289,7 +2274,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         sig: FunctionSignature,
         args: Sequence[Expression],
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check that function call arguments match the signature."""
         num_args = len(args)
@@ -2303,7 +2288,7 @@ class TypeChecker(BaseASTVisitor):
             return
 
         # Check each argument type
-        for i, (arg, expected_type) in enumerate(zip(args, sig.param_types)):
+        for i, (arg, expected_type) in enumerate(zip(args, sig.param_types, strict=False)):
             arg_type = self._infer_expression_type(arg)
             if not arg_type.is_compatible_with(expected_type):
                 param_name = sig.param_names[i] if i < len(sig.param_names) else f"argument {i + 1}"
@@ -2322,7 +2307,7 @@ class TypeChecker(BaseASTVisitor):
         self,
         func_type: FunctionType,
         args: Sequence[Expression],
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check that call arguments match a function type."""
         expected = len(func_type.param_types)
@@ -2335,7 +2320,7 @@ class TypeChecker(BaseASTVisitor):
             )
             return
 
-        for i, (arg, expected_type) in enumerate(zip(args, func_type.param_types)):
+        for i, (arg, expected_type) in enumerate(zip(args, func_type.param_types, strict=False)):
             arg_type = self._infer_expression_type(arg)
             if not arg_type.is_compatible_with(expected_type):
                 self._error(
@@ -2614,7 +2599,7 @@ class TypeChecker(BaseASTVisitor):
         # Type check each arm and collect body types
         body_types: list[Type] = []
         has_wildcard = False
-        wildcard_index: Optional[int] = None
+        wildcard_index: int | None = None
 
         for i, arm in enumerate(expr.arms):
             # Enter a new scope for pattern bindings
@@ -2678,7 +2663,7 @@ class TypeChecker(BaseASTVisitor):
                 self._bind_tuple_with_rest(pattern, subject_type, rest_index)
             else:
                 element_types = self._get_tuple_element_types(subject_type, len(pattern.elements))
-                for elem_pattern, elem_type in zip(pattern.elements, element_types):
+                for elem_pattern, elem_type in zip(pattern.elements, element_types, strict=False):
                     self._bind_pattern_variables(elem_pattern, elem_type)
         elif isinstance(pattern, ConstructorPattern):
             # Handle constructor patterns (Some, Ok, Err, etc.)
@@ -2722,11 +2707,11 @@ class TypeChecker(BaseASTVisitor):
                     (v for v in enum_type.variants if v.name == pattern.variant_name), None
                 )
                 if variant:
-                    for binding, field_type in zip(pattern.bindings, variant.fields):
+                    for binding, field_type in zip(pattern.bindings, variant.fields, strict=False):
                         binding_type = self._resolve_type_annotation(field_type)
                         self._bind_pattern_variables(binding, binding_type)
 
-    def _find_rest_pattern_index(self, elements: tuple[Pattern, ...]) -> Optional[int]:
+    def _find_rest_pattern_index(self, elements: tuple[Pattern, ...]) -> int | None:
         """Find the index of a RestPattern in a sequence of patterns."""
         for i, elem in enumerate(elements):
             if isinstance(elem, RestPattern):
@@ -2773,7 +2758,7 @@ class TypeChecker(BaseASTVisitor):
         elements = pattern.elements
 
         # Bind all non-rest elements to the element type
-        for i, elem in enumerate(elements):
+        for _i, elem in enumerate(elements):
             if isinstance(elem, RestPattern):
                 if elem.name:
                     # Rest captures remaining elements as a list
@@ -2800,9 +2785,8 @@ class TypeChecker(BaseASTVisitor):
 
     def _get_constructor_inner_type(self, constructor: str, subject_type: Type) -> Type:
         """Get the inner type for a constructor pattern."""
-        if isinstance(subject_type, OptionalType):
-            if constructor == "Some":
-                return subject_type.inner_type
+        if isinstance(subject_type, OptionalType) and constructor == "Some":
+            return subject_type.inner_type
         if isinstance(subject_type, ResultType):
             if constructor == "Ok":
                 return subject_type.ok_type
@@ -2933,7 +2917,7 @@ class TypeChecker(BaseASTVisitor):
     def _unify_types(
         self,
         types: list[Type],
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> Type:
         """
         Find a common type that can represent all given types.
@@ -3032,11 +3016,11 @@ class TypeChecker(BaseASTVisitor):
 
     def visit_let_statement(self, node: LetStatement) -> None:
         """Type check a variable declaration."""
-        declared_type: Optional[Type] = None
+        declared_type: Type | None = None
         if node.type_annotation:
             declared_type = self._resolve_type_annotation(node.type_annotation)
 
-        inferred_type: Optional[Type] = None
+        inferred_type: Type | None = None
         if node.value:
             inferred_type = self._infer_expression_type(node.value)
 
@@ -3096,7 +3080,7 @@ class TypeChecker(BaseASTVisitor):
         inferred_type = self._infer_expression_type(node.value)
 
         # Check declared type if present
-        declared_type: Optional[Type] = None
+        declared_type: Type | None = None
         if node.type_annotation:
             declared_type = self._resolve_type_annotation(node.type_annotation)
             if not inferred_type.is_compatible_with(declared_type):
@@ -3170,7 +3154,7 @@ class TypeChecker(BaseASTVisitor):
         self.symbol_table.enter_scope(f"function:{node.name}")
 
         # Add parameters to scope with location tracking
-        for param, param_type in zip(node.parameters, sig.param_types):
+        for param, param_type in zip(node.parameters, sig.param_types, strict=False):
             self.symbol_table.define(param.name, param_type, param.location, is_parameter=True)
 
             # Check default value type
@@ -3252,7 +3236,7 @@ class TypeChecker(BaseASTVisitor):
         if node.type_params:
             # Register as generic struct type
             type_vars = tuple(type_var_scope.values())
-            field_dict = {name: typ for name, typ in field_types}
+            field_dict = dict(field_types)
             generic_struct = GenericStructType(
                 name=node.name,
                 type_params=type_vars,
@@ -3281,7 +3265,7 @@ class TypeChecker(BaseASTVisitor):
     def visit_impl_block(self, node: ImplBlock) -> None:
         """Type check an implementation block, including operator trait implementations."""
         # Get or create the target type
-        target_type: Optional[Type] = None
+        target_type: Type | None = None
         if node.target_type in self.struct_types:
             target_type = self.struct_types[node.target_type]
         elif node.target_type in self.class_types:
@@ -3353,7 +3337,7 @@ class TypeChecker(BaseASTVisitor):
 
         # Find the method that implements the operator
         expected_method_name = trait_info.method_name
-        impl_method: Optional[Method] = None
+        impl_method: Method | None = None
         for method in node.methods:
             if method.name == expected_method_name:
                 impl_method = method
@@ -3384,7 +3368,7 @@ class TypeChecker(BaseASTVisitor):
         )
 
         # Get the output type (from associated types or return type)
-        output_type: Optional[Type] = associated_types.get("Output", return_type)
+        output_type: Type | None = associated_types.get("Output", return_type)
 
         # For comparison operators, output type is always Bool
         if trait_info.kind == OperatorKind.COMPARISON:
@@ -3651,7 +3635,7 @@ class TypeChecker(BaseASTVisitor):
     def _get_iterable_element_type(
         self,
         iterable_type: Type,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> Type:
         """Determine the element type of an iterable."""
         if isinstance(iterable_type, GenericTypeInstance):
@@ -3690,9 +3674,8 @@ class TypeChecker(BaseASTVisitor):
         self._in_loop = False
         self.symbol_table.exit_scope()
 
-    def visit_if_let_statement(self, node: "IfLetStatement") -> None:
+    def visit_if_let_statement(self, node: IfLetStatement) -> None:
         """Type check an if let statement."""
-        from mathviz.compiler.ast_nodes import IfLetStatement
 
         # Infer the type of the value expression
         self._infer_expression_type(node.value)
@@ -3711,9 +3694,8 @@ class TypeChecker(BaseASTVisitor):
             self.visit(node.else_block)
             self.symbol_table.exit_scope()
 
-    def visit_while_let_statement(self, node: "WhileLetStatement") -> None:
+    def visit_while_let_statement(self, node: WhileLetStatement) -> None:
         """Type check a while let statement."""
-        from mathviz.compiler.ast_nodes import WhileLetStatement
 
         # Infer the type of the value expression
         self._infer_expression_type(node.value)
@@ -3730,13 +3712,13 @@ class TypeChecker(BaseASTVisitor):
         self._in_loop = False
         self.symbol_table.exit_scope()
 
-    def _define_pattern_bindings(self, pattern: "Pattern") -> None:
+    def _define_pattern_bindings(self, pattern: Pattern) -> None:
         """Define variables from a pattern in the current scope."""
         from mathviz.compiler.ast_nodes import (
+            BindingPattern,
+            ConstructorPattern,
             IdentifierPattern,
             TuplePattern,
-            ConstructorPattern,
-            BindingPattern,
         )
 
         if isinstance(pattern, IdentifierPattern):
@@ -3770,13 +3752,15 @@ class TypeChecker(BaseASTVisitor):
                     f"Return type {value_type} does not match declared return type {expected_type}",
                     node.location,
                 )
-            elif value_type != expected_type and not isinstance(
-                expected_type, (UnknownType, AnyType)
+            elif (
+                value_type != expected_type
+                and not isinstance(expected_type, (UnknownType, AnyType))
+                and value_type == INT_TYPE
+                and expected_type == FLOAT_TYPE
             ):
-                if value_type == INT_TYPE and expected_type == FLOAT_TYPE:
-                    self._record_conversion(
-                        INT_TYPE, FLOAT_TYPE, TypeConversion.INT_TO_FLOAT, node.location
-                    )
+                self._record_conversion(
+                    INT_TYPE, FLOAT_TYPE, TypeConversion.INT_TO_FLOAT, node.location
+                )
         else:
             # Return without value
             if self._current_function_return_type != NONE_TYPE:
@@ -3875,7 +3859,7 @@ class TypeChecker(BaseASTVisitor):
             pass
         else:
             # Import the module path
-            module_name = ".".join(node.module_path)
+            ".".join(node.module_path)
             self.symbol_table.define(node.module_path[-1], ANY_TYPE)
 
     def visit_module_decl(self, node: ModuleDecl) -> None:
@@ -3926,7 +3910,7 @@ def type_check(program: Program) -> list[MathVizTypeError]:
 
 def infer_expression_type(
     expr: Expression,
-    context: Optional[dict[str, Type]] = None,
+    context: dict[str, Type] | None = None,
 ) -> Type:
     """
     Infer the type of an expression with an optional context.

@@ -17,58 +17,54 @@ Note: AST nodes are constructed directly to test the analyzer in isolation.
 import pytest
 
 from mathviz.compiler.ast_nodes import (
-    ForStatement,
-    FunctionDef,
-    Block,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    RangeExpression,
     AssignmentStatement,
-    LetStatement,
-    CompoundAssignment,
-    IndexExpression,
     BinaryExpression,
     BinaryOperator,
+    Block,
     CallExpression,
+    CompoundAssignment,
+    FloatLiteral,
+    ForStatement,
+    FunctionDef,
+    Identifier,
     IfStatement,
-    ReturnStatement,
-    ExpressionStatement,
-    Parameter,
-    SimpleType,
+    IndexExpression,
+    IntegerLiteral,
+    LetStatement,
     MemberAccess,
+    Parameter,
+    RangeExpression,
+    ReturnStatement,
+    SimpleType,
 )
 from mathviz.compiler.memory_optimizer import (
-    # Main classes
-    MemoryOptimizer,
+    AccessPattern,
     AllocationAnalyzer,
-    BufferReuseOptimizer,
-    InPlaceOptimizer,
-    CacheOptimizer,
-    LayoutOptimizer,
-    TemporaryEliminator,
-    MemoryPoolGenerator,
     # Data structures
     AllocationInfo,
     ArrayAccess,
-    CacheAnalysis,
-    InPlaceCandidate,
-    MemoryReport,
-    AccessPattern,
-    MemoryOrder,
-    LoopInterchange,
     BlockingInfo,
+    BufferReuseOptimizer,
+    CacheAnalysis,
+    CacheOptimizer,
     Graph,
+    InPlaceCandidate,
+    InPlaceOptimizer,
+    LayoutOptimizer,
+    LoopInterchange,
+    # Main classes
+    MemoryOptimizer,
+    MemoryOrder,
+    MemoryPoolGenerator,
+    MemoryReport,
+    TemporaryEliminator,
+    analyze_cache,
     # Convenience functions
     analyze_memory,
     find_allocations,
-    suggest_buffer_reuse,
-    find_inplace_candidates,
-    analyze_cache,
     generate_memory_pool,
+    suggest_buffer_reuse,
 )
-from mathviz.utils.errors import SourceLocation
-
 
 # ============================================================================
 # Helper functions to create AST nodes directly
@@ -610,7 +606,7 @@ class TestCacheOptimization:
                 ),
             ),
         )
-        analysis = cache_optimizer.analyze(func)
+        cache_optimizer.analyze(func)
 
         # Strided access should generate suggestions
         # This depends on implementation detecting stride > 1

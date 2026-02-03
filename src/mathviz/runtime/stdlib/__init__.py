@@ -4,11 +4,11 @@ MathViz Standard Library.
 Provides commonly used functions for math, strings, random, time, and collections.
 """
 
-from mathviz.runtime.stdlib.math import *
-from mathviz.runtime.stdlib.string import *
-from mathviz.runtime.stdlib.random import *
-from mathviz.runtime.stdlib.time import *
 from mathviz.runtime.stdlib.collections import *
+from mathviz.runtime.stdlib.math import *
+from mathviz.runtime.stdlib.random import *
+from mathviz.runtime.stdlib.string import *
+from mathviz.runtime.stdlib.time import *
 
 __all__ = [
     # Math

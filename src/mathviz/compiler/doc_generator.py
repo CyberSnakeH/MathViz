@@ -6,22 +6,19 @@ Supports Markdown and HTML output formats.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from pathlib import Path
+
 import re
+from dataclasses import dataclass, field
+from typing import Any
 
 from mathviz.compiler.ast_nodes import (
-    Program,
+    BaseASTVisitor,
+    ConstDeclaration,
+    EnumDef,
     FunctionDef,
+    Program,
     StructDef,
     TraitDef,
-    EnumDef,
-    ClassDef,
-    ModuleDecl,
-    ImplBlock,
-    ConstDeclaration,
-    BaseASTVisitor,
 )
 
 
@@ -33,11 +30,11 @@ class DocItem:
     kind: str  # "function", "struct", "trait", "enum", "const", "module"
     doc: str
     signature: str
-    location: Optional[str] = None
-    children: List["DocItem"] = field(default_factory=list)
-    params: List[Dict[str, str]] = field(default_factory=list)
-    returns: Optional[str] = None
-    examples: List[str] = field(default_factory=list)
+    location: str | None = None
+    children: list[DocItem] = field(default_factory=list)
+    params: list[dict[str, str]] = field(default_factory=list)
+    returns: str | None = None
+    examples: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -46,24 +43,24 @@ class Documentation:
 
     name: str
     description: str
-    items: List[DocItem] = field(default_factory=list)
-    submodules: List["Documentation"] = field(default_factory=list)
+    items: list[DocItem] = field(default_factory=list)
+    submodules: list[Documentation] = field(default_factory=list)
 
 
 class DocExtractor(BaseASTVisitor):
     """Extracts documentation from AST nodes."""
 
     def __init__(self) -> None:
-        self.items: List[DocItem] = []
-        self._current_module: Optional[str] = None
+        self.items: list[DocItem] = []
+        self._current_module: str | None = None
 
-    def extract(self, program: Program) -> List[DocItem]:
+    def extract(self, program: Program) -> list[DocItem]:
         """Extract all documented items from a program."""
         self.items = []
         self.visit(program)
         return self.items
 
-    def _parse_doc_comment(self, doc: Optional[str]) -> Dict[str, Any]:
+    def _parse_doc_comment(self, doc: str | None) -> dict[str, Any]:
         """Parse a doc comment into structured data."""
         if not doc:
             return {"description": "", "params": [], "returns": None, "examples": []}
@@ -229,7 +226,7 @@ class DocExtractor(BaseASTVisitor):
 
     def _type_to_str(self, type_ann) -> str:
         """Convert type annotation to string."""
-        from mathviz.compiler.ast_nodes import SimpleType, GenericType
+        from mathviz.compiler.ast_nodes import GenericType, SimpleType
 
         if isinstance(type_ann, SimpleType):
             return type_ann.name
@@ -242,7 +239,7 @@ class DocExtractor(BaseASTVisitor):
 class MarkdownGenerator:
     """Generates Markdown documentation."""
 
-    def generate(self, items: List[DocItem], title: str = "API Documentation") -> str:
+    def generate(self, items: list[DocItem], title: str = "API Documentation") -> str:
         """Generate Markdown documentation."""
         lines = [
             f"# {title}",
@@ -275,7 +272,7 @@ class MarkdownGenerator:
 
         return "\n".join(lines)
 
-    def _render_item(self, item: DocItem) -> List[str]:
+    def _render_item(self, item: DocItem) -> list[str]:
         """Render a single documented item."""
         lines = [
             f"### `{item.name}`",
@@ -316,7 +313,7 @@ class MarkdownGenerator:
 class HTMLGenerator:
     """Generates HTML documentation."""
 
-    def generate(self, items: List[DocItem], title: str = "API Documentation") -> str:
+    def generate(self, items: list[DocItem], title: str = "API Documentation") -> str:
         """Generate HTML documentation."""
         html = [
             "<!DOCTYPE html>",
@@ -377,10 +374,10 @@ class HTMLGenerator:
         .example { background: #f0f8ff; padding: 10px; border-left: 3px solid #0066cc; }
         """
 
-    def _render_item(self, item: DocItem) -> List[str]:
+    def _render_item(self, item: DocItem) -> list[str]:
         """Render a single documented item."""
         lines = [
-            f'<div class="doc-item">',
+            '<div class="doc-item">',
             f"<h3><code>{item.name}</code></h3>",
             f"<pre><code>{self._escape(item.signature)}</code></pre>",
         ]
@@ -437,9 +434,6 @@ def generate_docs(
     extractor = DocExtractor()
     items = extractor.extract(program)
 
-    if format == "html":
-        generator = HTMLGenerator()
-    else:
-        generator = MarkdownGenerator()
+    generator = HTMLGenerator() if format == "html" else MarkdownGenerator()
 
     return generator.generate(items, title)

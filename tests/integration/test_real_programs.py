@@ -5,10 +5,8 @@ These tests verify that the compiler correctly handles real-world
 programming patterns and produces appropriate analysis results.
 """
 
-import pytest
-
-from mathviz.compiler.purity_analyzer import Purity, is_jit_safe, can_memoize
 from mathviz.compiler.complexity_analyzer import Complexity
+from mathviz.compiler.purity_analyzer import Purity, can_memoize, is_jit_safe
 
 
 class TestRealPrograms:
@@ -369,7 +367,7 @@ fn simpson_rule(f: (Float) -> Float, a: Float, b: Float, n: Int) -> Float {
             analyses_by_func[func_name].append(analysis)
 
         if "trapezoid_rule" in analyses_by_func:
-            trap_analysis = analyses_by_func["trapezoid_rule"][0]
+            analyses_by_func["trapezoid_rule"][0]
             # The loop may not be parallelizable due to function call f(x)
             # which is considered potentially impure by the analyzer
             # This is correct conservative behavior

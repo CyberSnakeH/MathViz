@@ -15,43 +15,35 @@ AST nodes directly for most tests to test the analyzer in isolation.
 
 import pytest
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
 from mathviz.compiler.ast_nodes import (
-    ForStatement,
-    FunctionDef,
-    Block,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    RangeExpression,
     AssignmentStatement,
-    LetStatement,
-    CompoundAssignment,
-    IndexExpression,
     BinaryExpression,
     BinaryOperator,
-    CallExpression,
-    IfStatement,
+    Block,
     BreakStatement,
+    CompoundAssignment,
     ContinueStatement,
+    ForStatement,
+    FunctionDef,
+    Identifier,
+    IfStatement,
+    IndexExpression,
+    IntegerLiteral,
+    LetStatement,
     Parameter,
+    RangeExpression,
     SimpleType,
 )
 from mathviz.compiler.parallel_analyzer import (
-    ParallelAnalyzer,
-    LoopAnalysis,
     DataDependency,
     DependencyType,
-    ReductionOperator,
-    ReductionVariable,
-    VariableCollector,
     IndexAnalyzer,
-    LoopBodyAnalyzer,
+    LoopAnalysis,
+    ParallelAnalyzer,
+    VariableCollector,
     analyze_parallelization,
     can_parallelize_loop,
 )
-
 
 # ============================================================================
 # Helper functions to create AST nodes directly

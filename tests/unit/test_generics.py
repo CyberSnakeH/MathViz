@@ -12,22 +12,14 @@ Tests for:
 - Code generation with TypeVar and Generic
 """
 
-import pytest
-
-from mathviz.compiler.tokens import TokenType
 from mathviz.compiler.ast_nodes import (
-    FunctionDef,
-    StructDef,
     EnumDef,
-    TraitDef,
+    FunctionDef,
     ImplBlock,
-    Method,
-    TypeParameter,
-    WhereClause,
-    SimpleType,
-    GenericType,
+    StructDef,
+    TraitDef,
 )
-
+from mathviz.compiler.tokens import TokenType
 
 # =============================================================================
 # Lexer Tests for Generic Syntax

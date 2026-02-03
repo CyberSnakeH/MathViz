@@ -5,11 +5,11 @@ These tests verify the complete module system works end-to-end,
 from parsing to code generation.
 """
 
-import pytest
-from pathlib import Path
 from textwrap import dedent
 
-from mathviz.compiler import CompilationPipeline, ModuleLoader
+import pytest
+
+from mathviz.compiler import CompilationPipeline
 
 
 class TestMultiFileCompilation:

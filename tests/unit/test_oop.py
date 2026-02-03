@@ -12,23 +12,17 @@ Tests for:
 
 import pytest
 
-from mathviz.compiler.tokens import TokenType
 from mathviz.compiler.ast_nodes import (
-    StructDef,
-    StructField,
-    ImplBlock,
-    Method,
-    TraitDef,
-    TraitMethod,
     EnumDef,
-    EnumVariant,
-    SelfExpression,
-    EnumVariantAccess,
-    StructLiteral,
     EnumPattern,
+    EnumVariantAccess,
+    ImplBlock,
+    StructDef,
+    StructLiteral,
+    TraitDef,
     Visibility,
 )
-
+from mathviz.compiler.tokens import TokenType
 
 # =============================================================================
 # Lexer Tests for OOP Tokens

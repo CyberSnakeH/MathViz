@@ -1,9 +1,8 @@
 """Tests for the MathViz LSP diagnostics provider."""
 
-import pytest
+from lsprotocol.types import DiagnosticSeverity
 
 from mathviz.lsp.diagnostics import DiagnosticProvider, get_diagnostics_for_document
-from lsprotocol.types import DiagnosticSeverity
 
 
 class TestDiagnosticProvider:
@@ -50,7 +49,7 @@ fn unused() {
         diagnostics = get_diagnostics_for_document(source, "test://test.mviz")
 
         # May have warnings for unused function
-        warnings = [d for d in diagnostics if d.severity == DiagnosticSeverity.Warning]
+        [d for d in diagnostics if d.severity == DiagnosticSeverity.Warning]
         # Note: Depends on linter configuration
         # Just verify diagnostics were collected without error
         assert diagnostics is not None
@@ -106,10 +105,8 @@ fn test() {
         for warning in unused_warnings:
             # May have Unnecessary tag
             if warning.tags:
-                from lsprotocol.types import DiagnosticTag
-
                 # Check if Unnecessary tag is present
-                assert DiagnosticTag.Unnecessary in warning.tags or True
+                assert True
 
     def test_diagnostic_provider_instance(self) -> None:
         """Test DiagnosticProvider class directly."""
@@ -150,6 +147,6 @@ impl Point {
         assert len(errors) == 0
 
         # May have performance warnings for x^2 pattern
-        warnings = [d for d in diagnostics if d.severity == DiagnosticSeverity.Warning]
+        [d for d in diagnostics if d.severity == DiagnosticSeverity.Warning]
         # Just verify no crash
         assert diagnostics is not None

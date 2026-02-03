@@ -15,62 +15,45 @@ Tests cover:
 import pytest
 
 from mathviz.compiler.ast_nodes import (
-    FunctionDef,
-    Block,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    BooleanLiteral,
-    StringLiteral,
-    RangeExpression,
     AssignmentStatement,
-    LetStatement,
-    CompoundAssignment,
-    IndexExpression,
     BinaryExpression,
     BinaryOperator,
-    UnaryExpression,
-    UnaryOperator,
+    Block,
     CallExpression,
-    ReturnStatement,
+    CompoundAssignment,
+    FloatLiteral,
     ForStatement,
-    WhileStatement,
+    FunctionDef,
+    Identifier,
     IfStatement,
-    Parameter,
-    SimpleType,
-    GenericType,
+    IndexExpression,
+    IntegerLiteral,
     JitMode,
     JitOptions,
-    SetLiteral,
-    DictLiteral,
+    LetStatement,
+    Parameter,
+    RangeExpression,
+    ReturnStatement,
+    SimpleType,
+    UnaryExpression,
+    UnaryOperator,
 )
 from mathviz.compiler.jit_optimizer import (
-    JitAnalyzer,
-    JitStrategy,
-    JitDecision,
-    LoopOptimizer,
-    VectorizationAnalyzer,
-    CacheOptimizer,
-    CostModel,
-    MemoryAccessPattern,
-    LoopPattern,
-    VectorizableOp,
-    LoopTransformation,
-    ReductionInfo,
-    TilingInfo,
-    MemoryPattern,
-    VectorizationInfo,
-    CacheHints,
-    analyze_jit_decision,
-    get_loop_optimizations,
-    estimate_jit_speedup,
-    is_numba_compatible,
-    generate_optimized_function,
+    JIT_BLOCKING_FUNCTIONS,
     NUMBA_COMPATIBLE_TYPES,
     NUMBA_SUPPORTED_BUILTINS,
-    JIT_BLOCKING_FUNCTIONS,
+    CacheOptimizer,
+    CostModel,
+    JitAnalyzer,
+    JitDecision,
+    JitStrategy,
+    LoopOptimizer,
+    VectorizationAnalyzer,
+    analyze_jit_decision,
+    estimate_jit_speedup,
+    get_loop_optimizations,
+    is_numba_compatible,
 )
-
 
 # ============================================================================
 # Helper functions to create AST nodes
@@ -543,9 +526,7 @@ class TestVectorizationAnalyzer:
 
         info = vectorization_analyzer.analyze(func)
         # Conditionals can block or complicate vectorization
-        assert (
-            len(info.blocking_reasons) > 0 or not info.is_vectorizable or True
-        )  # Flexible assertion
+        assert len(info.blocking_reasons) > 0 or True  # Flexible assertion
 
     def test_math_function_calls_are_vectorizable(self, vectorization_analyzer):
         """Math function calls like sqrt, sin are vectorizable."""
@@ -912,7 +893,7 @@ class TestIntegration:
 
     def test_analysis_with_purity_info(self):
         """Test analysis with pre-computed purity information."""
-        from mathviz.compiler.purity_analyzer import PurityInfo, Purity
+        from mathviz.compiler.purity_analyzer import Purity, PurityInfo
 
         func = make_function(
             name="pure_compute",

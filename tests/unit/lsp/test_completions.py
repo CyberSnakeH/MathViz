@@ -1,10 +1,10 @@
 """Tests for the MathViz LSP completion provider."""
 
 import pytest
-
-from mathviz.lsp.completions import CompletionProvider, BUILTIN_TYPES, STDLIB_MATH
-from mathviz.lsp.symbols import Symbol, SymbolKind
 from lsprotocol.types import CompletionItemKind
+
+from mathviz.lsp.completions import BUILTIN_TYPES, CompletionProvider
+from mathviz.lsp.symbols import Symbol, SymbolKind
 
 
 class TestCompletionProvider:

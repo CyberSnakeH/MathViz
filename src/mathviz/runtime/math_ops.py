@@ -7,7 +7,8 @@ are designed to work with Python sets while providing clear semantics
 and good error messages.
 """
 
-from typing import Any, TypeVar, Union, Iterable
+from collections.abc import Iterable
+from typing import Any, TypeVar, Union
 
 T = TypeVar("T")
 SetLike = Union[set[T], frozenset[T], list[T], tuple[T, ...]]
@@ -253,7 +254,7 @@ def symmetric_difference(a: SetLike[T], b: SetLike[T]) -> set[T]:
     return _to_set(a) ^ _to_set(b)
 
 
-def cartesian_product(a: Iterable[T], b: Iterable) -> set[tuple[T, Any]]:
+def cartesian_product[T](a: Iterable[T], b: Iterable) -> set[tuple[T, Any]]:
     """
     Compute the Cartesian product of two collections (A × B).
 
@@ -274,7 +275,7 @@ def cartesian_product(a: Iterable[T], b: Iterable) -> set[tuple[T, Any]]:
     return {(x, y) for x in a for y in b}
 
 
-def power_set(s: SetLike[T]) -> set[frozenset[T]]:
+def power_set[T](s: SetLike[T]) -> set[frozenset[T]]:
     """
     Compute the power set of a set (P(S) or 2^S).
 

@@ -5,7 +5,6 @@ Provides string manipulation functions.
 """
 
 from __future__ import annotations
-from typing import List, Optional
 
 
 def strlen(s: str) -> int:
@@ -13,19 +12,19 @@ def strlen(s: str) -> int:
     return len(s)
 
 
-def substr(s: str, start: int, end: Optional[int] = None) -> str:
+def substr(s: str, start: int, end: int | None = None) -> str:
     """Return substring from start to end (exclusive)."""
     if end is None:
         return s[start:]
     return s[start:end]
 
 
-def split(s: str, sep: str = " ") -> List[str]:
+def split(s: str, sep: str = " ") -> list[str]:
     """Split string by separator."""
     return s.split(sep)
 
 
-def join(items: List[str], sep: str = "") -> str:
+def join(items: list[str], sep: str = "") -> str:
     """Join list of strings with separator."""
     return sep.join(items)
 
@@ -169,16 +168,16 @@ def count(s: str, sub: str) -> int:
     return s.count(sub)
 
 
-def lines(s: str) -> List[str]:
+def lines(s: str) -> list[str]:
     """Split string into lines."""
     return s.splitlines()
 
 
-def words(s: str) -> List[str]:
+def words(s: str) -> list[str]:
     """Split string into words."""
     return s.split()
 
 
-def chars(s: str) -> List[str]:
+def chars(s: str) -> list[str]:
     """Convert string to list of characters."""
     return list(s)

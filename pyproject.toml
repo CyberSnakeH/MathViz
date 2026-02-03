@@ -90,7 +90,36 @@ ignore = [
     "E501",   # line too long (handled by formatter)
     "B008",   # do not perform function calls in argument defaults
     "C901",   # too complex
+    "SIM102", # nested if statements - sometimes more readable
+    "SIM103", # return boolean expression directly - readability preference
+    "SIM108", # ternary instead of if-else - readability preference
+    "SIM116", # use dict instead of if-elif - sometimes less readable
+    "ARG001", # unused function arguments - common in callbacks/visitor patterns
+    "ARG002", # unused method arguments - common in visitor patterns
+    "B007",   # loop variable not used - often intentional for counting
+    "B018",   # useless expression - sometimes intentional for side effects
+    "B024",   # abstract base class without abstract methods
+    "B904",   # raise without from - acceptable in simple cases
+    "E402",   # module level import not at top - sometimes necessary
+    "E721",   # type comparison with == - sometimes clearer than isinstance
+    "E741",   # ambiguous variable name (l) - common for line/label
+    "F401",   # imported but unused - may be re-exported
+    "F402",   # import shadowed by loop variable - intentional override
+    "F811",   # redefinition of unused name - overloads pattern
+    "UP007",  # X | Y for type annotations - Union is sometimes clearer
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ARG001", "ARG002",  # Unused arguments are common in test fixtures
+    "F405", "F403",      # Star imports used for convenience in tests
+    "E741",              # Ambiguous variable name (l for line)
+    "SIM102",            # Nested if statements OK in tests for readability
+    "B007",              # Loop variable not used (common in counting loops)
+    "F401",              # Unused imports in test setup
+]
+"src/mathviz/runtime/stdlib/__init__.py" = ["F403", "F405"]  # Star imports for re-export
+"src/mathviz/runtime/__init__.py" = ["F403", "F405"]  # Star imports for runtime
 
 [tool.ruff.lint.isort]
 known-first-party = ["mathviz"]

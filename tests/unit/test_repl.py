@@ -11,11 +11,8 @@ Tests cover:
 """
 
 import pytest
-from unittest.mock import patch
-from io import StringIO
 
-from mathviz.repl import REPLSession, REPLCompleter, Colors, DefinedFunction
-
+from mathviz.repl import Colors, DefinedFunction, REPLCompleter, REPLSession
 
 # =============================================================================
 # Fixtures
@@ -127,21 +124,21 @@ class TestVariableDefinitions:
 
     def test_define_float(self, session):
         """Define a float variable."""
-        result = session.eval_line("let y = 3.14")
+        session.eval_line("let y = 3.14")
         assert "y" in session.variables
         assert abs(session.variables["y"] - 3.14) < 0.001
         assert session.variable_types["y"] == "Float"
 
     def test_define_string(self, session):
         """Define a string variable."""
-        result = session.eval_line('let name = "Alice"')
+        session.eval_line('let name = "Alice"')
         assert "name" in session.variables
         assert session.variables["name"] == "Alice"
         assert session.variable_types["name"] == "String"
 
     def test_define_list(self, session):
         """Define a list variable."""
-        result = session.eval_line("let arr = [1, 2, 3]")
+        session.eval_line("let arr = [1, 2, 3]")
         assert "arr" in session.variables
         assert session.variables["arr"] == [1, 2, 3]
         assert "List[Int]" in session.variable_types["arr"]

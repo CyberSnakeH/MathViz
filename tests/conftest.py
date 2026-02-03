@@ -3,28 +3,25 @@ Pytest configuration and shared fixtures for MathViz tests.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import pytest
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
-from mathviz.compiler.codegen import CodeGenerator
-from mathviz.compiler.tokens import Token
 from mathviz.compiler.ast_nodes import Program
-from mathviz.compiler.type_checker import TypeChecker, type_check
-from mathviz.compiler.purity_analyzer import PurityAnalyzer, PurityInfo, analyze_purity
+from mathviz.compiler.call_graph import CallGraph, CallGraphBuilder
+from mathviz.compiler.codegen import CodeGenerator
 from mathviz.compiler.complexity_analyzer import (
-    ComplexityAnalyzer,
     ComplexityInfo,
     analyze_complexity,
 )
-from mathviz.compiler.call_graph import CallGraph, CallGraphBuilder
+from mathviz.compiler.lexer import Lexer
 from mathviz.compiler.parallel_analyzer import (
-    ParallelAnalyzer,
     LoopAnalysis,
-    analyze_parallelization,
+    ParallelAnalyzer,
 )
+from mathviz.compiler.parser import Parser
+from mathviz.compiler.purity_analyzer import PurityInfo, analyze_purity
+from mathviz.compiler.tokens import Token
+from mathviz.compiler.type_checker import TypeChecker
 from mathviz.utils.errors import TypeError as MathVizTypeError
 
 
@@ -133,7 +130,7 @@ class CompilationResult:
 
     # Type checking
     type_errors: list[MathVizTypeError] = field(default_factory=list)
-    type_checker: Optional[TypeChecker] = None
+    type_checker: TypeChecker | None = None
 
     # Purity analysis
     purity_info: dict[str, PurityInfo] = field(default_factory=dict)
@@ -142,7 +139,7 @@ class CompilationResult:
     complexity_info: dict[str, ComplexityInfo] = field(default_factory=dict)
 
     # Call graph
-    call_graph: Optional[CallGraph] = None
+    call_graph: CallGraph | None = None
 
     # Parallelization analysis
     parallel_loops: list[tuple[str, LoopAnalysis]] = field(default_factory=list)
@@ -233,7 +230,7 @@ def compile_with_analysis(parse):
 
             if isinstance(stmt, FunctionDef):
                 loop_analyses = parallel_analyzer.analyze_function(stmt)
-                for loop, analysis in loop_analyses:
+                for _loop, analysis in loop_analyses:
                     parallel_loops.append((stmt.name, analysis))
 
         # Generate code (non-optimized)
@@ -324,7 +321,7 @@ def analyze_parallelization_fixture(parse):
 
             if isinstance(stmt, FunctionDef):
                 loop_analyses = analyzer.analyze_function(stmt)
-                for loop, analysis in loop_analyses:
+                for _loop, analysis in loop_analyses:
                     results.append((stmt.name, analysis))
 
         return ast, results

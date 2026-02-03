@@ -17,7 +17,7 @@ from mathviz.utils.errors import SourceLocation
 class ASTNode(ABC):
     """Base class for all AST nodes."""
 
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
 
     @abstractmethod
     def accept(self, visitor: "ASTVisitor") -> Any:
@@ -59,7 +59,7 @@ class SimpleType(TypeAnnotation):
     """
 
     name: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_simple_type(self)
@@ -76,7 +76,7 @@ class GenericType(TypeAnnotation):
 
     base: str
     type_args: tuple[TypeAnnotation, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_generic_type(self)
@@ -93,7 +93,7 @@ class FunctionType(TypeAnnotation):
 
     param_types: tuple[TypeAnnotation, ...]
     return_type: TypeAnnotation
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_function_type(self)
@@ -122,7 +122,7 @@ class TypeParameter:
 
     name: str
     bounds: tuple[str, ...] = ()
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -139,7 +139,7 @@ class WhereClause:
     """
 
     constraints: tuple[tuple[str, tuple[str, ...]], ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 # -----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ class DocComment:
     """
 
     content: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def get_summary(self) -> str:
         """Get the first line/paragraph as a summary."""
@@ -279,7 +279,7 @@ class Attribute:
 
     name: str
     arguments: tuple["Expression", ...] = ()
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 # -----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ class Identifier(Expression):
     """
 
     name: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_identifier(self)
@@ -314,7 +314,7 @@ class IntegerLiteral(Expression):
     """An integer literal."""
 
     value: int
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_integer_literal(self)
@@ -325,7 +325,7 @@ class FloatLiteral(Expression):
     """A floating-point literal."""
 
     value: float
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_float_literal(self)
@@ -336,7 +336,7 @@ class StringLiteral(Expression):
     """A string literal."""
 
     value: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_string_literal(self)
@@ -375,7 +375,7 @@ class FStringExpression(FStringPart):
     """
 
     expression: "Expression"
-    format_spec: Optional[str] = None  # e.g., ".2f", "05d", "x"
+    format_spec: str | None = None  # e.g., ".2f", "05d", "x"
 
 
 @dataclass(frozen=True, slots=True)
@@ -390,7 +390,7 @@ class FString(Expression):
     """
 
     parts: tuple[FStringPart, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_fstring(self)
@@ -401,7 +401,7 @@ class BooleanLiteral(Expression):
     """A boolean literal (true/false)."""
 
     value: bool
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_boolean_literal(self)
@@ -411,7 +411,7 @@ class BooleanLiteral(Expression):
 class NoneLiteral(Expression):
     """The None literal."""
 
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_none_literal(self)
@@ -427,7 +427,7 @@ class ListLiteral(Expression):
     """
 
     elements: tuple[Expression, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_list_literal(self)
@@ -443,7 +443,7 @@ class SetLiteral(Expression):
     """
 
     elements: tuple[Expression, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_set_literal(self)
@@ -459,7 +459,7 @@ class DictLiteral(Expression):
     """
 
     pairs: tuple[tuple[Expression, Expression], ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_dict_literal(self)
@@ -477,7 +477,7 @@ class TupleLiteral(Expression):
     """
 
     elements: tuple[Expression, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_tuple_literal(self)
@@ -493,7 +493,7 @@ class SomeExpression(Expression):
     """
 
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_some_expression(self)
@@ -509,7 +509,7 @@ class OkExpression(Expression):
     """
 
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_ok_expression(self)
@@ -525,7 +525,7 @@ class ErrExpression(Expression):
     """
 
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_err_expression(self)
@@ -544,7 +544,7 @@ class UnwrapExpression(Expression):
     """
 
     operand: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_unwrap_expression(self)
@@ -564,7 +564,7 @@ class AwaitExpression(Expression):
     """
 
     expression: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_await_expression(self)
@@ -630,7 +630,7 @@ class BinaryExpression(Expression):
     left: Expression
     operator: BinaryOperator
     right: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_binary_expression(self)
@@ -647,7 +647,7 @@ class UnaryExpression(Expression):
 
     operator: UnaryOperator
     operand: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_unary_expression(self)
@@ -664,7 +664,7 @@ class KeywordArgument(Expression):
 
     name: str
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_keyword_argument(self)
@@ -682,7 +682,7 @@ class CallExpression(Expression):
     callee: Expression
     arguments: tuple[Expression, ...]
     keyword_arguments: tuple["KeywordArgument", ...] = ()
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_call_expression(self)
@@ -699,7 +699,7 @@ class MemberAccess(Expression):
 
     object: Expression
     member: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_member_access(self)
@@ -716,7 +716,7 @@ class IndexExpression(Expression):
 
     object: Expression
     index: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_index_expression(self)
@@ -734,7 +734,7 @@ class ConditionalExpression(Expression):
     condition: Expression
     then_expr: Expression
     else_expr: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_conditional_expression(self)
@@ -751,7 +751,7 @@ class LambdaExpression(Expression):
 
     parameters: tuple["Parameter", ...]
     body: Union[Expression, "Block"]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_lambda_expression(self)
@@ -769,8 +769,8 @@ class RangeExpression(Expression):
     start: Expression
     end: Expression
     inclusive: bool = False
-    step: Optional[Expression] = None
-    location: Optional[SourceLocation] = None
+    step: Expression | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_range_expression(self)
@@ -794,8 +794,8 @@ class ComprehensionClause:
 
     variable: str
     iterable: Expression
-    condition: Optional[Expression] = None  # Optional if clause
-    location: Optional[SourceLocation] = None
+    condition: Expression | None = None  # Optional if clause
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -811,7 +811,7 @@ class ListComprehension(Expression):
 
     element: Expression
     clauses: tuple[ComprehensionClause, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_list_comprehension(self)
@@ -829,7 +829,7 @@ class SetComprehension(Expression):
 
     element: Expression
     clauses: tuple[ComprehensionClause, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_set_comprehension(self)
@@ -849,7 +849,7 @@ class DictComprehension(Expression):
     key: Expression
     value: Expression
     clauses: tuple[ComprehensionClause, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_dict_comprehension(self)
@@ -868,7 +868,7 @@ class PipeLambda(Expression):
 
     parameters: tuple[str, ...]
     body: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_pipe_lambda(self)
@@ -886,7 +886,7 @@ class Pattern(ABC):
     Patterns are used in match expressions to destructure and match values.
     """
 
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
 
     @abstractmethod
     def accept(self, visitor: "ASTVisitor") -> Any:
@@ -911,7 +911,7 @@ class LiteralPattern(Pattern):
     """
 
     value: Expression  # IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_literal_pattern(self)
@@ -934,7 +934,7 @@ class IdentifierPattern(Pattern):
 
     name: str
     is_wildcard: bool = False
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_identifier_pattern(self)
@@ -958,7 +958,7 @@ class TuplePattern(Pattern):
     """
 
     elements: tuple[Pattern, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_tuple_pattern(self)
@@ -986,7 +986,7 @@ class ConstructorPattern(Pattern):
 
     name: str
     args: tuple[Pattern, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_constructor_pattern(self)
@@ -1015,7 +1015,7 @@ class RangePattern(Pattern):
     start: Expression  # Inclusive start
     end: Expression  # Exclusive end (or inclusive with ..=)
     inclusive: bool = False  # True for ..= (inclusive end)
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_range_pattern(self)
@@ -1039,7 +1039,7 @@ class OrPattern(Pattern):
     """
 
     patterns: tuple[Pattern, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_or_pattern(self)
@@ -1066,7 +1066,7 @@ class BindingPattern(Pattern):
 
     name: str
     pattern: Pattern
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_binding_pattern(self)
@@ -1091,8 +1091,8 @@ class RestPattern(Pattern):
         (first, .., last) -> "first and last only"
     """
 
-    name: Optional[str] = None  # None for anonymous rest (..)
-    location: Optional[SourceLocation] = None
+    name: str | None = None  # None for anonymous rest (..)
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_rest_pattern(self)
@@ -1120,7 +1120,7 @@ class ListPattern(Pattern):
     """
 
     elements: tuple[Pattern, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_list_pattern(self)
@@ -1144,9 +1144,9 @@ class MatchArm:
     """
 
     pattern: Pattern
-    guard: Optional[Expression]  # where condition
+    guard: Expression | None  # where condition
     body: Union[Expression, "Block"]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -1166,7 +1166,7 @@ class MatchExpression(Expression):
 
     subject: Expression
     arms: tuple[MatchArm, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_match_expression(self)
@@ -1193,7 +1193,7 @@ class ExpressionStatement(Statement):
     """
 
     expression: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_expression_statement(self)
@@ -1209,9 +1209,9 @@ class Parameter:
     """
 
     name: str
-    type_annotation: Optional[TypeAnnotation] = None
-    default_value: Optional[Expression] = None
-    location: Optional[SourceLocation] = None
+    type_annotation: TypeAnnotation | None = None
+    default_value: Expression | None = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -1224,7 +1224,7 @@ class Block(ASTNode):
     """
 
     statements: tuple[Statement, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_block(self)
@@ -1242,10 +1242,10 @@ class LetStatement(Statement):
     """
 
     name: str
-    type_annotation: Optional[TypeAnnotation] = None
-    value: Optional[Expression] = None
+    type_annotation: TypeAnnotation | None = None
+    value: Expression | None = None
     mutable: bool = False
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_let_statement(self)
@@ -1264,7 +1264,7 @@ class DestructuringLetStatement(Statement):
     names: tuple[str, ...]
     value: Expression
     mutable: bool = False
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_destructuring_let_statement(self)
@@ -1287,8 +1287,8 @@ class ConstDeclaration(Statement):
 
     name: str
     value: Expression  # Must be a constant expression
-    type_annotation: Optional[TypeAnnotation] = None
-    location: Optional[SourceLocation] = None
+    type_annotation: TypeAnnotation | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_const_declaration(self)
@@ -1306,7 +1306,7 @@ class AssignmentStatement(Statement):
 
     target: Expression
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_assignment_statement(self)
@@ -1324,7 +1324,7 @@ class CompoundAssignment(Statement):
     target: Expression
     operator: BinaryOperator
     value: Expression
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_compound_assignment(self)
@@ -1425,14 +1425,14 @@ class FunctionDef(Statement):
 
     name: str
     parameters: tuple[Parameter, ...]
-    return_type: Optional[TypeAnnotation] = None
-    body: Optional[Block] = None
+    return_type: TypeAnnotation | None = None
+    body: Block | None = None
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     jit_options: JitOptions = field(default_factory=JitOptions)
     doc_comment: Optional["DocComment"] = None
     attributes: tuple["Attribute", ...] = ()
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -1501,11 +1501,11 @@ class AsyncFunctionDef(Statement):
 
     name: str
     parameters: tuple[Parameter, ...]
-    return_type: Optional[TypeAnnotation] = None
-    body: Optional[Block] = None
+    return_type: TypeAnnotation | None = None
+    body: Block | None = None
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -1532,8 +1532,8 @@ class ClassDef(Statement):
 
     name: str
     base_classes: tuple[str, ...] = ()
-    body: Optional[Block] = None
-    location: Optional[SourceLocation] = None
+    body: Block | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_class_def(self)
@@ -1554,8 +1554,8 @@ class SceneDef(Statement):
     """
 
     name: str
-    body: Optional[Block] = None
-    location: Optional[SourceLocation] = None
+    body: Block | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_scene_def(self)
@@ -1579,8 +1579,8 @@ class IfStatement(Statement):
     condition: Expression
     then_block: Block
     elif_clauses: tuple[tuple[Expression, Block], ...] = ()
-    else_block: Optional[Block] = None
-    location: Optional[SourceLocation] = None
+    else_block: Block | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_if_statement(self)
@@ -1608,7 +1608,7 @@ class ForStatement(Statement):
     variable: str | tuple[str, ...]
     iterable: Expression
     body: Block
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_for_statement(self)
@@ -1632,7 +1632,7 @@ class AsyncForStatement(Statement):
     variable: str
     iterable: Expression
     body: Block
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_async_for_statement(self)
@@ -1651,7 +1651,7 @@ class WhileStatement(Statement):
 
     condition: Expression
     body: Block
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_while_statement(self)
@@ -1672,7 +1672,7 @@ class LoopStatement(Statement):
     """
 
     body: Block
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_loop_statement(self)
@@ -1692,8 +1692,8 @@ class IfLetStatement(Statement):
     pattern: "Pattern"
     value: Expression
     then_block: Block
-    else_block: Optional[Block] = None
-    location: Optional[SourceLocation] = None
+    else_block: Block | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_if_let_statement(self)
@@ -1713,7 +1713,7 @@ class WhileLetStatement(Statement):
     pattern: "Pattern"
     value: Expression
     body: Block
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_while_let_statement(self)
@@ -1729,8 +1729,8 @@ class ReturnStatement(Statement):
         return
     """
 
-    value: Optional[Expression] = None
-    location: Optional[SourceLocation] = None
+    value: Expression | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_return_statement(self)
@@ -1740,7 +1740,7 @@ class ReturnStatement(Statement):
 class BreakStatement(Statement):
     """A break statement."""
 
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_break_statement(self)
@@ -1750,7 +1750,7 @@ class BreakStatement(Statement):
 class ContinueStatement(Statement):
     """A continue statement."""
 
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_continue_statement(self)
@@ -1760,7 +1760,7 @@ class ContinueStatement(Statement):
 class PassStatement(Statement):
     """A pass statement (no-op)."""
 
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_pass_statement(self)
@@ -1778,10 +1778,10 @@ class ImportStatement(Statement):
     """
 
     module: str
-    alias: Optional[str] = None
-    names: tuple[tuple[str, Optional[str]], ...] = ()  # (name, alias) pairs
+    alias: str | None = None
+    names: tuple[tuple[str, str | None], ...] = ()  # (name, alias) pairs
     is_from_import: bool = False
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_import_statement(self)
@@ -1800,7 +1800,7 @@ class PrintStatement(Statement):
     format_string: Expression
     arguments: tuple[Expression, ...] = ()
     newline: bool = False  # True for println
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_print_statement(self)
@@ -1819,8 +1819,8 @@ class UseStatement(Statement):
 
     module_path: tuple[str, ...]
     wildcard: bool = False  # True for use module.*
-    alias: Optional[str] = None
-    location: Optional[SourceLocation] = None
+    alias: str | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_use_statement(self)
@@ -1843,7 +1843,7 @@ class ModuleDecl(Statement):
     body: Block
     is_public: bool = False
     doc_comment: Optional["DocComment"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_module_decl(self)
@@ -1860,8 +1860,8 @@ class PlayStatement(Statement):
     """
 
     animation: Expression
-    run_time: Optional[Expression] = None
-    location: Optional[SourceLocation] = None
+    run_time: Expression | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_play_statement(self)
@@ -1877,8 +1877,8 @@ class WaitStatement(Statement):
         wait()
     """
 
-    duration: Optional[Expression] = None
-    location: Optional[SourceLocation] = None
+    duration: Expression | None = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_wait_statement(self)
@@ -1909,7 +1909,7 @@ class StructField:
     name: str
     type_annotation: TypeAnnotation
     visibility: Visibility = Visibility.PRIVATE
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -1938,7 +1938,7 @@ class StructDef(Statement):
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     doc_comment: Optional["DocComment"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -1964,13 +1964,13 @@ class Method:
 
     name: str
     parameters: tuple[Parameter, ...]  # First param may be 'self'
-    return_type: Optional[TypeAnnotation] = None
+    return_type: TypeAnnotation | None = None
     body: Optional["Block"] = None
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     visibility: Visibility = Visibility.PRIVATE
     has_self: bool = False  # True if first param is 'self'
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -1997,7 +1997,7 @@ class AssociatedType:
 
     name: str
     type_value: TypeAnnotation
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -2030,7 +2030,7 @@ class ImplBlock(Statement):
     """
 
     target_type: str  # The struct/type being implemented
-    trait_name: Optional[str] = None  # None for inherent impl, trait name for trait impl
+    trait_name: str | None = None  # None for inherent impl, trait name for trait impl
     trait_type_args: tuple[
         TypeAnnotation, ...
     ] = ()  # Type args for trait (e.g., Float in Mul<Float>)
@@ -2039,7 +2039,7 @@ class ImplBlock(Statement):
     type_params: tuple["TypeParameter", ...] = ()
     target_type_args: tuple[str, ...] = ()  # Type arguments for target (e.g., T in Box<T>)
     where_clause: Optional["WhereClause"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -2070,13 +2070,13 @@ class TraitMethod:
 
     name: str
     parameters: tuple[Parameter, ...]
-    return_type: Optional[TypeAnnotation] = None
+    return_type: TypeAnnotation | None = None
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     has_self: bool = False
     has_default_impl: bool = False
     default_body: Optional["Block"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -2105,7 +2105,7 @@ class TraitDef(Statement):
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     doc_comment: Optional["DocComment"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -2129,7 +2129,7 @@ class EnumVariant:
 
     name: str
     fields: tuple[TypeAnnotation, ...] = ()  # Associated data types
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -2160,7 +2160,7 @@ class EnumDef(Statement):
     type_params: tuple["TypeParameter", ...] = ()
     where_clause: Optional["WhereClause"] = None
     doc_comment: Optional["DocComment"] = None
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     @property
     def is_generic(self) -> bool:
@@ -2181,7 +2181,7 @@ class SelfExpression(Expression):
         self.radius
     """
 
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_self_expression(self)
@@ -2200,7 +2200,7 @@ class EnumVariantAccess(Expression):
 
     enum_name: str
     variant_name: str
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_enum_variant_access(self)
@@ -2218,8 +2218,8 @@ class StructLiteral(Expression):
 
     struct_name: str
     fields: tuple[tuple[str, Expression], ...]  # (field_name, value) pairs
-    spread: Optional[Expression] = None  # The base struct for spread syntax
-    location: Optional[SourceLocation] = None
+    spread: Expression | None = None  # The base struct for spread syntax
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_struct_literal(self)
@@ -2239,7 +2239,7 @@ class EnumPattern(Pattern):
     enum_name: str
     variant_name: str
     bindings: tuple[Pattern, ...] = ()
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_enum_pattern(self)
@@ -2265,7 +2265,7 @@ class Program(ASTNode):
     """
 
     statements: tuple[Statement, ...]
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_program(self)

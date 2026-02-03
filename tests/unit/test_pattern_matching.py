@@ -10,31 +10,23 @@ Tests cover:
 
 import pytest
 
-from mathviz.compiler.lexer import Lexer, tokenize
-from mathviz.compiler.tokens import TokenType
-from mathviz.compiler.parser import Parser
 from mathviz.compiler.ast_nodes import (
-    MatchExpression,
-    LiteralPattern,
-    IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
-    IntegerLiteral,
     BooleanLiteral,
+    ConstructorPattern,
+    IdentifierPattern,
+    IntegerLiteral,
+    LiteralPattern,
+    MatchExpression,
     NoneLiteral,
-    Identifier,
-)
-from mathviz.compiler.type_checker import (
-    TypeChecker,
-    INT_TYPE,
-    FLOAT_TYPE,
-    BOOL_TYPE,
-    STRING_TYPE,
-    OptionalType,
-    ResultType,
+    TuplePattern,
 )
 from mathviz.compiler.codegen import CodeGenerator
-
+from mathviz.compiler.lexer import tokenize
+from mathviz.compiler.parser import Parser
+from mathviz.compiler.tokens import TokenType
+from mathviz.compiler.type_checker import (
+    TypeChecker,
+)
 
 # =============================================================================
 # Fixtures

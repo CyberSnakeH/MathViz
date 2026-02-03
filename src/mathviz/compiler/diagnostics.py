@@ -24,10 +24,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 from mathviz.utils.errors import SourceLocation
-
 
 # =============================================================================
 # Diagnostic Severity Levels
@@ -87,7 +85,7 @@ class SourceSpan:
         cls,
         loc: SourceLocation,
         length: int = 1,
-    ) -> "SourceSpan":
+    ) -> SourceSpan:
         """Create a span from a SourceLocation."""
         return cls(
             start_line=loc.line,
@@ -98,7 +96,7 @@ class SourceSpan:
         )
 
     @classmethod
-    def single_char(cls, line: int, col: int, filename: str = "<input>") -> "SourceSpan":
+    def single_char(cls, line: int, col: int, filename: str = "<input>") -> SourceSpan:
         """Create a single-character span."""
         return cls(line, col, line, col + 1, filename)
 
@@ -140,11 +138,11 @@ class Diagnostic:
     severity: DiagnosticSeverity
     code: str
     message: str
-    location: Optional[SourceLocation] = None
-    span: Optional[SourceSpan] = None
-    suggestion: Optional[str] = None
-    help_text: Optional[str] = None
-    related: list["Diagnostic"] = field(default_factory=list)
+    location: SourceLocation | None = None
+    span: SourceSpan | None = None
+    suggestion: str | None = None
+    help_text: str | None = None
+    related: list[Diagnostic] = field(default_factory=list)
     labels: list[tuple[SourceSpan, str]] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
@@ -157,27 +155,27 @@ class Diagnostic:
         if self.notes is None:
             object.__setattr__(self, "notes", [])
 
-    def add_related(self, diagnostic: "Diagnostic") -> "Diagnostic":
+    def add_related(self, diagnostic: Diagnostic) -> Diagnostic:
         """Add a related diagnostic and return self for chaining."""
         self.related.append(diagnostic)
         return self
 
-    def add_label(self, span: SourceSpan, message: str = "") -> "Diagnostic":
+    def add_label(self, span: SourceSpan, message: str = "") -> Diagnostic:
         """Add a source label and return self for chaining."""
         self.labels.append((span, message))
         return self
 
-    def add_note(self, note: str) -> "Diagnostic":
+    def add_note(self, note: str) -> Diagnostic:
         """Add a note and return self for chaining."""
         self.notes.append(note)
         return self
 
-    def with_suggestion(self, suggestion: str) -> "Diagnostic":
+    def with_suggestion(self, suggestion: str) -> Diagnostic:
         """Set suggestion and return self for chaining."""
         self.suggestion = suggestion
         return self
 
-    def with_help(self, help_text: str) -> "Diagnostic":
+    def with_help(self, help_text: str) -> Diagnostic:
         """Set help text and return self for chaining."""
         self.help_text = help_text
         return self
@@ -274,7 +272,7 @@ def find_similar_names(
     return [candidate for _, candidate in scored[:max_suggestions]]
 
 
-def find_best_match(name: str, candidates: list[str], max_distance: int = 2) -> Optional[str]:
+def find_best_match(name: str, candidates: list[str], max_distance: int = 2) -> str | None:
     """
     Find the single best matching name from candidates.
 
@@ -340,7 +338,7 @@ class DiagnosticEmitter:
         name: str,
         loc: SourceLocation,
         candidates: list[str],
-        defined_at: Optional[SourceLocation] = None,
+        defined_at: SourceLocation | None = None,
     ) -> Diagnostic:
         """
         Emit an undefined variable error with 'did you mean?' suggestion.
@@ -377,7 +375,7 @@ class DiagnosticEmitter:
         expected: str,
         found: str,
         loc: SourceLocation,
-        context: Optional[str] = None,
+        context: str | None = None,
     ) -> Diagnostic:
         """
         Emit a type mismatch error with conversion help.
@@ -613,7 +611,7 @@ class DiagnosticEmitter:
     def format_diagnostic(
         self,
         diag: Diagnostic,
-        source_lines: Optional[list[str]] = None,
+        source_lines: list[str] | None = None,
         use_color: bool = True,
     ) -> str:
         """
@@ -753,7 +751,7 @@ def format_error(
     code: str,
     loc: SourceLocation,
     source: str,
-    suggestion: Optional[str] = None,
+    suggestion: str | None = None,
 ) -> str:
     """
     Format a single error message with source context.

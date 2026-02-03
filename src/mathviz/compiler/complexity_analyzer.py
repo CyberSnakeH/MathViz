@@ -9,9 +9,9 @@ The analysis is heuristic-based and provides estimates that are useful
 for educational purposes and optimization hints.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from mathviz.compiler.ast_nodes import (
     ASTNode,
@@ -290,7 +290,7 @@ class _RecursionVisitor(BaseASTVisitor):
         for arg in node.arguments:
             self.visit(arg)
 
-    def _get_callee_name(self, callee: ASTNode) -> Optional[str]:
+    def _get_callee_name(self, callee: ASTNode) -> str | None:
         """Extract the function name from a callee expression."""
         if isinstance(callee, Identifier):
             return callee.name
@@ -305,16 +305,15 @@ class _RecursionVisitor(BaseASTVisitor):
             if pattern:
                 self._argument_patterns.append(pattern)
 
-    def _detect_argument_pattern(self, arg: ASTNode) -> Optional[tuple[str, str]]:
+    def _detect_argument_pattern(self, arg: ASTNode) -> tuple[str, str] | None:
         """Detect the pattern of argument transformation in recursion."""
         if isinstance(arg, BinaryExpression):
             # Check for n - 1 pattern (linear recursion)
-            if arg.operator == BinaryOperator.SUB:
-                if isinstance(arg.left, Identifier):
-                    from mathviz.compiler.ast_nodes import IntegerLiteral
+            if arg.operator == BinaryOperator.SUB and isinstance(arg.left, Identifier):
+                from mathviz.compiler.ast_nodes import IntegerLiteral
 
-                    if isinstance(arg.right, IntegerLiteral) and arg.right.value == 1:
-                        return (arg.left.name, "linear")
+                if isinstance(arg.right, IntegerLiteral) and arg.right.value == 1:
+                    return (arg.left.name, "linear")
             # Check for n / 2 pattern (logarithmic recursion)
             if arg.operator in (BinaryOperator.DIV, BinaryOperator.FLOOR_DIV):
                 if isinstance(arg.left, Identifier):
@@ -353,7 +352,7 @@ class _FunctionCallVisitor(BaseASTVisitor):
         for arg in node.arguments:
             self.visit(arg)
 
-    def _get_callee_name(self, callee: ASTNode) -> Optional[str]:
+    def _get_callee_name(self, callee: ASTNode) -> str | None:
         """Extract the function name from a callee expression."""
         if isinstance(callee, Identifier):
             return callee.name

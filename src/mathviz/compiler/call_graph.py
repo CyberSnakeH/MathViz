@@ -21,11 +21,9 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Optional
 
 from mathviz.compiler.ast_nodes import (
     BaseASTVisitor,
-    Block,
     CallExpression,
     ClassDef,
     FunctionDef,
@@ -93,7 +91,7 @@ class CallGraphNode:
 class CallGraphError(Exception):
     """Exception raised for call graph analysis errors."""
 
-    def __init__(self, message: str, cycles: Optional[list[list[str]]] = None) -> None:
+    def __init__(self, message: str, cycles: list[list[str]] | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.cycles = cycles or []
@@ -256,7 +254,7 @@ class CallGraph:
         # that need to be compiled first)
         # For compilation order, we reverse the edges:
         # A function must be compiled after all functions it calls
-        in_degree: dict[str, int] = {name: 0 for name in self.nodes}
+        in_degree: dict[str, int] = dict.fromkeys(self.nodes, 0)
 
         for node in self.nodes.values():
             for callee in node.calls:
@@ -503,7 +501,7 @@ class CallGraphBuilder(BaseASTVisitor):
     def __init__(self) -> None:
         """Initialize the builder."""
         self._graph: CallGraph = CallGraph()
-        self._current_function: Optional[str] = None
+        self._current_function: str | None = None
         self._function_scope_stack: list[str] = []
         self._defined_functions: set[str] = set()
 
@@ -655,7 +653,7 @@ class CallGraphBuilder(BaseASTVisitor):
         for arg in node.arguments:
             self.visit(arg)
 
-    def _extract_callee_name(self, node: CallExpression) -> Optional[str]:
+    def _extract_callee_name(self, node: CallExpression) -> str | None:
         """
         Extract the function name from a call expression.
 

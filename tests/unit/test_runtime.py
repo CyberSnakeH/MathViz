@@ -2,21 +2,19 @@
 Unit tests for the MathViz Runtime Library.
 """
 
-import pytest
-
 from mathviz.runtime.math_ops import (
-    set_union,
-    set_intersection,
-    set_difference,
-    is_subset,
-    is_superset,
-    is_proper_subset,
-    is_proper_superset,
+    cartesian_product,
     is_element,
     is_not_element,
-    symmetric_difference,
-    cartesian_product,
+    is_proper_subset,
+    is_proper_superset,
+    is_subset,
+    is_superset,
     power_set,
+    set_difference,
+    set_intersection,
+    set_union,
+    symmetric_difference,
 )
 
 

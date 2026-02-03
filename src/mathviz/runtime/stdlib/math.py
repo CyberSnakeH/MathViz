@@ -11,8 +11,9 @@ Provides comprehensive mathematical functions including:
 """
 
 from __future__ import annotations
+
 import math as _math
-from typing import Union, Tuple, List, Sequence
+
 import numpy as np
 
 # =============================================================================
@@ -31,19 +32,19 @@ NAN = float("nan")
 # =============================================================================
 
 
-def abs(x: Union[int, float]) -> Union[int, float]:
+def abs(x: int | float) -> int | float:
     """Return absolute value."""
     return x if x >= 0 else -x
 
 
-def min(*args) -> Union[int, float]:
+def min(*args) -> int | float:
     """Return minimum value."""
     if len(args) == 1 and hasattr(args[0], "__iter__"):
         return _math.inf if not args[0] else __builtins__["min"](args[0])
     return __builtins__["min"](args)
 
 
-def max(*args) -> Union[int, float]:
+def max(*args) -> int | float:
     """Return maximum value."""
     if len(args) == 1 and hasattr(args[0], "__iter__"):
         return -_math.inf if not args[0] else __builtins__["max"](args[0])
@@ -275,13 +276,10 @@ def is_prime(n: int) -> bool:
         return True
     if n % 2 == 0:
         return False
-    for i in range(3, int(_math.sqrt(n)) + 1, 2):
-        if n % i == 0:
-            return False
-    return True
+    return all(n % i != 0 for i in range(3, int(_math.sqrt(n)) + 1, 2))
 
 
-def prime_factors(n: int) -> List[int]:
+def prime_factors(n: int) -> list[int]:
     """Return list of prime factors."""
     factors = []
     d = 2

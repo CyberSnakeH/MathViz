@@ -2,8 +2,6 @@
 Unit tests for the MathViz Code Generator.
 """
 
-import pytest
-
 
 class TestCodeGenBasics:
     """Basic code generation tests."""

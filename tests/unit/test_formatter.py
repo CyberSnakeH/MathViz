@@ -10,18 +10,15 @@ Tests cover:
 """
 
 import pytest
-from pathlib import Path
-from tempfile import NamedTemporaryFile
 
 from mathviz.formatter import (
-    Formatter,
     FormatConfig,
-    format_source,
-    format_file,
+    Formatter,
     check_format,
+    format_file,
+    format_source,
     get_diff,
 )
-
 
 # =============================================================================
 # Fixtures

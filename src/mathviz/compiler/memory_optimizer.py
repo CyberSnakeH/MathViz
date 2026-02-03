@@ -25,42 +25,34 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional
 
 from mathviz.compiler.ast_nodes import (
+    AssignmentStatement,
     # AST base classes
-    ASTNode,
     BaseASTVisitor,
-    Expression,
-    Statement,
+    BinaryExpression,
+    BinaryOperator,
     Block,
+    CallExpression,
+    ConditionalExpression,
+    Expression,
+    ExpressionStatement,
+    ForStatement,
+    FunctionDef,
     # Expressions
     Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
+    IfStatement,
     IndexExpression,
-    ConditionalExpression,
-    RangeExpression,
-    BinaryOperator,
-    UnaryOperator,
+    IntegerLiteral,
     # Statements
     LetStatement,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    ForStatement,
-    WhileStatement,
-    IfStatement,
+    MemberAccess,
     ReturnStatement,
-    ExpressionStatement,
-    Parameter,
+    Statement,
+    UnaryExpression,
+    WhileStatement,
 )
 from mathviz.utils.errors import SourceLocation
-
 
 # =============================================================================
 # Data Structures
@@ -97,7 +89,7 @@ class SourceLocation:
 
     line: int
     column: int = 0
-    filename: Optional[str] = None
+    filename: str | None = None
 
     def __str__(self) -> str:
         if self.filename:
@@ -127,15 +119,15 @@ class AllocationInfo:
     """
 
     variable: str
-    size_expr: Optional[Expression]
+    size_expr: Expression | None
     element_type: str
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
     is_temporary: bool
     lifetime: tuple[int, int]
     can_reuse: bool
     allocation_func: str = "zeros"
     shape_dims: int = 1
-    estimated_size: Optional[int] = None
+    estimated_size: int | None = None
 
     def __str__(self) -> str:
         temp_str = " (temporary)" if self.is_temporary else ""
@@ -164,10 +156,10 @@ class ArrayAccess:
     array_var: str
     indices: list[Expression]
     is_write: bool
-    loop_var: Optional[str] = None
+    loop_var: str | None = None
     index_depends_on_loop: bool = False
     stride: int = 1
-    location: Optional[SourceLocation] = None
+    location: SourceLocation | None = None
 
 
 @dataclass(slots=True)
@@ -268,7 +260,7 @@ class InPlaceCandidate:
     variable: str
     operation: str
     source_vars: list[str]
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
     transform_type: str
     original_code: str = ""
     suggested_code: str = ""
@@ -445,7 +437,7 @@ class AllocationAnalyzer(BaseASTVisitor):
         self,
         var_name: str,
         expr: Expression,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check if an expression is an allocation and record it."""
         if not isinstance(expr, CallExpression):
@@ -490,7 +482,7 @@ class AllocationAnalyzer(BaseASTVisitor):
             return f"{base}.{callee.member}" if base else callee.member
         return ""
 
-    def _get_base_name(self, expr: Expression) -> Optional[str]:
+    def _get_base_name(self, expr: Expression) -> str | None:
         """Get base identifier name from expression."""
         if isinstance(expr, Identifier):
             return expr.name
@@ -509,7 +501,7 @@ class AllocationAnalyzer(BaseASTVisitor):
             return "Int"
         return "Float"
 
-    def _estimate_size(self, size_expr: Expression) -> Optional[int]:
+    def _estimate_size(self, size_expr: Expression) -> int | None:
         """Try to estimate the allocation size."""
         if isinstance(size_expr, IntegerLiteral):
             return size_expr.value
@@ -523,7 +515,7 @@ class AllocationAnalyzer(BaseASTVisitor):
                     return left + right
         return None
 
-    def _get_shape_dims(self, size_expr: Optional[Expression]) -> int:
+    def _get_shape_dims(self, size_expr: Expression | None) -> int:
         """Determine number of dimensions from size expression."""
         if size_expr is None:
             return 1
@@ -932,7 +924,7 @@ class InPlaceOptimizer(BaseASTVisitor):
             return f"{base}.{callee.member}" if base else callee.member
         return ""
 
-    def _get_base(self, expr: Expression) -> Optional[str]:
+    def _get_base(self, expr: Expression) -> str | None:
         """Get base identifier."""
         if isinstance(expr, Identifier):
             return expr.name
@@ -1003,19 +995,18 @@ class InPlaceOptimizer(BaseASTVisitor):
         # Pattern 2: result = np.func(arr)  ->  np.func(arr, out=result)
         elif isinstance(value, CallExpression):
             func_name = self._get_func_name(value.callee)
-            if func_name in self.NUMPY_OUT_FUNCS:
-                if target_name in self._pre_allocated:
-                    self._candidates.append(
-                        InPlaceCandidate(
-                            variable=target_name,
-                            operation=func_name,
-                            source_vars=self._collect_vars(value),
-                            location=stmt.location,
-                            transform_type="out_param",
-                            original_code=f"{target_name} = {func_name}(...)",
-                            suggested_code=f"{func_name}(..., out={target_name})",
-                        )
+            if func_name in self.NUMPY_OUT_FUNCS and target_name in self._pre_allocated:
+                self._candidates.append(
+                    InPlaceCandidate(
+                        variable=target_name,
+                        operation=func_name,
+                        source_vars=self._collect_vars(value),
+                        location=stmt.location,
+                        transform_type="out_param",
+                        original_code=f"{target_name} = {func_name}(...)",
+                        suggested_code=f"{func_name}(..., out={target_name})",
                     )
+                )
 
     def _can_use_compound(self, target: str, expr: BinaryExpression) -> bool:
         """Check if expression can be converted to compound assignment."""
@@ -1054,9 +1045,8 @@ class InPlaceOptimizer(BaseASTVisitor):
         value = assignment.value
 
         # Check pattern: a = a op b
-        if isinstance(value, BinaryExpression):
-            if value.operator in self.INPLACE_OPS:
-                return self._can_use_compound(target, value)
+        if isinstance(value, BinaryExpression) and value.operator in self.INPLACE_OPS:
+            return self._can_use_compound(target, value)
 
         return False
 
@@ -1089,7 +1079,7 @@ class CacheOptimizer(BaseASTVisitor):
     def __init__(self) -> None:
         """Initialize the cache optimizer."""
         self._array_accesses: list[ArrayAccess] = []
-        self._current_loop_var: Optional[str] = None
+        self._current_loop_var: str | None = None
         self._nested_loops: list[str] = []
 
     def analyze(self, func: FunctionDef) -> CacheAnalysis:
@@ -1176,7 +1166,7 @@ class CacheOptimizer(BaseASTVisitor):
             for arg in expr.arguments:
                 self._analyze_expression(arg, is_write=False)
 
-    def _create_access(self, expr: IndexExpression, is_write: bool) -> Optional[ArrayAccess]:
+    def _create_access(self, expr: IndexExpression, is_write: bool) -> ArrayAccess | None:
         """Create an ArrayAccess from an IndexExpression."""
         if not isinstance(expr.object, Identifier):
             return None
@@ -1213,19 +1203,17 @@ class CacheOptimizer(BaseASTVisitor):
     def _compute_stride(self, index: Expression) -> int:
         """Compute stride of array access relative to loop variable."""
         # Simple case: index is just the loop variable -> stride 1
-        if isinstance(index, Identifier):
-            if index.name == self._current_loop_var:
-                return 1
+        if isinstance(index, Identifier) and index.name == self._current_loop_var:
+            return 1
 
         # index = loop_var * constant
-        if isinstance(index, BinaryExpression):
-            if index.operator == BinaryOperator.MUL:
-                if isinstance(index.left, Identifier) and isinstance(index.right, IntegerLiteral):
-                    if index.left.name == self._current_loop_var:
-                        return index.right.value
-                if isinstance(index.right, Identifier) and isinstance(index.left, IntegerLiteral):
-                    if index.right.name == self._current_loop_var:
-                        return index.left.value
+        if isinstance(index, BinaryExpression) and index.operator == BinaryOperator.MUL:
+            if isinstance(index.left, Identifier) and isinstance(index.right, IntegerLiteral):
+                if index.left.name == self._current_loop_var:
+                    return index.right.value
+            if isinstance(index.right, Identifier) and isinstance(index.left, IntegerLiteral):
+                if index.right.name == self._current_loop_var:
+                    return index.left.value
 
         return 1
 
@@ -1238,12 +1226,12 @@ class CacheOptimizer(BaseASTVisitor):
 
         return issues
 
-    def _suggest_loop_interchange(self, nested_loop) -> Optional[LoopInterchange]:
+    def _suggest_loop_interchange(self, nested_loop) -> LoopInterchange | None:
         """Suggest loop order changes for better cache usage."""
         # Would analyze nested loop access patterns
         return None
 
-    def _suggest_blocking(self, loop: ForStatement) -> Optional[BlockingInfo]:
+    def _suggest_blocking(self, loop: ForStatement) -> BlockingInfo | None:
         """Suggest loop blocking/tiling for cache."""
         # Would analyze data reuse patterns
         return None
@@ -1290,7 +1278,7 @@ class CacheOptimizer(BaseASTVisitor):
                 f"Found {strided_count} strided access(es). Consider loop reordering."
             )
 
-        arrays = set(a.array_var for a in self._array_accesses)
+        arrays = {a.array_var for a in self._array_accesses}
 
         return CacheAnalysis(
             access_pattern=pattern,
@@ -1342,7 +1330,7 @@ class LayoutOptimizer:
 
         # Analyze each array
         suggestions: list[str] = []
-        for array_var, accesses in by_array.items():
+        for _array_var, accesses in by_array.items():
             layout = self._analyze_access_pattern(accesses)
             suggestions.append(layout)
 

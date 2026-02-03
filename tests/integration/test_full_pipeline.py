@@ -5,10 +5,8 @@ These tests verify that all analyzers work together correctly in the
 full compilation pipeline, from parsing through code generation.
 """
 
-import pytest
-
-from mathviz.compiler.purity_analyzer import Purity, is_jit_safe
 from mathviz.compiler.complexity_analyzer import Complexity
+from mathviz.compiler.purity_analyzer import Purity, is_jit_safe
 
 
 class TestCompilationPipeline:

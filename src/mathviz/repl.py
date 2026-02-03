@@ -29,12 +29,11 @@ from __future__ import annotations
 
 import math
 import os
-import re
 import sys
-import traceback
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any
 
 try:
     import readline
@@ -47,19 +46,17 @@ except ImportError:
 import numpy as np
 
 from mathviz import __version__
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
-from mathviz.compiler.codegen import CodeGenerator
-from mathviz.compiler.type_checker import TypeChecker, infer_expression_type
 from mathviz.compiler.ast_nodes import (
-    Program,
+    ExpressionStatement,
     FunctionDef,
     LetStatement,
-    ExpressionStatement,
-    Statement,
+    Program,
 )
+from mathviz.compiler.codegen import CodeGenerator
+from mathviz.compiler.lexer import Lexer
+from mathviz.compiler.parser import Parser
+from mathviz.compiler.type_checker import infer_expression_type
 from mathviz.utils.errors import MathVizError
-
 
 # =============================================================================
 # ANSI Color Codes
@@ -121,7 +118,7 @@ class REPLCommand:
     name: str
     aliases: tuple[str, ...] = ()
     help_text: str = ""
-    handler: Optional[Callable[["REPLSession", str], Optional[str]]] = None
+    handler: Callable[[REPLSession, str], str | None] | None = None
 
 
 # =============================================================================
@@ -305,7 +302,7 @@ class REPLSession:
     # Command Handlers
     # -------------------------------------------------------------------------
 
-    def _cmd_help(self, session: "REPLSession", args: str) -> str:
+    def _cmd_help(self, session: REPLSession, args: str) -> str:
         """Show help message."""
         lines = [
             f"{Colors.BOLD}Commands:{Colors.RESET}",
@@ -326,20 +323,20 @@ class REPLSession:
             f"  {Colors.GREEN}[x^2 for x in 0..5]{Colors.RESET}         List comprehension",
             "",
             f"{Colors.BOLD}Built-in Constants:{Colors.RESET}",
-            f"  PI, E, TAU, INF, NAN",
+            "  PI, E, TAU, INF, NAN",
             "",
             f"{Colors.BOLD}Built-in Functions:{Colors.RESET}",
-            f"  sqrt, sin, cos, tan, exp, log, abs, floor, ceil, round",
-            f"  min, max, sum, len, range, array, zeros, ones, linspace",
+            "  sqrt, sin, cos, tan, exp, log, abs, floor, ceil, round",
+            "  min, max, sum, len, range, array, zeros, ones, linspace",
         ]
         return "\n".join(lines)
 
-    def _cmd_quit(self, session: "REPLSession", args: str) -> str:
+    def _cmd_quit(self, session: REPLSession, args: str) -> str:
         """Exit the REPL."""
         print(f"{Colors.DIM}Goodbye!{Colors.RESET}")
         sys.exit(0)
 
-    def _cmd_clear(self, session: "REPLSession", args: str) -> str:
+    def _cmd_clear(self, session: REPLSession, args: str) -> str:
         """Clear all definitions."""
         self.variables.clear()
         self.variable_types.clear()
@@ -349,12 +346,12 @@ class REPLSession:
         self._setup_builtins()
         return f"{Colors.GREEN}Cleared all definitions{Colors.RESET}"
 
-    def _cmd_reset(self, session: "REPLSession", args: str) -> str:
+    def _cmd_reset(self, session: REPLSession, args: str) -> str:
         """Reset the entire session."""
         self.__init__()
         return f"{Colors.GREEN}Session reset{Colors.RESET}"
 
-    def _cmd_type(self, session: "REPLSession", args: str) -> str:
+    def _cmd_type(self, session: REPLSession, args: str) -> str:
         """Show the type of an expression."""
         if not args.strip():
             return f"{Colors.RED}Error: :type requires an expression{Colors.RESET}"
@@ -384,7 +381,7 @@ class REPLSession:
         except Exception as e:
             return f"{Colors.RED}Error: {e}{Colors.RESET}"
 
-    def _cmd_ast(self, session: "REPLSession", args: str) -> str:
+    def _cmd_ast(self, session: REPLSession, args: str) -> str:
         """Show the AST of an expression."""
         if not args.strip():
             return f"{Colors.RED}Error: :ast requires an expression{Colors.RESET}"
@@ -401,7 +398,7 @@ class REPLSession:
         except Exception as e:
             return f"{Colors.RED}Error: {e}{Colors.RESET}"
 
-    def _cmd_vars(self, session: "REPLSession", args: str) -> str:
+    def _cmd_vars(self, session: REPLSession, args: str) -> str:
         """Show all defined variables."""
         if not self.variables:
             return f"{Colors.DIM}No variables defined{Colors.RESET}"
@@ -413,7 +410,7 @@ class REPLSession:
 
         return "\n".join(lines)
 
-    def _cmd_funcs(self, session: "REPLSession", args: str) -> str:
+    def _cmd_funcs(self, session: REPLSession, args: str) -> str:
         """Show all defined functions."""
         if not self.functions:
             return f"{Colors.DIM}No functions defined{Colors.RESET}"
@@ -421,14 +418,14 @@ class REPLSession:
         lines = []
         for name, func in sorted(self.functions.items()):
             params = ", ".join(
-                f"{p}: {t}" if t else p for p, t in zip(func.params, func.param_types)
+                f"{p}: {t}" if t else p for p, t in zip(func.params, func.param_types, strict=False)
             )
             ret = f" -> {func.return_type}" if func.return_type else ""
             lines.append(f"  {Colors.GREEN}{name}{Colors.RESET}({params}){ret}")
 
         return "\n".join(lines)
 
-    def _cmd_load(self, session: "REPLSession", args: str) -> str:
+    def _cmd_load(self, session: REPLSession, args: str) -> str:
         """Load and execute a .mviz file."""
         filepath = args.strip()
         if not filepath:
@@ -457,7 +454,7 @@ class REPLSession:
         except Exception as e:
             return f"{Colors.RED}Error loading file: {e}{Colors.RESET}"
 
-    def _cmd_save(self, session: "REPLSession", args: str) -> str:
+    def _cmd_save(self, session: REPLSession, args: str) -> str:
         """Save session to a file."""
         filepath = args.strip()
         if not filepath:
@@ -465,8 +462,8 @@ class REPLSession:
 
         try:
             lines = []
-            lines.append(f"# MathViz REPL session")
-            lines.append(f"# Saved from interactive session\n")
+            lines.append("# MathViz REPL session")
+            lines.append("# Saved from interactive session\n")
 
             # Export functions
             for name, func in self.functions.items():
@@ -528,7 +525,7 @@ class REPLSession:
     # Evaluation
     # -------------------------------------------------------------------------
 
-    def eval_line(self, line: str) -> Optional[str]:
+    def eval_line(self, line: str) -> str | None:
         """
         Evaluate a single line of input.
 
@@ -564,7 +561,7 @@ class REPLSession:
 
         return f"{Colors.RED}Unknown command: :{command_name}{Colors.RESET}\nType :help for available commands"
 
-    def _compile_and_run(self, source: str) -> Optional[str]:
+    def _compile_and_run(self, source: str) -> str | None:
         """Compile and execute MathViz code."""
         # Parse the source
         lexer = Lexer(source)
@@ -599,9 +596,8 @@ class REPLSession:
             for p in func.parameters
         ]
         return_type = ""
-        if func.return_type:
-            if hasattr(func.return_type, "name"):
-                return_type = str(func.return_type.name)
+        if func.return_type and hasattr(func.return_type, "name"):
+            return_type = str(func.return_type.name)
 
         # Store function info
         self.functions[func.name] = DefinedFunction(
@@ -622,7 +618,9 @@ class REPLSession:
         eval(compiled, self._globals)  # noqa: S307 - Safe: executing compiler-generated code
 
         # Format output
-        params_str = ", ".join(f"{p}: {t}" if t else p for p, t in zip(params, param_types))
+        params_str = ", ".join(
+            f"{p}: {t}" if t else p for p, t in zip(params, param_types, strict=False)
+        )
         ret_str = f" -> {return_type}" if return_type else ""
 
         return f"{Colors.GREEN}defined:{Colors.RESET} {func.name}({params_str}){ret_str}"
@@ -654,7 +652,7 @@ class REPLSession:
 
         return ""
 
-    def _handle_expression(self, stmt: ExpressionStatement, source: str) -> Optional[str]:
+    def _handle_expression(self, stmt: ExpressionStatement, source: str) -> str | None:
         """Handle an expression statement."""
         # Wrap in a result assignment to capture the value
         wrapped_source = f"__repl_result__ = ({source})"
@@ -687,7 +685,7 @@ class REPLSession:
 
         return None
 
-    def _execute_statement(self, ast: Program, source: str) -> Optional[str]:
+    def _execute_statement(self, ast: Program, source: str) -> str | None:
         """Execute a general statement."""
         codegen = CodeGenerator(optimize=False)
         python_code = codegen.generate(ast)
@@ -898,7 +896,7 @@ class REPLCompleter:
             ":reset",
         ]
 
-    def complete(self, text: str, state: int) -> Optional[str]:
+    def complete(self, text: str, state: int) -> str | None:
         """Get completions for the given text."""
         if state == 0:
             # Build completions on first call

@@ -11,48 +11,40 @@ Tests cover:
 - Full optimization pipeline
 """
 
-import pytest
 import math
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
 from mathviz.compiler.ast_nodes import (
-    Program,
-    LetStatement,
-    ExpressionStatement,
-    IfStatement,
-    FunctionDef,
-    ReturnStatement,
-    Block,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
     BinaryExpression,
-    UnaryExpression,
     BinaryOperator,
-    UnaryOperator,
-    Identifier,
+    BooleanLiteral,
     CallExpression,
+    FloatLiteral,
+    FunctionDef,
+    Identifier,
+    IntegerLiteral,
+    LetStatement,
+    Program,
+    ReturnStatement,
+    StringLiteral,
 )
 from mathviz.compiler.const_fold import (
+    AlgebraicSimplifier,
     ConstantFolder,
     ConstantPropagator,
-    DeadCodeEliminator,
-    AlgebraicSimplifier,
-    StrengthReducer,
-    CSEliminator,
-    ConstOptimizer,
     ConstantScope,
+    ConstOptimizer,
+    CSEliminator,
+    DeadCodeEliminator,
     ExpressionKey,
+    StrengthReducer,
     fold_constants,
-    propagate_constants,
-    eliminate_dead_code,
-    simplify_algebra,
-    reduce_strength,
-    eliminate_cse,
     optimize_program,
+    propagate_constants,
+    reduce_strength,
+    simplify_algebra,
 )
+from mathviz.compiler.lexer import Lexer
+from mathviz.compiler.parser import Parser
 
 
 def parse_program(source: str) -> Program:

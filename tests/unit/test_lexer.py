@@ -4,8 +4,7 @@ Unit tests for the MathViz Lexer.
 
 import pytest
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.tokens import Token, TokenType
+from mathviz.compiler.tokens import TokenType
 from mathviz.utils.errors import LexerError
 
 

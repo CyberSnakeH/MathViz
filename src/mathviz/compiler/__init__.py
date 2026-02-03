@@ -21,14 +21,6 @@ from pathlib import Path
 from typing import Optional
 
 from mathviz.compiler.ast_nodes import ForStatement, FunctionDef, Program, UseStatement
-from mathviz.compiler.module_loader import (
-    DependencyGraph,
-    ModuleInfo,
-    ModuleLoader,
-    ModuleRegistry,
-    is_python_module,
-    PYTHON_MODULES,
-)
 from mathviz.compiler.call_graph import (
     CallGraph,
     CallGraphBuilder,
@@ -152,6 +144,14 @@ from mathviz.compiler.memory_optimizer import (
 )
 from mathviz.compiler.memory_optimizer import (
     CacheOptimizer as MemoryCacheOptimizer,
+)
+from mathviz.compiler.module_loader import (
+    PYTHON_MODULES,
+    DependencyGraph,
+    ModuleInfo,
+    ModuleLoader,
+    ModuleRegistry,
+    is_python_module,
 )
 from mathviz.compiler.parallel_analyzer import (
     DataDependency,
@@ -477,7 +477,7 @@ class CompilationPipeline:
         )
 
         # Register the main module
-        main_module = module_loader.load_from_ast(ast, "__main__", file_path)
+        module_loader.load_from_ast(ast, "__main__", file_path)
 
         # Resolve all use statements and load dependencies
         for stmt in ast.statements:
@@ -555,7 +555,7 @@ class CompilationPipeline:
         result.function_analysis = function_analysis
 
         # Generate optimization suggestions
-        for func_name, analysis in function_analysis.items():
+        for _func_name, analysis in function_analysis.items():
             self._generate_optimization_suggestions(analysis, warnings)
 
         # Stage 8: Code Generation
@@ -661,11 +661,10 @@ class CompilationPipeline:
 
         # JIT optimization suggestions
         if analysis.is_jit_compatible:
-            if analysis.purity.is_pure():
-                if can_memoize(analysis.purity):
-                    suggestions.append(
-                        f"Function '{analysis.name}' is pure and can be memoized for repeated calls"
-                    )
+            if analysis.purity.is_pure() and can_memoize(analysis.purity):
+                suggestions.append(
+                    f"Function '{analysis.name}' is pure and can be memoized for repeated calls"
+                )
         else:
             if analysis.purity.has_io():
                 suggestions.append(

@@ -22,29 +22,29 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, NoReturn, Optional
+from typing import Any
 
 from mathviz import __version__
-from mathviz.compiler import compile_source, compile_file
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
-from mathviz.compiler.type_checker import TypeChecker, type_check
-from mathviz.compiler.purity_analyzer import PurityAnalyzer, Purity, analyze_purity, is_jit_safe
-from mathviz.compiler.complexity_analyzer import ComplexityAnalyzer, Complexity, analyze_complexity
-from mathviz.compiler.call_graph import CallGraphBuilder, CallGraph
-from mathviz.compiler.parallel_analyzer import ParallelAnalyzer, analyze_parallelization
+from mathviz.compiler import compile_source
+from mathviz.compiler.call_graph import CallGraph, CallGraphBuilder
 from mathviz.compiler.codegen import CodeGenerator
+from mathviz.compiler.complexity_analyzer import Complexity, analyze_complexity
+from mathviz.compiler.lexer import Lexer
 from mathviz.compiler.linter import (
-    Linter,
-    LintConfiguration,
-    LintLevel,
-    LintCategory,
-    LintViolation,
     ALL_RULES,
     RULES_BY_NAME,
+    LintCategory,
+    LintConfiguration,
+    Linter,
+    LintLevel,
+    LintViolation,
 )
-from mathviz.utils.errors import MathVizError, TypeError as MathVizTypeError
-
+from mathviz.compiler.parallel_analyzer import ParallelAnalyzer
+from mathviz.compiler.parser import Parser
+from mathviz.compiler.purity_analyzer import Purity, analyze_purity, is_jit_safe
+from mathviz.compiler.type_checker import TypeChecker
+from mathviz.utils.errors import MathVizError
+from mathviz.utils.errors import TypeError as MathVizTypeError
 
 # =============================================================================
 # ANSI Color Codes for Terminal Output
@@ -345,7 +345,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # REPL command
-    repl_parser = subparsers.add_parser(
+    subparsers.add_parser(
         "repl",
         aliases=["i"],
         help="Start interactive REPL mode",
@@ -496,7 +496,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # Info command
-    info_parser = subparsers.add_parser(
+    subparsers.add_parser(
         "info",
         help="Show language information and capabilities",
     )
@@ -895,7 +895,7 @@ def _get_optimization_suggestions(
             )
 
     for func_name, loops in parallel_info.items():
-        for loop, analysis in loops:
+        for _loop, analysis in loops:
             if analysis.is_parallelizable and not analysis.can_use_prange:
                 suggestions.append(
                     f"Loop in '{func_name}' could be parallelized with some refactoring"
@@ -972,8 +972,8 @@ def _print_analysis_json(
     # Build call graph
     for node_name, node in call_graph.nodes.items():
         result["call_graph"][node_name] = {
-            "calls": list(sorted(node.calls)),
-            "called_by": list(sorted(node.called_by)),
+            "calls": sorted(node.calls),
+            "called_by": sorted(node.called_by),
             "is_recursive": node.is_recursive,
             "in_cycle": node.in_cycle,
         }
@@ -1235,9 +1235,7 @@ def cmd_lint(args: argparse.Namespace) -> int:
 
         if args.allow:
             rule_id = args.allow
-            if rule_id in ALL_RULES:
-                config.allow(rule_id)
-            elif rule_id in RULES_BY_NAME:
+            if rule_id in ALL_RULES or rule_id in RULES_BY_NAME:
                 config.allow(rule_id)
             else:
                 print(f"Error: Unknown rule '{rule_id}'", file=sys.stderr)
@@ -1276,7 +1274,7 @@ def _print_lint_report(
     input_path: Path,
     violations: list[LintViolation],
     config: LintConfiguration,
-    source: Optional[str] = None,
+    source: str | None = None,
 ) -> None:
     """
     Print a Rust-style formatted lint report with source context.
@@ -1449,7 +1447,7 @@ def cmd_repl(args: argparse.Namespace) -> int:
 
 def cmd_fmt(args: argparse.Namespace) -> int:
     """Handle the fmt command - format source files."""
-    from mathviz.formatter import format_file, format_source, check_format, get_diff
+    from mathviz.formatter import check_format, format_source, get_diff
 
     # Default to current directory if no input specified
     input_path = args.input or Path(".")
@@ -1526,7 +1524,7 @@ def cmd_watch(args: argparse.Namespace) -> int:
     print(f"{Colors.BOLD}Watching for changes...{Colors.RESET}")
     print(f"  Input: {input_path}")
     print(f"  Output: {output_path}")
-    print(f"Press Ctrl+C to stop\n")
+    print("Press Ctrl+C to stop\n")
 
     # Track file modification times
     last_mtime: dict[Path, float] = {}
@@ -1589,10 +1587,7 @@ def cmd_doc(args: argparse.Namespace) -> int:
         return 1
 
     # Collect .mviz files
-    if input_path.is_file():
-        files = [input_path]
-    else:
-        files = list(input_path.rglob("*.mviz"))
+    files = [input_path] if input_path.is_file() else list(input_path.rglob("*.mviz"))
 
     if not files:
         print(f"No .mviz files found in {input_path}", file=sys.stderr)
@@ -1632,7 +1627,7 @@ def cmd_doc(args: argparse.Namespace) -> int:
 
 def _extract_documentation(ast, filepath: Path) -> dict[str, Any]:
     """Extract documentation from an AST."""
-    from mathviz.compiler.ast_nodes import FunctionDef, StructDef, TraitDef, EnumDef, SceneDef
+    from mathviz.compiler.ast_nodes import EnumDef, FunctionDef, SceneDef, StructDef, TraitDef
 
     doc: dict[str, Any] = {
         "file": str(filepath),
@@ -1942,13 +1937,13 @@ media/
 
     print(f"{Colors.GREEN}Created MathViz project:{Colors.RESET} {project_dir}/")
     print(f"  - src/main.mviz (template: {template})")
-    print(f"  - mathviz.toml")
-    print(f"  - .gitignore")
+    print("  - mathviz.toml")
+    print("  - .gitignore")
     print()
-    print(f"Next steps:")
+    print("Next steps:")
     print(f"  cd {project_dir}")
-    print(f"  mathviz build     # Build the project")
-    print(f"  mathviz exec src/main.mviz  # Run")
+    print("  mathviz build     # Build the project")
+    print("  mathviz exec src/main.mviz  # Run")
 
     return 0
 
@@ -1964,13 +1959,10 @@ def cmd_build(args: argparse.Namespace) -> int:
 
     # Find source files
     src_dir = Path("src")
-    if src_dir.exists():
-        files = list(src_dir.rglob("*.mviz"))
-    else:
-        files = list(Path(".").rglob("*.mviz"))
+    files = list(src_dir.rglob("*.mviz")) if src_dir.exists() else list(Path(".").rglob("*.mviz"))
 
     if not files:
-        print(f"Error: No .mviz files found", file=sys.stderr)
+        print("Error: No .mviz files found", file=sys.stderr)
         return 1
 
     # Create build directory
@@ -2021,7 +2013,7 @@ def cmd_test(args: argparse.Namespace) -> int:
     tests_dir = Path("tests")
 
     if not tests_dir.exists():
-        print(f"Error: No tests directory found", file=sys.stderr)
+        print("Error: No tests directory found", file=sys.stderr)
         return 1
 
     # Find test files
@@ -2149,7 +2141,7 @@ def _print_ast(node, indent: int = 0) -> None:
         print(f"{prefix}{node_name}")
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """Main entry point for the CLI."""
     parser = create_parser()
     args = parser.parse_args(argv)

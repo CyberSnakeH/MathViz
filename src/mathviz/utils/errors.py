@@ -3,7 +3,6 @@ Error types and source location tracking for MathViz compiler.
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,7 +20,7 @@ class SourceLocation:
     line: int
     column: int
     offset: int = 0
-    filename: Optional[str] = None
+    filename: str | None = None
 
     def __str__(self) -> str:
         if self.filename:
@@ -35,8 +34,8 @@ class MathVizError(Exception):
     def __init__(
         self,
         message: str,
-        location: Optional[SourceLocation] = None,
-        source_line: Optional[str] = None,
+        location: SourceLocation | None = None,
+        source_line: str | None = None,
     ) -> None:
         self.message = message
         self.location = location
@@ -98,10 +97,10 @@ class ModuleResolutionError(MathVizError):
     def __init__(
         self,
         message: str,
-        location: Optional[SourceLocation] = None,
-        module_path: Optional[str] = None,
-        search_paths: Optional[list] = None,
-        cycle: Optional[list[str]] = None,
+        location: SourceLocation | None = None,
+        module_path: str | None = None,
+        search_paths: list | None = None,
+        cycle: list[str] | None = None,
     ) -> None:
         """
         Initialize the error.

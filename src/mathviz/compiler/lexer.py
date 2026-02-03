@@ -5,15 +5,15 @@ Transforms MathViz source code into a stream of tokens, supporting both
 standard programming constructs and mathematical Unicode symbols.
 """
 
-from typing import Iterator, Optional
+from collections.abc import Iterator
 
 from mathviz.compiler.tokens import (
-    Token,
-    TokenType,
+    DOUBLE_CHAR_TOKENS,
     KEYWORDS,
     MATH_SYMBOLS,
     SINGLE_CHAR_TOKENS,
-    DOUBLE_CHAR_TOKENS,
+    Token,
+    TokenType,
 )
 
 # Pending doc comment to attach to the next statement
@@ -39,7 +39,7 @@ class Lexer:
         # or iterate: for token in lexer: ...
     """
 
-    def __init__(self, source: str, filename: Optional[str] = None) -> None:
+    def __init__(self, source: str, filename: str | None = None) -> None:
         """
         Initialize the lexer with source code.
 
@@ -58,21 +58,21 @@ class Lexer:
         self._line_start = 0
 
     @property
-    def _current_char(self) -> Optional[str]:
+    def _current_char(self) -> str | None:
         """Return the current character or None if at end."""
         if self.pos >= len(self.source):
             return None
         return self.source[self.pos]
 
     @property
-    def _peek_char(self) -> Optional[str]:
+    def _peek_char(self) -> str | None:
         """Return the next character without consuming it."""
         peek_pos = self.pos + 1
         if peek_pos >= len(self.source):
             return None
         return self.source[peek_pos]
 
-    def _peek_ahead(self, n: int) -> Optional[str]:
+    def _peek_ahead(self, n: int) -> str | None:
         """Return the character n positions ahead."""
         peek_pos = self.pos + n
         if peek_pos >= len(self.source):
@@ -479,7 +479,7 @@ class Lexer:
 
         return Token(TokenType.IDENTIFIER, identifier, start_loc)
 
-    def _read_math_symbol(self) -> Optional[Token]:
+    def _read_math_symbol(self) -> Token | None:
         """
         Try to read a mathematical Unicode symbol.
 
@@ -658,7 +658,7 @@ class Lexer:
         # The value is a tuple: ("fstring", parts)
         return Token(TokenType.STRING, ("fstring", tuple(parts)), start_loc)
 
-    def _read_operator(self) -> Optional[Token]:
+    def _read_operator(self) -> Token | None:
         """
         Read an operator token (single or double character).
 
@@ -695,7 +695,7 @@ class Lexer:
 
         return None
 
-    def _next_token(self) -> Optional[Token]:
+    def _next_token(self) -> Token | None:
         """
         Extract the next token from the source.
 
@@ -709,12 +709,12 @@ class Lexer:
             # Check for doc comments (/// or /**) BEFORE regular comments
             if self._current_char == "/":
                 # Check for /// doc comment
-                if self._peek_char == "/" and self._peek_ahead(2) == "/":
-                    doc_token = self._read_doc_comment()
-                    if doc_token:
-                        return doc_token
-                # Check for /** doc comment (not just /*)
-                elif self._peek_char == "*" and self._peek_ahead(2) == "*":
+                if (
+                    self._peek_char == "/"
+                    and self._peek_ahead(2) == "/"
+                    or self._peek_char == "*"
+                    and self._peek_ahead(2) == "*"
+                ):
                     doc_token = self._read_doc_comment()
                     if doc_token:
                         return doc_token
@@ -805,7 +805,7 @@ class Lexer:
         return iter(self.tokens)
 
 
-def tokenize(source: str, filename: Optional[str] = None) -> list[Token]:
+def tokenize(source: str, filename: str | None = None) -> list[Token]:
     """
     Convenience function to tokenize source code.
 

@@ -5,66 +5,64 @@ Tests the runtime helper functions directly, independent of the
 compilation pipeline, to ensure they behave correctly.
 """
 
-import pytest
-
 from mathviz.runtime.iterators import (
-    # Transformation
-    iter_map,
-    iter_filter,
-    iter_reduce,
-    iter_fold,
-    iter_flat_map,
-    iter_flatten,
-    # Access
-    iter_first,
-    iter_last,
-    iter_nth,
-    iter_find,
-    iter_position,
+    dict_filter_keys,
+    dict_filter_values,
+    dict_items,
+    # Dict-specific
+    dict_keys,
+    dict_map_values,
+    dict_values,
+    iter_all,
     # Predicate
     iter_any,
-    iter_all,
-    iter_none,
+    iter_average,
+    iter_chain,
+    iter_chunk,
+    iter_collect_dict,
+    # Collection
+    iter_collect_list,
+    iter_collect_set,
     iter_count,
     iter_count_if,
-    # Numeric
-    iter_sum,
-    iter_product,
-    iter_min,
+    iter_enumerate,
+    iter_filter,
+    iter_find,
+    # Access
+    iter_first,
+    iter_flat_map,
+    iter_flatten,
+    iter_fold,
+    iter_group_by,
+    iter_join,
+    iter_last,
+    # Transformation
+    iter_map,
     iter_max,
-    iter_average,
-    iter_min_by,
     iter_max_by,
-    # Slicing
-    iter_take,
+    iter_min,
+    iter_min_by,
+    iter_none,
+    iter_nth,
+    iter_partition,
+    iter_position,
+    iter_product,
+    iter_reduce,
+    iter_reversed,
     iter_skip,
-    iter_take_while,
     iter_skip_while,
     # Ordering
     iter_sorted,
     iter_sorted_by,
     iter_sorted_by_desc,
-    iter_reversed,
+    # Numeric
+    iter_sum,
+    # Slicing
+    iter_take,
+    iter_take_while,
+    iter_unique,
     # Combination
     iter_zip,
-    iter_enumerate,
-    iter_chain,
-    iter_chunk,
-    iter_unique,
-    # Collection
-    iter_collect_list,
-    iter_collect_set,
-    iter_collect_dict,
-    iter_join,
-    iter_group_by,
-    iter_partition,
-    # Dict-specific
-    dict_keys,
-    dict_values,
-    dict_items,
-    dict_map_values,
-    dict_filter_keys,
-    dict_filter_values,
 )
 
 

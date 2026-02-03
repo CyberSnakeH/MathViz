@@ -9,29 +9,29 @@ Tests cover:
 - Type checking of constant declarations
 """
 
-import pytest
 import math
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
-from mathviz.compiler.tokens import TokenType
+import pytest
+
 from mathviz.compiler.ast_nodes import (
-    ConstDeclaration,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
     BinaryExpression,
     BinaryOperator,
-    Identifier,
+    ConstDeclaration,
+    FloatLiteral,
+    IntegerLiteral,
+    StringLiteral,
 )
+from mathviz.compiler.codegen import CodeGenerator
 from mathviz.compiler.const_evaluator import (
-    ConstEvaluator,
-    ConstEvalError,
     BUILTIN_CONSTANTS,
+    ConstEvalError,
+    ConstEvaluator,
     evaluate_const,
     is_const_expr,
 )
-from mathviz.compiler.codegen import CodeGenerator
+from mathviz.compiler.lexer import Lexer
+from mathviz.compiler.parser import Parser
+from mathviz.compiler.tokens import TokenType
 from mathviz.utils.errors import ParserError
 
 

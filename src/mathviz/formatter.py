@@ -15,94 +15,89 @@ from __future__ import annotations
 import difflib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, TextIO, Union
 
-from mathviz.compiler.lexer import Lexer
-from mathviz.compiler.parser import Parser
 from mathviz.compiler.ast_nodes import (
-    # Program
-    Program,
+    AssignmentStatement,
+    BinaryExpression,
+    BinaryOperator,
     Block,
-    # Types
-    TypeAnnotation,
-    SimpleType,
-    GenericType,
-    FunctionType,
+    BooleanLiteral,
+    BreakStatement,
+    CallExpression,
+    ClassDef,
+    CompoundAssignment,
+    ConditionalExpression,
+    ConstructorPattern,
+    ContinueStatement,
+    DictLiteral,
+    EnumDef,
+    EnumPattern,
+    EnumVariant,
+    EnumVariantAccess,
+    ErrExpression,
     # Expressions
     Expression,
-    Identifier,
-    IntegerLiteral,
+    ExpressionStatement,
     FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    TupleLiteral,
-    SomeExpression,
-    OkExpression,
-    ErrExpression,
-    UnwrapExpression,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
-    BinaryOperator,
-    UnaryOperator,
-    MatchExpression,
-    MatchArm,
-    Pattern,
-    LiteralPattern,
+    ForStatement,
+    FunctionDef,
+    FunctionType,
+    GenericType,
+    Identifier,
     IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
+    IfStatement,
+    ImplBlock,
+    ImportStatement,
+    IndexExpression,
+    IntegerLiteral,
+    JitMode,
+    JitOptions,
+    LambdaExpression,
+    LetStatement,
+    ListLiteral,
+    LiteralPattern,
+    MatchExpression,
+    MemberAccess,
+    Method,
+    ModuleDecl,
+    NoneLiteral,
+    OkExpression,
+    Parameter,
+    PassStatement,
+    Pattern,
+    PlayStatement,
+    PrintStatement,
+    # Program
+    Program,
+    RangeExpression,
+    ReturnStatement,
+    SceneDef,
+    SelfExpression,
+    SetLiteral,
+    SimpleType,
+    SomeExpression,
     # Statements
     Statement,
-    ExpressionStatement,
-    LetStatement,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    ClassDef,
-    SceneDef,
-    IfStatement,
-    ForStatement,
-    WhileStatement,
-    ReturnStatement,
-    BreakStatement,
-    ContinueStatement,
-    PassStatement,
-    ImportStatement,
-    PrintStatement,
-    UseStatement,
-    ModuleDecl,
-    PlayStatement,
-    WaitStatement,
-    Parameter,
+    StringLiteral,
     # OOP
     StructDef,
-    StructField,
-    ImplBlock,
-    Method,
+    StructLiteral,
     TraitDef,
     TraitMethod,
-    EnumDef,
-    EnumVariant,
-    SelfExpression,
-    EnumVariantAccess,
-    StructLiteral,
-    EnumPattern,
+    TupleLiteral,
+    TuplePattern,
+    # Types
+    TypeAnnotation,
+    UnaryExpression,
+    UnaryOperator,
+    UnwrapExpression,
+    UseStatement,
     Visibility,
-    JitOptions,
-    JitMode,
+    WaitStatement,
+    WhileStatement,
 )
-from mathviz.utils.errors import MathVizError
-
+from mathviz.compiler.lexer import Lexer
+from mathviz.compiler.parser import Parser
 
 # =============================================================================
 # Formatter Configuration
@@ -187,7 +182,7 @@ class Formatter:
     Traverses the AST and produces consistently formatted source code.
     """
 
-    def __init__(self, config: Optional[FormatConfig] = None) -> None:
+    def __init__(self, config: FormatConfig | None = None) -> None:
         """Initialize the formatter with optional configuration."""
         self.config = config or FormatConfig()
         self._indent_level = 0
@@ -200,7 +195,7 @@ class Formatter:
         self._current_line = ""
         self._indent_level = 0
 
-        prev_stmt_type: Optional[type] = None
+        prev_stmt_type: type | None = None
 
         for i, stmt in enumerate(program.statements):
             # Add blank lines between certain statement types
@@ -220,7 +215,7 @@ class Formatter:
 
         return result
 
-    def _should_add_blank_lines(self, prev: Optional[type], curr: type) -> bool:
+    def _should_add_blank_lines(self, prev: type | None, curr: type) -> bool:
         """Determine if blank lines should be added between statements."""
         function_types = (FunctionDef, ClassDef, SceneDef, StructDef, ImplBlock, TraitDef, EnumDef)
         return prev in function_types or curr in function_types
@@ -601,9 +596,7 @@ class Formatter:
         """Format an expression to a string."""
         if isinstance(expr, Identifier):
             return expr.name
-        elif isinstance(expr, IntegerLiteral):
-            return str(expr.value)
-        elif isinstance(expr, FloatLiteral):
+        elif isinstance(expr, (IntegerLiteral, FloatLiteral)):
             return str(expr.value)
         elif isinstance(expr, StringLiteral):
             return f'"{expr.value}"'
@@ -777,7 +770,7 @@ class Formatter:
 # =============================================================================
 
 
-def format_source(source: str, config: Optional[FormatConfig] = None) -> str:
+def format_source(source: str, config: FormatConfig | None = None) -> str:
     """
     Format MathViz source code.
 
@@ -801,8 +794,8 @@ def format_source(source: str, config: Optional[FormatConfig] = None) -> str:
 
 
 def format_file(
-    filepath: Union[str, Path],
-    config: Optional[FormatConfig] = None,
+    filepath: str | Path,
+    config: FormatConfig | None = None,
     in_place: bool = False,
 ) -> str:
     """
@@ -833,7 +826,7 @@ def format_file(
 
 def check_format(
     source: str,
-    config: Optional[FormatConfig] = None,
+    config: FormatConfig | None = None,
 ) -> bool:
     """
     Check if source code is properly formatted.
@@ -854,7 +847,7 @@ def check_format(
 
 def get_diff(
     source: str,
-    config: Optional[FormatConfig] = None,
+    config: FormatConfig | None = None,
     filename: str = "<input>",
 ) -> str:
     """

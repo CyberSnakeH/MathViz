@@ -5,9 +5,9 @@ Provides time-related functions.
 """
 
 from __future__ import annotations
+
 import time as _time
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
 
 
 def now() -> float:
@@ -39,25 +39,25 @@ class Stopwatch:
     """Simple stopwatch for measuring elapsed time."""
 
     def __init__(self) -> None:
-        self._start: Optional[float] = None
+        self._start: float | None = None
         self._elapsed: float = 0.0
         self._running: bool = False
 
-    def start(self) -> "Stopwatch":
+    def start(self) -> Stopwatch:
         """Start the stopwatch."""
         if not self._running:
             self._start = _time.perf_counter()
             self._running = True
         return self
 
-    def stop(self) -> "Stopwatch":
+    def stop(self) -> Stopwatch:
         """Stop the stopwatch."""
         if self._running:
             self._elapsed += _time.perf_counter() - self._start
             self._running = False
         return self
 
-    def reset(self) -> "Stopwatch":
+    def reset(self) -> Stopwatch:
         """Reset the stopwatch."""
         self._elapsed = 0.0
         if self._running:

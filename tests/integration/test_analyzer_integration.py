@@ -5,10 +5,8 @@ These tests verify that the different analysis passes produce consistent
 and complementary results when analyzing the same code.
 """
 
-import pytest
-
-from mathviz.compiler.purity_analyzer import Purity, is_jit_safe, can_memoize, can_parallelize
 from mathviz.compiler.complexity_analyzer import Complexity
+from mathviz.compiler.purity_analyzer import Purity, can_memoize, can_parallelize, is_jit_safe
 
 
 class TestAnalyzerIntegration:
@@ -142,14 +140,14 @@ fn mutation_loop(arr: List[Int], n: Int) {
         # Impure loop should not be parallelizable (due to function calls)
         assert "impure_loop" in analyses_by_func
         # The analysis should flag it as having function calls
-        impure_analysis = analyses_by_func["impure_loop"][0]
+        analyses_by_func["impure_loop"][0]
         # Note: The parallelization check may pass if println is not considered
         # a "function call" at the AST level, but purity analysis catches it
 
         # Both purity and parallelization should agree on safety
         # Note: can_parallelize checks purity level, but IO is allowed
         # (I/O can still be parallelized with proper handling)
-        purity_allows_parallel = can_parallelize(result.purity_info["impure_loop"])
+        can_parallelize(result.purity_info["impure_loop"])
         # IO actually allows parallelization in some contexts (IMPURE_IO returns True from can_parallelize)
 
     def test_complexity_and_parallelization(self, compile_with_analysis):
@@ -300,7 +298,7 @@ fn pure_with_loops(n: Int) -> Int {
         assert can_memoize(pure_info)
 
         # Reading globals may affect memoization
-        global_info = result.purity_info["reads_global"]
+        result.purity_info["reads_global"]
         # If it reads globals, it may not be fully memoizable
         # (depends on whether the global can change)
 

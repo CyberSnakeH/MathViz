@@ -5,9 +5,12 @@ Provides async/await utilities and helpers.
 """
 
 from __future__ import annotations
+
 import asyncio
-from typing import TypeVar, Callable, Awaitable, List, Tuple, Optional, Any
+import contextlib
+from collections.abc import Awaitable, Callable
 from functools import wraps
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -18,12 +21,12 @@ U = TypeVar("U")
 # =============================================================================
 
 
-def run(coro: Awaitable[T]) -> T:
+def run[T](coro: Awaitable[T]) -> T:
     """Run an async function synchronously."""
     return asyncio.run(coro)
 
 
-def run_until_complete(coro: Awaitable[T]) -> T:
+def run_until_complete[T](coro: Awaitable[T]) -> T:
     """Run coroutine until complete in current event loop."""
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(coro)
@@ -34,19 +37,19 @@ def run_until_complete(coro: Awaitable[T]) -> T:
 # =============================================================================
 
 
-async def gather(*coros: Awaitable[T]) -> List[T]:
+async def gather[T](*coros: Awaitable[T]) -> list[T]:
     """Run multiple coroutines concurrently and gather results."""
     return list(await asyncio.gather(*coros))
 
 
-async def gather_dict(coros: dict[str, Awaitable[T]]) -> dict[str, T]:
+async def gather_dict[T](coros: dict[str, Awaitable[T]]) -> dict[str, T]:
     """Run dict of coroutines and return dict of results."""
     keys = list(coros.keys())
     values = await asyncio.gather(*coros.values())
-    return dict(zip(keys, values))
+    return dict(zip(keys, values, strict=False))
 
 
-async def first_completed(*coros: Awaitable[T]) -> T:
+async def first_completed[T](*coros: Awaitable[T]) -> T:
     """Return result of first completed coroutine."""
     done, pending = await asyncio.wait(
         [asyncio.create_task(c) for c in coros], return_when=asyncio.FIRST_COMPLETED
@@ -58,12 +61,12 @@ async def first_completed(*coros: Awaitable[T]) -> T:
     return done.pop().result()
 
 
-async def race(*coros: Awaitable[T]) -> T:
+async def race[T](*coros: Awaitable[T]) -> T:
     """Alias for first_completed."""
     return await first_completed(*coros)
 
 
-async def all_settled(*coros: Awaitable[T]) -> List[Tuple[bool, Any]]:
+async def all_settled[T](*coros: Awaitable[T]) -> list[tuple[bool, Any]]:
     """
     Run all coroutines and return (success, value/exception) tuples.
     Never raises - captures all results/errors.
@@ -96,15 +99,15 @@ async def sleep_ms(milliseconds: int) -> None:
     await asyncio.sleep(milliseconds / 1000)
 
 
-async def timeout(coro: Awaitable[T], seconds: float) -> Optional[T]:
+async def timeout[T](coro: Awaitable[T], seconds: float) -> T | None:
     """Run coroutine with timeout, return None on timeout."""
     try:
         return await asyncio.wait_for(coro, timeout=seconds)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return None
 
 
-async def timeout_or_raise(coro: Awaitable[T], seconds: float) -> T:
+async def timeout_or_raise[T](coro: Awaitable[T], seconds: float) -> T:
     """Run coroutine with timeout, raise TimeoutError on timeout."""
     return await asyncio.wait_for(coro, timeout=seconds)
 
@@ -114,12 +117,12 @@ async def timeout_or_raise(coro: Awaitable[T], seconds: float) -> T:
 # =============================================================================
 
 
-async def retry(
+async def retry[T](
     coro_factory: Callable[[], Awaitable[T]],
     max_attempts: int = 3,
     delay: float = 1.0,
     backoff: float = 2.0,
-    exceptions: Tuple[type, ...] = (Exception,),
+    exceptions: tuple[type, ...] = (Exception,),
 ) -> T:
     """
     Retry a coroutine with exponential backoff.
@@ -156,7 +159,7 @@ def create_queue(maxsize: int = 0) -> asyncio.Queue:
     return asyncio.Queue(maxsize=maxsize)
 
 
-async def send(queue: asyncio.Queue, item: T) -> None:
+async def send[T](queue: asyncio.Queue, item: T) -> None:
     """Send item to queue."""
     await queue.put(item)
 
@@ -166,7 +169,7 @@ async def receive(queue: asyncio.Queue) -> T:
     return await queue.get()
 
 
-def try_send(queue: asyncio.Queue, item: T) -> bool:
+def try_send[T](queue: asyncio.Queue, item: T) -> bool:
     """Try to send item without blocking. Returns success."""
     try:
         queue.put_nowait(item)
@@ -175,7 +178,7 @@ def try_send(queue: asyncio.Queue, item: T) -> bool:
         return False
 
 
-def try_receive(queue: asyncio.Queue) -> Optional[T]:
+def try_receive(queue: asyncio.Queue) -> T | None:
     """Try to receive item without blocking. Returns None if empty."""
     try:
         return queue.get_nowait()
@@ -208,19 +211,19 @@ def create_event() -> asyncio.Event:
 # =============================================================================
 
 
-async def async_map(func: Callable[[T], Awaitable[U]], items: List[T]) -> List[U]:
+async def async_map(func: Callable[[T], Awaitable[U]], items: list[T]) -> list[U]:
     """Map async function over items concurrently."""
     return await asyncio.gather(*[func(item) for item in items])
 
 
-async def async_filter(pred: Callable[[T], Awaitable[bool]], items: List[T]) -> List[T]:
+async def async_filter(pred: Callable[[T], Awaitable[bool]], items: list[T]) -> list[T]:
     """Filter items using async predicate."""
     results = await asyncio.gather(*[pred(item) for item in items])
-    return [item for item, keep in zip(items, results) if keep]
+    return [item for item, keep in zip(items, results, strict=False) if keep]
 
 
 async def async_reduce(
-    func: Callable[[T, T], Awaitable[T]], items: List[T], initial: Optional[T] = None
+    func: Callable[[T, T], Awaitable[T]], items: list[T], initial: T | None = None
 ) -> T:
     """Reduce items using async function (sequentially)."""
     if not items:
@@ -241,12 +244,12 @@ async def async_reduce(
     return result
 
 
-async def async_for_each(func: Callable[[T], Awaitable[None]], items: List[T]) -> None:
+async def async_for_each(func: Callable[[T], Awaitable[None]], items: list[T]) -> None:
     """Apply async function to each item concurrently."""
     await asyncio.gather(*[func(item) for item in items])
 
 
-async def async_for_each_sequential(func: Callable[[T], Awaitable[None]], items: List[T]) -> None:
+async def async_for_each_sequential(func: Callable[[T], Awaitable[None]], items: list[T]) -> None:
     """Apply async function to each item sequentially."""
     for item in items:
         await func(item)
@@ -257,7 +260,7 @@ async def async_for_each_sequential(func: Callable[[T], Awaitable[None]], items:
 # =============================================================================
 
 
-def create_task(coro: Awaitable[T]) -> asyncio.Task[T]:
+def create_task[T](coro: Awaitable[T]) -> asyncio.Task[T]:
     """Create a task from a coroutine."""
     return asyncio.create_task(coro)
 
@@ -265,10 +268,8 @@ def create_task(coro: Awaitable[T]) -> asyncio.Task[T]:
 async def cancel_task(task: asyncio.Task) -> None:
     """Cancel a task and wait for cancellation."""
     task.cancel()
-    try:
+    with contextlib.suppress(asyncio.CancelledError):
         await task
-    except asyncio.CancelledError:
-        pass
 
 
 def is_task_done(task: asyncio.Task) -> bool:
@@ -286,7 +287,7 @@ def get_task_result(task: asyncio.Task) -> Any:
 # =============================================================================
 
 
-def async_cached(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
+def async_cached[T](func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
     """Cache results of async function."""
     cache = {}
 
@@ -312,10 +313,8 @@ def async_throttle(calls: int, period: float):
             async with semaphore:
                 result = await func(*args, **kwargs)
                 asyncio.get_event_loop().call_later(period, semaphore.release)
-                try:
+                with contextlib.suppress(BaseException):
                     await semaphore.acquire()
-                except:
-                    pass
                 return result
 
         return wrapper

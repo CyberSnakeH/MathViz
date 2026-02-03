@@ -14,129 +14,121 @@ Transforms an AST into executable Python code, handling:
 
 from __future__ import annotations
 
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mathviz.compiler.purity_analyzer import PurityInfo
-    from mathviz.compiler.complexity_analyzer import ComplexityInfo
-    from mathviz.compiler.parallel_analyzer import LoopAnalysis
     from mathviz.compiler.call_graph import CallGraph
+    from mathviz.compiler.complexity_analyzer import ComplexityInfo
     from mathviz.compiler.module_loader import ModuleInfo, ModuleRegistry
-
-from mathviz.compiler.module_loader import PYTHON_MODULES
+    from mathviz.compiler.parallel_analyzer import LoopAnalysis
+    from mathviz.compiler.purity_analyzer import PurityInfo
 
 from mathviz.compiler.ast_nodes import (
-    # Program
-    Program,
+    AssignmentStatement,
+    AsyncForStatement,
+    AsyncFunctionDef,
+    AwaitExpression,
+    BaseASTVisitor,
+    BinaryExpression,
+    BinaryOperator,
+    BindingPattern,
     Block,
-    # Types
-    TypeAnnotation,
-    SimpleType,
-    GenericType,
-    FunctionType,
+    BooleanLiteral,
+    BreakStatement,
+    CallExpression,
+    ClassDef,
+    CompoundAssignment,
+    # Comprehensions and pipe lambdas
+    ComprehensionClause,
+    ConditionalExpression,
+    ConstDeclaration,
+    ConstructorPattern,
+    ContinueStatement,
+    DestructuringLetStatement,
+    DictComprehension,
+    DictLiteral,
+    EnumDef,
+    EnumPattern,
+    EnumVariantAccess,
+    ErrExpression,
     # Expressions
     Expression,
-    Identifier,
-    IntegerLiteral,
+    ExpressionStatement,
     FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    TupleLiteral,
-    SomeExpression,
-    OkExpression,
-    ErrExpression,
-    UnwrapExpression,
-    AwaitExpression,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    KeywordArgument,
-    # Pattern matching
-    Pattern,
-    LiteralPattern,
+    ForStatement,
+    FString,
+    FStringExpression,
+    FStringLiteral,
+    # F-strings
+    FunctionDef,
+    FunctionType,
+    GenericType,
+    Identifier,
     IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
-    RangePattern,
-    OrPattern,
-    BindingPattern,
-    RestPattern,
-    ListPattern,
-    MatchArm,
-    MatchExpression,
-    MemberAccess,
+    IfLetStatement,
+    IfStatement,
+    ImplBlock,
+    ImportStatement,
     IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
-    BinaryOperator,
-    UnaryOperator,
+    IntegerLiteral,
     # JIT/Numba
     JitMode,
     JitOptions,
-    # F-strings
-    FStringPart,
-    FStringLiteral,
-    FStringExpression,
-    FString,
+    LambdaExpression,
+    LetStatement,
+    ListComprehension,
+    ListLiteral,
+    ListPattern,
+    LiteralPattern,
+    LoopStatement,
+    MatchArm,
+    MatchExpression,
+    MemberAccess,
+    Method,
+    ModuleDecl,
+    NoneLiteral,
+    OkExpression,
+    OrPattern,
+    PassStatement,
+    # Pattern matching
+    Pattern,
+    PipeLambda,
+    PlayStatement,
+    PrintStatement,
+    # Program
+    Program,
+    RangeExpression,
+    RangePattern,
+    RestPattern,
+    ReturnStatement,
+    SceneDef,
+    SelfExpression,
+    SetComprehension,
+    SetLiteral,
+    SimpleType,
+    SomeExpression,
     # Statements
     Statement,
-    ExpressionStatement,
-    LetStatement,
-    DestructuringLetStatement,
-    ConstDeclaration,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    AsyncFunctionDef,
-    ClassDef,
-    SceneDef,
-    IfStatement,
-    ForStatement,
-    AsyncForStatement,
-    WhileStatement,
-    LoopStatement,
-    ReturnStatement,
-    BreakStatement,
-    ContinueStatement,
-    PassStatement,
-    ImportStatement,
-    PrintStatement,
-    UseStatement,
-    ModuleDecl,
-    PlayStatement,
-    WaitStatement,
-    Parameter,
-    BaseASTVisitor,
-    # OOP constructs
-    Visibility,
-    StructField,
+    StringLiteral,
     StructDef,
-    Method,
-    ImplBlock,
-    TraitMethod,
-    TraitDef,
-    EnumVariant,
-    EnumDef,
-    SelfExpression,
-    EnumVariantAccess,
     StructLiteral,
-    EnumPattern,
-    # Comprehensions and pipe lambdas
-    ComprehensionClause,
-    ListComprehension,
-    SetComprehension,
-    DictComprehension,
-    PipeLambda,
+    TraitDef,
+    TraitMethod,
+    TupleLiteral,
+    TuplePattern,
+    # Types
+    TypeAnnotation,
     # Generic type parameters
-    TypeParameter,
-    WhereClause,
+    UnaryExpression,
+    UnaryOperator,
+    UnwrapExpression,
+    UseStatement,
+    # OOP constructs
+    WaitStatement,
+    WhileLetStatement,
+    WhileStatement,
 )
-
+from mathviz.compiler.module_loader import PYTHON_MODULES
 
 # Binary operator to Python code mapping
 BINARY_OP_TO_PYTHON: dict[BinaryOperator, str] = {
@@ -533,10 +525,9 @@ class JitCompatibilityAnalyzer(BaseASTVisitor):
             # If no type annotation, we can't be sure - still try to JIT
 
         # Check return type
-        if func.return_type:
-            if not self._is_jit_compatible_type(func.return_type):
-                self.is_compatible = False
-                self.reasons.append("Return type is not JIT-compatible")
+        if func.return_type and not self._is_jit_compatible_type(func.return_type):
+            self.is_compatible = False
+            self.reasons.append("Return type is not JIT-compatible")
 
         # Analyze function body
         if func.body:
@@ -552,9 +543,7 @@ class JitCompatibilityAnalyzer(BaseASTVisitor):
             if type_ann.name in JIT_COMPATIBLE_TYPES:
                 return True
             # NumPy array types (Vec, Mat, Array, etc.)
-            if type_ann.name in NUMPY_ARRAY_TYPES:
-                return True
-            return False
+            return type_ann.name in NUMPY_ARRAY_TYPES
         elif isinstance(type_ann, GenericType):
             # List[Int], List[Float], Array[Float], etc.
             if type_ann.base in JIT_COMPATIBLE_ARRAY_TYPES:
@@ -649,7 +638,7 @@ class CodeGenerator(BaseASTVisitor):
         parallel_info: dict[str, list[LoopAnalysis]] | None = None,
         call_graph: CallGraph | None = None,
         verbose: bool = False,
-        module_registry: "ModuleRegistry | None" = None,
+        module_registry: ModuleRegistry | None = None,
     ) -> None:
         """
         Initialize the code generator.
@@ -1674,10 +1663,7 @@ class CodeGenerator(BaseASTVisitor):
             # Add guard if present
             if arm.guard:
                 guard_code = self._generate_expr(arm.guard)
-                if condition != "True":
-                    condition = f"({condition} and {guard_code})"
-                else:
-                    condition = guard_code
+                condition = f"({condition} and {guard_code})" if condition != "True" else guard_code
 
             # Generate body with pattern bindings
             bindings = self._generate_pattern_bindings(arm.pattern, subject_var)
@@ -1712,7 +1698,7 @@ class CodeGenerator(BaseASTVisitor):
         """
         # We'll generate inline helper that returns the matched value
         lines = []
-        lines.append(f"(lambda _match_subj: (")
+        lines.append("(lambda _match_subj: (")
 
         # Generate if-elif chain
         first = True
@@ -1721,10 +1707,7 @@ class CodeGenerator(BaseASTVisitor):
 
             if arm.guard:
                 guard_code = self._generate_expr(arm.guard)
-                if condition != "True":
-                    condition = f"({condition} and {guard_code})"
-                else:
-                    condition = guard_code
+                condition = f"({condition} and {guard_code})" if condition != "True" else guard_code
 
             bindings = self._generate_pattern_bindings(arm.pattern, "_match_subj")
 
@@ -1747,7 +1730,7 @@ class CodeGenerator(BaseASTVisitor):
             else:
                 lines.append(f"    else {body_expr} if {condition}")
 
-        lines.append(f"    else None")
+        lines.append("    else None")
         lines.append(f"))({subject})")
 
         return " ".join(lines)
@@ -2104,7 +2087,7 @@ class CodeGenerator(BaseASTVisitor):
             else:
                 self._emit(f"{node.name} = None")
 
-    def visit_destructuring_let_statement(self, node: "DestructuringLetStatement") -> None:
+    def visit_destructuring_let_statement(self, node: DestructuringLetStatement) -> None:
         """Generate code for a destructuring variable declaration."""
         names = ", ".join(node.names)
         value = self._generate_expr(node.value)
@@ -2117,7 +2100,7 @@ class CodeGenerator(BaseASTVisitor):
         Constants are generated as module-level Python constants (uppercase by convention).
         The const_evaluator is used to compute values at compile time when possible.
         """
-        from mathviz.compiler.const_evaluator import ConstEvaluator, ConstEvalError
+        from mathviz.compiler.const_evaluator import ConstEvalError, ConstEvaluator
 
         # Try to evaluate the constant at compile time
         try:
@@ -2421,10 +2404,7 @@ class CodeGenerator(BaseASTVisitor):
         iterable = self._generate_expr(node.iterable)
 
         # Handle tuple destructuring in for loop: for (a, b) in ...
-        if isinstance(node.variable, tuple):
-            var_str = ", ".join(node.variable)
-        else:
-            var_str = node.variable
+        var_str = ", ".join(node.variable) if isinstance(node.variable, tuple) else node.variable
 
         if use_prange:
             # Convert range() to prange() for parallel execution
@@ -2497,7 +2477,7 @@ class CodeGenerator(BaseASTVisitor):
         self.visit(node.body)
         self._dedent()
 
-    def visit_if_let_statement(self, node: "IfLetStatement") -> None:
+    def visit_if_let_statement(self, node: IfLetStatement) -> None:
         """
         Generate code for an if let statement.
 
@@ -2509,7 +2489,6 @@ class CodeGenerator(BaseASTVisitor):
                 x = _if_let_val._0
                 body
         """
-        from mathviz.compiler.ast_nodes import IfLetStatement
 
         # Generate a temporary variable for the value
         temp_var = "_if_let_val"
@@ -2537,7 +2516,7 @@ class CodeGenerator(BaseASTVisitor):
             self.visit(node.else_block)
             self._dedent()
 
-    def visit_while_let_statement(self, node: "WhileLetStatement") -> None:
+    def visit_while_let_statement(self, node: WhileLetStatement) -> None:
         """
         Generate code for a while let statement.
 
@@ -2551,7 +2530,6 @@ class CodeGenerator(BaseASTVisitor):
                 x = _while_let_val._0
                 body
         """
-        from mathviz.compiler.ast_nodes import WhileLetStatement
 
         temp_var = "_while_let_val"
 
@@ -2663,7 +2641,7 @@ class CodeGenerator(BaseASTVisitor):
             else:
                 self._emit(f"import {module_path}")
 
-    def _generate_mviz_module(self, module_info: "ModuleInfo") -> None:
+    def _generate_mviz_module(self, module_info: ModuleInfo) -> None:
         """
         Generate Python code for a MathViz module.
 
@@ -2673,7 +2651,6 @@ class CodeGenerator(BaseASTVisitor):
         Args:
             module_info: The module information from the registry
         """
-        from mathviz.compiler.module_loader import ModuleInfo
 
         # Use the last part of the module name as the class name
         class_name = module_info.name.split(".")[-1]
@@ -2859,7 +2836,7 @@ class CodeGenerator(BaseASTVisitor):
             self._emit("")
 
     def _generate_method(
-        self, method: Method, target_type: str, method_name_override: Optional[str] = None
+        self, method: Method, target_type: str, method_name_override: str | None = None
     ) -> None:
         """Generate code for a single method.
 

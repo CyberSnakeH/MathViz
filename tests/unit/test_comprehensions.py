@@ -9,20 +9,15 @@ Tests cover:
 - Iterator method code generation
 """
 
-import pytest
-
 from mathviz.compiler.ast_nodes import (
-    ListComprehension,
-    SetComprehension,
-    DictComprehension,
-    PipeLambda,
-    ComprehensionClause,
-    Identifier,
     BinaryExpression,
-    RangeExpression,
-    IntegerLiteral,
+    DictComprehension,
+    Identifier,
     LetStatement,
+    ListComprehension,
     ListLiteral,
+    PipeLambda,
+    SetComprehension,
 )
 
 

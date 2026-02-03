@@ -2,32 +2,26 @@
 Unit tests for Tuple, Optional, and Result types in MathViz compiler.
 """
 
-import pytest
-
 from mathviz.compiler.ast_nodes import (
-    TupleLiteral,
-    SomeExpression,
-    OkExpression,
     ErrExpression,
-    UnwrapExpression,
-    IntegerLiteral,
-    StringLiteral,
     Identifier,
+    IntegerLiteral,
+    OkExpression,
+    SomeExpression,
+    StringLiteral,
+    TupleLiteral,
+    UnwrapExpression,
 )
 from mathviz.compiler.type_checker import (
-    TupleType,
+    EMPTY_TUPLE_TYPE,
+    FLOAT_TYPE,
+    INT_TYPE,
+    NONE_TYPE,
+    STRING_TYPE,
     OptionalType,
     ResultType,
-    INT_TYPE,
-    FLOAT_TYPE,
-    STRING_TYPE,
-    BOOL_TYPE,
-    NONE_TYPE,
-    EMPTY_TUPLE_TYPE,
-    UNKNOWN_TYPE,
+    TupleType,
 )
-from mathviz.utils.errors import ParserError
-
 
 # =============================================================================
 # Tuple Tests
@@ -99,7 +93,7 @@ class TestTupleTypeChecking:
 
     def test_empty_tuple_type(self):
         """Empty tuple has special empty tuple type."""
-        assert EMPTY_TUPLE_TYPE == TupleType(())
+        assert TupleType(()) == EMPTY_TUPLE_TYPE
         assert str(EMPTY_TUPLE_TYPE) == "()"
 
     def test_single_element_tuple_type(self):

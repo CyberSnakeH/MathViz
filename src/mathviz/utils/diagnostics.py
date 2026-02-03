@@ -20,8 +20,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
-
 
 # =============================================================================
 # Error Codes Catalog
@@ -163,7 +161,7 @@ class SourceSpan:
     @classmethod
     def from_location(
         cls, line: int, col: int, length: int = 1, filename: str = "<input>"
-    ) -> "SourceSpan":
+    ) -> SourceSpan:
         """Create a span from a single location with a given length."""
         return cls(
             start_line=line,
@@ -176,7 +174,7 @@ class SourceSpan:
     @classmethod
     def single_line(
         cls, line: int, start_col: int, end_col: int, filename: str = "<input>"
-    ) -> "SourceSpan":
+    ) -> SourceSpan:
         """Create a span on a single line."""
         return cls(
             start_line=line,
@@ -280,7 +278,6 @@ class Diagnostic:
         # Color helpers
         reset = "\033[0m" if use_color else ""
         bold = "\033[1m" if use_color else ""
-        dim = "\033[2m" if use_color else ""
         level_color = self.level.color_code() if use_color else ""
         blue = "\033[94m" if use_color else ""
 
@@ -380,11 +377,11 @@ class DiagnosticBuilder:
 
     def __init__(
         self,
-        emitter: "DiagnosticEmitter",
+        emitter: DiagnosticEmitter,
         code: str,
         level: DiagnosticLevel,
         message: str,
-        primary_span: Optional[SourceSpan] = None,
+        primary_span: SourceSpan | None = None,
     ) -> None:
         self._emitter = emitter
         self._code = code
@@ -400,34 +397,34 @@ class DiagnosticBuilder:
 
     def label(
         self, span: SourceSpan, message: str = "", is_primary: bool = False
-    ) -> "DiagnosticBuilder":
+    ) -> DiagnosticBuilder:
         """Add a source code label."""
         self._labels.append(DiagnosticLabel(span, message, is_primary))
         return self
 
-    def primary_label(self, span: SourceSpan, message: str = "") -> "DiagnosticBuilder":
+    def primary_label(self, span: SourceSpan, message: str = "") -> DiagnosticBuilder:
         """Add a primary label (replaces any existing primary)."""
         # Remove existing primary labels
         self._labels = [l for l in self._labels if not l.is_primary]
         self._labels.insert(0, DiagnosticLabel(span, message, True))
         return self
 
-    def secondary_label(self, span: SourceSpan, message: str = "") -> "DiagnosticBuilder":
+    def secondary_label(self, span: SourceSpan, message: str = "") -> DiagnosticBuilder:
         """Add a secondary label."""
         self._labels.append(DiagnosticLabel(span, message, False))
         return self
 
-    def note(self, message: str) -> "DiagnosticBuilder":
+    def note(self, message: str) -> DiagnosticBuilder:
         """Add a note."""
         self._notes.append(message)
         return self
 
-    def help(self, message: str) -> "DiagnosticBuilder":
+    def help(self, message: str) -> DiagnosticBuilder:
         """Add a help message."""
         self._helps.append(message)
         return self
 
-    def suggestion(self, span: SourceSpan, replacement: str, message: str) -> "DiagnosticBuilder":
+    def suggestion(self, span: SourceSpan, replacement: str, message: str) -> DiagnosticBuilder:
         """Add a code suggestion."""
         self._suggestions.append(Suggestion(span, replacement, message))
         return self
@@ -495,19 +492,15 @@ class DiagnosticEmitter:
         """Add a diagnostic to the collection."""
         self.diagnostics.append(diagnostic)
 
-    def error(
-        self, code: str, message: str, span: Optional[SourceSpan] = None
-    ) -> DiagnosticBuilder:
+    def error(self, code: str, message: str, span: SourceSpan | None = None) -> DiagnosticBuilder:
         """Create an error diagnostic builder."""
         return DiagnosticBuilder(self, code, DiagnosticLevel.ERROR, message, span)
 
-    def warning(
-        self, code: str, message: str, span: Optional[SourceSpan] = None
-    ) -> DiagnosticBuilder:
+    def warning(self, code: str, message: str, span: SourceSpan | None = None) -> DiagnosticBuilder:
         """Create a warning diagnostic builder."""
         return DiagnosticBuilder(self, code, DiagnosticLevel.WARNING, message, span)
 
-    def note(self, message: str, span: Optional[SourceSpan] = None) -> DiagnosticBuilder:
+    def note(self, message: str, span: SourceSpan | None = None) -> DiagnosticBuilder:
         """Create a note diagnostic builder."""
         return DiagnosticBuilder(self, "", DiagnosticLevel.NOTE, message, span)
 
@@ -626,9 +619,9 @@ def suggest_similar(
 
 def suggest_similar_with_context(
     name: str,
-    candidates: dict[str, "VariableInfo"],
+    candidates: dict[str, VariableInfo],
     max_distance: int = 2,
-) -> list[tuple[str, "VariableInfo"]]:
+) -> list[tuple[str, VariableInfo]]:
     """
     Find similar names with their definition context.
 
@@ -679,7 +672,7 @@ def create_undefined_variable_diagnostic(
     name: str,
     span: SourceSpan,
     candidates: list[str],
-    definitions: Optional[dict[str, VariableInfo]] = None,
+    definitions: dict[str, VariableInfo] | None = None,
 ) -> Diagnostic:
     """
     Create a diagnostic for an undefined variable error.

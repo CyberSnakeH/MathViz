@@ -5,8 +5,10 @@ Provides random number generation functions.
 """
 
 from __future__ import annotations
+
 import random as _random
-from typing import TypeVar, Sequence, List, Optional
+from collections.abc import Sequence
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -39,29 +41,29 @@ def random_bool(probability: float = 0.5) -> bool:
     return _rng.random() < probability
 
 
-def random_choice(seq: Sequence[T]) -> T:
+def random_choice[T](seq: Sequence[T]) -> T:
     """Return random element from sequence."""
     return _rng.choice(seq)
 
 
-def random_choices(seq: Sequence[T], k: int) -> List[T]:
+def random_choices[T](seq: Sequence[T], k: int) -> list[T]:
     """Return k random elements with replacement."""
     return _rng.choices(seq, k=k)
 
 
-def random_sample(seq: Sequence[T], k: int) -> List[T]:
+def random_sample[T](seq: Sequence[T], k: int) -> list[T]:
     """Return k unique random elements without replacement."""
     return _rng.sample(list(seq), k)
 
 
-def random_shuffle(seq: List[T]) -> List[T]:
+def random_shuffle[T](seq: list[T]) -> list[T]:
     """Return shuffled copy of list."""
     result = list(seq)
     _rng.shuffle(result)
     return result
 
 
-def shuffle_in_place(seq: List[T]) -> None:
+def shuffle_in_place[T](seq: list[T]) -> None:
     """Shuffle list in place."""
     _rng.shuffle(seq)
 
@@ -81,12 +83,12 @@ def exponential(lambd: float = 1.0) -> float:
     return _rng.expovariate(lambd)
 
 
-def triangular(low: float = 0.0, high: float = 1.0, mode: Optional[float] = None) -> float:
+def triangular(low: float = 0.0, high: float = 1.0, mode: float | None = None) -> float:
     """Return random value from triangular distribution."""
     return _rng.triangular(low, high, mode)
 
 
-def weighted_choice(weights: List[float]) -> int:
+def weighted_choice(weights: list[float]) -> int:
     """Return random index weighted by given weights."""
     return _rng.choices(range(len(weights)), weights=weights)[0]
 
@@ -111,7 +113,7 @@ def random_color() -> str:
     return "#" + random_hex(6)
 
 
-def random_unit_vector(dim: int = 3) -> List[float]:
+def random_unit_vector(dim: int = 3) -> list[float]:
     """Return random unit vector of given dimension."""
     import math
 
@@ -139,6 +141,6 @@ def dice(sides: int = 6) -> int:
     return _rng.randint(1, sides)
 
 
-def dice_roll(num: int = 1, sides: int = 6) -> List[int]:
+def dice_roll(num: int = 1, sides: int = 6) -> list[int]:
     """Roll multiple dice."""
     return [dice(sides) for _ in range(num)]

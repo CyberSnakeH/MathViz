@@ -12,7 +12,6 @@ Each operator trait maps to:
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Optional
 
 from mathviz.compiler.ast_nodes import BinaryOperator, UnaryOperator
 
@@ -41,7 +40,7 @@ class OperatorTraitInfo:
     """
 
     method_name: str
-    operator: Optional[BinaryOperator | UnaryOperator]
+    operator: BinaryOperator | UnaryOperator | None
     python_magic: str
     kind: OperatorKind
     has_output_type: bool = True
@@ -201,7 +200,7 @@ OPERATOR_TRAITS: dict[str, OperatorTraitInfo] = {
 }
 
 
-def get_trait_for_binary_operator(op: BinaryOperator) -> Optional[str]:
+def get_trait_for_binary_operator(op: BinaryOperator) -> str | None:
     """Get the trait name for a binary operator."""
     for trait_name, info in OPERATOR_TRAITS.items():
         if info.operator == op and info.kind in (OperatorKind.BINARY, OperatorKind.COMPARISON):
@@ -209,7 +208,7 @@ def get_trait_for_binary_operator(op: BinaryOperator) -> Optional[str]:
     return None
 
 
-def get_trait_for_unary_operator(op: UnaryOperator) -> Optional[str]:
+def get_trait_for_unary_operator(op: UnaryOperator) -> str | None:
     """Get the trait name for a unary operator."""
     for trait_name, info in OPERATOR_TRAITS.items():
         if info.operator == op and info.kind == OperatorKind.UNARY:
@@ -222,13 +221,13 @@ def is_operator_trait(trait_name: str) -> bool:
     return trait_name in OPERATOR_TRAITS
 
 
-def get_python_magic_method(trait_name: str) -> Optional[str]:
+def get_python_magic_method(trait_name: str) -> str | None:
     """Get the Python magic method name for an operator trait."""
     info = OPERATOR_TRAITS.get(trait_name)
     return info.python_magic if info else None
 
 
-def get_operator_method_name(trait_name: str) -> Optional[str]:
+def get_operator_method_name(trait_name: str) -> str | None:
     """Get the MathViz method name for an operator trait."""
     info = OPERATOR_TRAITS.get(trait_name)
     return info.method_name if info else None

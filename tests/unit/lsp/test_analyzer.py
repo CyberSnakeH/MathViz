@@ -1,7 +1,5 @@
 """Tests for the MathViz LSP document analyzer."""
 
-import pytest
-
 from mathviz.lsp.analyzer import DocumentAnalyzer
 from mathviz.lsp.symbols import SymbolKind
 

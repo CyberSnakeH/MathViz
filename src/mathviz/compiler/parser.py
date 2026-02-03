@@ -6,131 +6,128 @@ Syntax Tree (AST). Implements operator precedence parsing for expressions
 and handles all MathViz language constructs.
 """
 
-from typing import Callable, Optional
-
-from mathviz.compiler.tokens import Token, TokenType
 from mathviz.compiler.ast_nodes import (
-    # Program
-    Program,
-    # Types
-    TypeAnnotation,
-    SimpleType,
-    GenericType,
-    FunctionType,
-    # Expressions
-    Expression,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    TupleLiteral,
-    SomeExpression,
-    OkExpression,
-    ErrExpression,
-    UnwrapExpression,
+    AssignmentStatement,
+    AssociatedType,
+    AsyncForStatement,
+    AsyncFunctionDef,
     AwaitExpression,
     BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    KeywordArgument,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
     BinaryOperator,
-    UnaryOperator,
-    # Pattern matching
-    Pattern,
-    LiteralPattern,
-    IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
-    RangePattern,
-    OrPattern,
     BindingPattern,
-    RestPattern,
-    ListPattern,
-    MatchArm,
-    MatchExpression,
+    Block,
+    BooleanLiteral,
+    BreakStatement,
+    CallExpression,
+    ClassDef,
+    CompoundAssignment,
+    # Comprehensions and pipe lambdas
+    ComprehensionClause,
+    # Const declarations
+    ConstDeclaration,
+    ConstructorPattern,
+    ContinueStatement,
+    DictComprehension,
+    DictLiteral,
+    EnumDef,
+    EnumPattern,
+    EnumVariant,
+    EnumVariantAccess,
+    ErrExpression,
+    # Expressions
+    Expression,
+    ExpressionStatement,
+    FloatLiteral,
+    ForStatement,
+    FString,
+    FStringExpression,
+    FStringLiteral,
+    # F-string
+    FStringPart,
+    FunctionDef,
+    FunctionType,
+    GenericType,
+    Identifier,
+    IdentifierPattern,
+    IfLetStatement,
+    IfStatement,
+    ImplBlock,
+    ImportStatement,
+    IndexExpression,
+    IntegerLiteral,
     # JIT/Numba
     JitMode,
     JitOptions,
+    KeywordArgument,
+    LambdaExpression,
+    LetStatement,
+    ListComprehension,
+    ListLiteral,
+    ListPattern,
+    LiteralPattern,
+    LoopStatement,
+    MatchArm,
+    MatchExpression,
+    MemberAccess,
+    Method,
+    ModuleDecl,
+    NoneLiteral,
+    OkExpression,
+    OrPattern,
+    Parameter,
+    PassStatement,
+    # Pattern matching
+    Pattern,
+    PipeLambda,
+    PlayStatement,
+    PrintStatement,
+    # Program
+    Program,
+    RangeExpression,
+    RangePattern,
+    RestPattern,
+    ReturnStatement,
+    SceneDef,
+    SelfExpression,
+    SetComprehension,
+    SetLiteral,
+    SimpleType,
+    SomeExpression,
     # Statements
     Statement,
-    Block,
-    ExpressionStatement,
-    LetStatement,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    AsyncFunctionDef,
-    ClassDef,
-    SceneDef,
-    IfStatement,
-    ForStatement,
-    AsyncForStatement,
-    WhileStatement,
-    ReturnStatement,
-    BreakStatement,
-    ContinueStatement,
-    PassStatement,
-    ImportStatement,
-    PrintStatement,
-    UseStatement,
-    ModuleDecl,
-    PlayStatement,
-    WaitStatement,
-    Parameter,
-    # OOP constructs
-    Visibility,
-    StructField,
+    StringLiteral,
     StructDef,
-    Method,
-    ImplBlock,
-    AssociatedType,
-    TraitMethod,
-    TraitDef,
-    EnumVariant,
-    EnumDef,
-    SelfExpression,
-    EnumVariantAccess,
+    StructField,
     StructLiteral,
-    EnumPattern,
-    # F-string
-    FStringPart,
-    FStringLiteral,
-    FStringExpression,
-    FString,
-    # Const declarations
-    ConstDeclaration,
-    # Comprehensions and pipe lambdas
-    ComprehensionClause,
-    ListComprehension,
-    SetComprehension,
-    DictComprehension,
-    PipeLambda,
+    TraitDef,
+    TraitMethod,
+    TupleLiteral,
+    TuplePattern,
+    # Types
+    TypeAnnotation,
     # Generic type parameters
     TypeParameter,
+    UnaryExpression,
+    UnaryOperator,
+    UnwrapExpression,
+    UseStatement,
+    # OOP constructs
+    Visibility,
+    WaitStatement,
     WhereClause,
-    # Documentation and attributes
-    DocComment,
-    Attribute,
+    WhileLetStatement,
+    WhileStatement,
+)
+from mathviz.compiler.tokens import Token, TokenType
+from mathviz.utils.diagnostics import (
+    Diagnostic,
+    DiagnosticEmitter,
+    ErrorCode,
+    SourceSpan,
+    create_unclosed_delimiter_diagnostic,
+    create_unexpected_token_diagnostic,
 )
 from mathviz.utils.errors import ParserError, SourceLocation
-from mathviz.utils.diagnostics import (
-    DiagnosticEmitter,
-    SourceSpan,
-    Diagnostic,
-    ErrorCode,
-    create_unexpected_token_diagnostic,
-    create_unclosed_delimiter_diagnostic,
-)
 
 
 # Operator precedence levels (higher = tighter binding)
@@ -281,7 +278,7 @@ class Parser:
         self._source_lines: list[str] = source.splitlines() if source else []
         self._source = source
         self._filename = filename
-        self._emitter: Optional[DiagnosticEmitter] = None
+        self._emitter: DiagnosticEmitter | None = None
         self._delimiter_stack: list[tuple[str, SourceLocation]] = []  # Track open delimiters
         self.diagnostics: list[Diagnostic] = []
 
@@ -378,7 +375,7 @@ class Parser:
         token = self._current
         return ParserError(message, token.location)
 
-    def _error_with_context(self, message: str, expected: Optional[str] = None) -> ParserError:
+    def _error_with_context(self, message: str, expected: str | None = None) -> ParserError:
         """Create a parser error with rich diagnostic context."""
         token = self._current
 
@@ -507,14 +504,13 @@ class Parser:
     # Statement Parsing
     # -------------------------------------------------------------------------
 
-    def _parse_statement(self) -> Optional[Statement]:
+    def _parse_statement(self) -> Statement | None:
         """Parse a single statement."""
         self._skip_newlines()
 
         # Collect doc comments to attach to the next declaration
-        doc_comment = None
         if self._check(TokenType.DOC_COMMENT):
-            doc_comment = self._advance().value
+            self._advance().value
             self._skip_newlines()
 
         if self._check(TokenType.IMPORT, TokenType.FROM):
@@ -593,7 +589,7 @@ class Parser:
             module = self._expect(TokenType.IDENTIFIER, "Expected module name").value
             self._expect(TokenType.IMPORT, "Expected 'import' after module name")
 
-            names: list[tuple[str, Optional[str]]] = []
+            names: list[tuple[str, str | None]] = []
             while True:
                 name = self._expect(TokenType.IDENTIFIER, "Expected import name").value
                 alias = None
@@ -659,11 +655,11 @@ class Parser:
 
         name = self._expect(TokenType.IDENTIFIER, "Expected variable name").value
 
-        type_annotation: Optional[TypeAnnotation] = None
+        type_annotation: TypeAnnotation | None = None
         if self._match(TokenType.COLON):
             type_annotation = self._parse_type_annotation()
 
-        value: Optional[Expression] = None
+        value: Expression | None = None
         if self._match(TokenType.ASSIGN):
             value = self._parse_expression()
 
@@ -691,7 +687,7 @@ class Parser:
 
         name = self._expect(TokenType.IDENTIFIER, "Expected constant name").value
 
-        type_annotation: Optional[TypeAnnotation] = None
+        type_annotation: TypeAnnotation | None = None
         if self._match(TokenType.COLON):
             type_annotation = self._parse_type_annotation()
 
@@ -833,7 +829,7 @@ class Parser:
             inline=inline,
         )
 
-    def _parse_function_def(self, jit_options: Optional[JitOptions] = None) -> FunctionDef:
+    def _parse_function_def(self, jit_options: JitOptions | None = None) -> FunctionDef:
         """
         Parse a function definition, with optional generics.
 
@@ -861,12 +857,12 @@ class Parser:
         self._expect(TokenType.RPAREN, "Expected ')' after parameters")
 
         # Optional return type
-        return_type: Optional[TypeAnnotation] = None
+        return_type: TypeAnnotation | None = None
         if self._match(TokenType.THIN_ARROW):
             return_type = self._parse_type_annotation()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -909,11 +905,11 @@ class Parser:
             else:
                 name = self._expect(TokenType.IDENTIFIER, "Expected parameter name").value
 
-            type_annotation: Optional[TypeAnnotation] = None
+            type_annotation: TypeAnnotation | None = None
             if self._match(TokenType.COLON):
                 type_annotation = self._parse_type_annotation()
 
-            default_value: Optional[Expression] = None
+            default_value: Expression | None = None
             if self._match(TokenType.ASSIGN):
                 default_value = self._parse_expression()
 
@@ -1094,7 +1090,7 @@ class Parser:
         then_block = self._parse_block()
 
         elif_clauses: list[tuple[Expression, Block]] = []
-        else_block: Optional[Block] = None
+        else_block: Block | None = None
 
         self._skip_newlines()
         while self._match(TokenType.ELIF):
@@ -1124,8 +1120,6 @@ class Parser:
             if let Option::Some(x) = opt { body }
             if let Option::Some(x) = opt { body } else { body }
         """
-        from mathviz.compiler.ast_nodes import IfLetStatement
-
         self._advance()  # consume 'let'
 
         # Parse the pattern
@@ -1139,7 +1133,7 @@ class Parser:
         self._skip_newlines()
         then_block = self._parse_block()
 
-        else_block: Optional[Block] = None
+        else_block: Block | None = None
         self._skip_newlines()
         if self._match(TokenType.ELSE):
             self._skip_newlines()
@@ -1234,12 +1228,12 @@ class Parser:
         self._expect(TokenType.RPAREN, "Expected ')' after parameters")
 
         # Optional return type
-        return_type: Optional[TypeAnnotation] = None
+        return_type: TypeAnnotation | None = None
         if self._match(TokenType.THIN_ARROW):
             return_type = self._parse_type_annotation()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -1313,8 +1307,6 @@ class Parser:
         Example:
             while let Option::Some(x) = iter.next() { body }
         """
-        from mathviz.compiler.ast_nodes import WhileLetStatement
-
         self._advance()  # consume 'let'
 
         # Parse the pattern
@@ -1342,8 +1334,6 @@ class Parser:
         Handles:
             loop { body }
         """
-        from mathviz.compiler.ast_nodes import LoopStatement
-
         loc = self._current.location
         self._advance()  # consume 'loop'
 
@@ -1360,7 +1350,7 @@ class Parser:
         loc = self._current.location
         self._advance()  # consume 'return'
 
-        value: Optional[Expression] = None
+        value: Expression | None = None
         if not self._check(TokenType.NEWLINE, TokenType.RBRACE, TokenType.EOF):
             value = self._parse_expression()
 
@@ -2229,7 +2219,7 @@ class Parser:
             iterable = self._parse_expression()
 
             # Check for optional 'if' condition
-            condition: Optional[Expression] = None
+            condition: Expression | None = None
             if self._match(TokenType.IF):
                 condition = self._parse_expression()
 
@@ -2324,7 +2314,7 @@ class Parser:
         self._skip_newlines()
 
         fields: list[tuple[str, Expression]] = []
-        spread: Optional[Expression] = None
+        spread: Expression | None = None
 
         while not self._check(TokenType.RBRACE, TokenType.EOF):
             # Check for spread syntax: ...expr
@@ -2475,7 +2465,7 @@ class Parser:
         pattern = self._parse_pattern()
 
         # Parse optional guard
-        guard: Optional[Expression] = None
+        guard: Expression | None = None
         if self._match(TokenType.WHERE):
             guard = self._parse_expression()
 
@@ -2576,7 +2566,7 @@ class Parser:
 
         return left
 
-    def _pattern_to_expr(self, pattern: Pattern) -> Optional[Expression]:
+    def _pattern_to_expr(self, pattern: Pattern) -> Expression | None:
         """Convert a literal pattern to an expression for range patterns."""
         if isinstance(pattern, LiteralPattern):
             return pattern.value
@@ -2592,7 +2582,7 @@ class Parser:
                 self._advance()  # consume first dot
                 self._advance()  # consume second dot
                 # Check for optional name
-                name: Optional[str] = None
+                name: str | None = None
                 if self._check(TokenType.IDENTIFIER):
                     name = self._advance().value
                 return RestPattern(name=name, location=loc)
@@ -2834,7 +2824,7 @@ class Parser:
             type_params = self._parse_type_parameters()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -2938,7 +2928,7 @@ class Parser:
             self._expect(TokenType.GT, "Expected '>' to close type arguments")
 
         # Check for 'for' keyword (trait impl)
-        trait_name: Optional[str] = None
+        trait_name: str | None = None
         trait_type_args: tuple[TypeAnnotation, ...] = ()
         target_type: str
         target_type_args: list[str] = []
@@ -2971,7 +2961,7 @@ class Parser:
                     raise self._error("Complex type arguments not supported for inherent impls")
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -3060,12 +3050,12 @@ class Parser:
         self._expect(TokenType.RPAREN, "Expected ')' after parameters")
 
         # Optional return type
-        return_type: Optional[TypeAnnotation] = None
+        return_type: TypeAnnotation | None = None
         if self._match(TokenType.THIN_ARROW):
             return_type = self._parse_type_annotation()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -3114,11 +3104,11 @@ class Parser:
             loc = self._current.location
             name = self._expect(TokenType.IDENTIFIER, "Expected parameter name").value
 
-            type_annotation: Optional[TypeAnnotation] = None
+            type_annotation: TypeAnnotation | None = None
             if self._match(TokenType.COLON):
                 type_annotation = self._parse_type_annotation()
 
-            default_value: Optional[Expression] = None
+            default_value: Expression | None = None
             if self._match(TokenType.ASSIGN):
                 default_value = self._parse_expression()
 
@@ -3166,7 +3156,7 @@ class Parser:
             type_params = self._parse_type_parameters()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
@@ -3215,19 +3205,19 @@ class Parser:
         self._expect(TokenType.RPAREN, "Expected ')' after parameters")
 
         # Optional return type
-        return_type: Optional[TypeAnnotation] = None
+        return_type: TypeAnnotation | None = None
         if self._match(TokenType.THIN_ARROW):
             return_type = self._parse_type_annotation()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
         # Check for default implementation
         self._skip_newlines()
         has_default_impl = False
-        default_body: Optional[Block] = None
+        default_body: Block | None = None
         if self._check(TokenType.LBRACE):
             has_default_impl = True
             default_body = self._parse_block()
@@ -3276,7 +3266,7 @@ class Parser:
             type_params = self._parse_type_parameters()
 
         # Optional where clause
-        where_clause: Optional[WhereClause] = None
+        where_clause: WhereClause | None = None
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 

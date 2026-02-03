@@ -24,75 +24,53 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Optional
+from enum import Enum
 
 from mathviz.compiler.ast_nodes import (
-    # Program and base
-    Program,
-    ASTNode,
+    AssignmentStatement,
     BaseASTVisitor,
+    BinaryExpression,
+    BinaryOperator,
     Block,
-    # Type annotations
-    TypeAnnotation,
-    SimpleType,
-    GenericType,
-    FunctionType as ASTFunctionType,
+    BooleanLiteral,
+    BreakStatement,
+    CallExpression,
+    ClassDef,
+    ConstructorPattern,
+    ContinueStatement,
+    DictLiteral,
     # Expressions
     Expression,
-    Identifier,
-    IntegerLiteral,
     FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    BinaryExpression,
-    UnaryExpression,
-    CallExpression,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
-    BinaryOperator,
-    UnaryOperator,
-    # Pattern matching
-    MatchExpression,
-    MatchArm,
-    Pattern,
-    LiteralPattern,
-    IdentifierPattern,
-    TuplePattern,
-    ConstructorPattern,
-    # Statements
-    Statement,
-    ExpressionStatement,
-    LetStatement,
-    AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    ClassDef,
-    SceneDef,
-    IfStatement,
     ForStatement,
-    WhileStatement,
-    ReturnStatement,
-    BreakStatement,
-    ContinueStatement,
-    PassStatement,
+    FunctionDef,
+    Identifier,
+    IdentifierPattern,
+    IfStatement,
     ImportStatement,
-    PrintStatement,
-    UseStatement,
+    IntegerLiteral,
+    LambdaExpression,
+    LetStatement,
+    ListLiteral,
+    LiteralPattern,
+    MatchExpression,
+    MemberAccess,
     ModuleDecl,
-    PlayStatement,
-    WaitStatement,
-    Parameter,
+    NoneLiteral,
+    Pattern,
+    Program,
+    ReturnStatement,
+    SceneDef,
+    SetLiteral,
+    SimpleType,
+    # Statements
+    StringLiteral,
+    TuplePattern,
+    # Type annotations
+    UseStatement,
+    WhileStatement,
 )
 from mathviz.utils.errors import SourceLocation
-
 
 # =============================================================================
 # Lint Rule Configuration
@@ -145,7 +123,7 @@ class LintRule:
     category: LintCategory
     message: str
     level: LintLevel = LintLevel.WARN
-    suggestion: Optional[str] = None
+    suggestion: str | None = None
 
     def __str__(self) -> str:
         return f"{self.code} ({self.name})"
@@ -165,9 +143,9 @@ class LintViolation:
     """
 
     rule: LintRule
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
     message: str
-    suggestion: Optional[str] = None
+    suggestion: str | None = None
     related_locations: list[SourceLocation] = field(default_factory=list)
 
     def __str__(self) -> str:
@@ -621,7 +599,7 @@ class SymbolInfo:
     """Information about a defined symbol."""
 
     name: str
-    location: Optional[SourceLocation]
+    location: SourceLocation | None
     kind: str  # "variable", "function", "parameter", "import", "loop_variable"
     used: bool = False
     scope_depth: int = 0
@@ -634,7 +612,7 @@ class ScopeInfo:
     name: str
     depth: int
     symbols: dict[str, SymbolInfo] = field(default_factory=dict)
-    parent: Optional["ScopeInfo"] = None
+    parent: ScopeInfo | None = None
 
 
 # =============================================================================
@@ -662,7 +640,7 @@ class Linter(BaseASTVisitor):
             print(v)
     """
 
-    def __init__(self, config: Optional[LintConfiguration] = None) -> None:
+    def __init__(self, config: LintConfiguration | None = None) -> None:
         """
         Initialize the linter.
 
@@ -674,13 +652,13 @@ class Linter(BaseASTVisitor):
 
         # Symbol tracking
         self._scopes: list[ScopeInfo] = []
-        self._current_scope: Optional[ScopeInfo] = None
+        self._current_scope: ScopeInfo | None = None
         self._global_symbols: dict[str, SymbolInfo] = {}
 
         # Function tracking
         self._defined_functions: dict[str, SymbolInfo] = {}
         self._called_functions: set[str] = set()
-        self._current_function: Optional[str] = None
+        self._current_function: str | None = None
         self._function_params: dict[str, dict[str, SymbolInfo]] = {}
 
         # Import tracking
@@ -697,7 +675,7 @@ class Linter(BaseASTVisitor):
         # Expression analysis state
         self._in_condition = False
         self._analyzing_loop_body = False
-        self._current_loop_var: Optional[str] = None
+        self._current_loop_var: str | None = None
 
     def lint(self, program: Program) -> list[LintViolation]:
         """
@@ -743,10 +721,10 @@ class Linter(BaseASTVisitor):
     def _emit(
         self,
         rule: LintRule,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
         *format_args: str,
-        suggestion: Optional[str] = None,
-        related_locations: Optional[list[SourceLocation]] = None,
+        suggestion: str | None = None,
+        related_locations: list[SourceLocation] | None = None,
     ) -> None:
         """
         Emit a lint violation if the rule is enabled.
@@ -803,7 +781,7 @@ class Linter(BaseASTVisitor):
     def _define_symbol(
         self,
         name: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
         kind: str,
     ) -> None:
         """Define a symbol in the current scope."""
@@ -834,7 +812,7 @@ class Linter(BaseASTVisitor):
                 scope_depth=self._current_scope.depth,
             )
 
-    def _lookup_symbol(self, name: str) -> Optional[SymbolInfo]:
+    def _lookup_symbol(self, name: str) -> SymbolInfo | None:
         """Look up a symbol in the scope chain."""
         # Check current scope chain
         scope = self._current_scope
@@ -978,7 +956,7 @@ class Linter(BaseASTVisitor):
         if not node.statements:
             self._emit(EMPTY_BLOCK, node.location, "statement")
 
-        for i, stmt in enumerate(node.statements):
+        for _i, stmt in enumerate(node.statements):
             # Check if previous statement made this unreachable
             if self._after_return or self._after_break or self._after_continue:
                 self._emit(UNREACHABLE_CODE, stmt.location)
@@ -1230,17 +1208,16 @@ class Linter(BaseASTVisitor):
                 self._emit(DIVISION_BY_ZERO_POSSIBLE, node.location)
 
         # Check for inefficient power
-        if node.operator == BinaryOperator.POW:
-            if isinstance(node.right, IntegerLiteral):
-                exp = node.right.value
-                if 2 <= exp <= 4:
-                    suggestion = self._generate_power_suggestion(node.left, exp)
-                    self._emit(
-                        INEFFICIENT_POWER,
-                        node.location,
-                        str(exp),
-                        suggestion,
-                    )
+        if node.operator == BinaryOperator.POW and isinstance(node.right, IntegerLiteral):
+            exp = node.right.value
+            if 2 <= exp <= 4:
+                suggestion = self._generate_power_suggestion(node.left, exp)
+                self._emit(
+                    INEFFICIENT_POWER,
+                    node.location,
+                    str(exp),
+                    suggestion,
+                )
 
         # Check for redundant boolean comparison
         if node.operator in (BinaryOperator.EQ, BinaryOperator.NE):
@@ -1252,9 +1229,8 @@ class Linter(BaseASTVisitor):
         self.visit(node.object)
 
         # Track module usage
-        if isinstance(node.object, Identifier):
-            if node.object.name in self._imports:
-                self._used_imports.add(node.object.name)
+        if isinstance(node.object, Identifier) and node.object.name in self._imports:
+            self._used_imports.add(node.object.name)
 
     def visit_import_statement(self, node: ImportStatement) -> None:
         """Visit an import statement."""
@@ -1342,7 +1318,7 @@ class Linter(BaseASTVisitor):
 
         # Track pattern coverage for exhaustiveness checking
         has_wildcard = False
-        wildcard_location: Optional[SourceLocation] = None
+        wildcard_location: SourceLocation | None = None
         seen_literal_patterns: set[tuple[str, object]] = set()  # (type, value)
 
         for arm in node.arms:
@@ -1401,9 +1377,11 @@ class Linter(BaseASTVisitor):
                 self.visit(arm.body)
 
             # Exit scope if we entered one
-            if isinstance(pattern, (TuplePattern, ConstructorPattern)):
-                self._exit_scope()
-            elif isinstance(pattern, IdentifierPattern) and not pattern.is_wildcard:
+            if (
+                isinstance(pattern, (TuplePattern, ConstructorPattern))
+                or isinstance(pattern, IdentifierPattern)
+                and not pattern.is_wildcard
+            ):
                 self._exit_scope()
 
         # Check for non-exhaustive match (no wildcard pattern)
@@ -1479,22 +1457,21 @@ class Linter(BaseASTVisitor):
             if expr.operator == BinaryOperator.DIV:
                 return True  # Division always produces float
             return self._is_float_expression(expr.left) or self._is_float_expression(expr.right)
-        if isinstance(expr, CallExpression):
-            if isinstance(expr.callee, Identifier):
-                # Math functions typically return float
-                float_funcs = {
-                    "sqrt",
-                    "sin",
-                    "cos",
-                    "tan",
-                    "exp",
-                    "log",
-                    "log10",
-                    "pow",
-                    "abs",
-                    "float",
-                }
-                return expr.callee.name in float_funcs
+        if isinstance(expr, CallExpression) and isinstance(expr.callee, Identifier):
+            # Math functions typically return float
+            float_funcs = {
+                "sqrt",
+                "sin",
+                "cos",
+                "tan",
+                "exp",
+                "log",
+                "log10",
+                "pow",
+                "abs",
+                "float",
+            }
+            return expr.callee.name in float_funcs
         return False
 
     def _is_none_expression(self, expr: Expression) -> bool:
@@ -1525,10 +1502,7 @@ class Linter(BaseASTVisitor):
 
     def _generate_power_suggestion(self, base: Expression, exponent: int) -> str:
         """Generate a suggestion for replacing power with multiplication."""
-        if isinstance(base, Identifier):
-            base_str = base.name
-        else:
-            base_str = "x"
+        base_str = base.name if isinstance(base, Identifier) else "x"
 
         if exponent == 2:
             return f"{base_str} * {base_str}"
@@ -1550,7 +1524,7 @@ class Linter(BaseASTVisitor):
         self,
         name: str,
         kind: str,
-        location: Optional[SourceLocation],
+        location: SourceLocation | None,
     ) -> None:
         """Check if a name follows the expected naming convention."""
         if name.startswith("_"):
@@ -1562,9 +1536,8 @@ class Linter(BaseASTVisitor):
                 self._emit(NAMING_CONVENTION, location, name, "snake_case")
 
         # Check for PascalCase (classes)
-        elif kind == "class":
-            if not self._is_pascal_case(name):
-                self._emit(NAMING_CONVENTION, location, name, "PascalCase")
+        elif kind == "class" and not self._is_pascal_case(name):
+            self._emit(NAMING_CONVENTION, location, name, "PascalCase")
 
     def _is_snake_case(self, name: str) -> bool:
         """Check if a name is in snake_case."""
@@ -1585,7 +1558,7 @@ class Linter(BaseASTVisitor):
 # =============================================================================
 
 
-def lint_source(source: str, config: Optional[LintConfiguration] = None) -> list[LintViolation]:
+def lint_source(source: str, config: LintConfiguration | None = None) -> list[LintViolation]:
     """
     Lint MathViz source code.
 
@@ -1613,9 +1586,7 @@ def lint_source(source: str, config: Optional[LintConfiguration] = None) -> list
     return linter.lint(program)
 
 
-def lint_program(
-    program: Program, config: Optional[LintConfiguration] = None
-) -> list[LintViolation]:
+def lint_program(program: Program, config: LintConfiguration | None = None) -> list[LintViolation]:
     """
     Lint an already-parsed MathViz program.
 
@@ -1630,12 +1601,12 @@ def lint_program(
     return linter.lint(program)
 
 
-def get_rule_by_name(name: str) -> Optional[LintRule]:
+def get_rule_by_name(name: str) -> LintRule | None:
     """Get a lint rule by its name."""
     return RULES_BY_NAME.get(name)
 
 
-def get_rule_by_code(code: str) -> Optional[LintRule]:
+def get_rule_by_code(code: str) -> LintRule | None:
     """Get a lint rule by its code."""
     return ALL_RULES.get(code)
 

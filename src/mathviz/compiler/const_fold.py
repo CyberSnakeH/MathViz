@@ -15,80 +15,56 @@ All optimizations maintain AST immutability by creating new nodes.
 
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Optional, Union
+from typing import Any
 
 from mathviz.compiler.ast_nodes import (
-    ASTNode,
-    ASTVisitor,
-    BaseASTVisitor,
-    # Type annotations
-    TypeAnnotation,
-    # Expressions
-    Expression,
-    Identifier,
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    BooleanLiteral,
-    NoneLiteral,
-    ListLiteral,
-    SetLiteral,
-    DictLiteral,
-    TupleLiteral,
-    BinaryExpression,
-    UnaryExpression,
-    BinaryOperator,
-    UnaryOperator,
-    CallExpression,
-    MemberAccess,
-    IndexExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    RangeExpression,
-    # Comprehensions
-    ListComprehension,
-    SetComprehension,
-    DictComprehension,
-    ComprehensionClause,
-    PipeLambda,
-    # Statements
-    Statement,
-    Block,
-    ExpressionStatement,
-    LetStatement,
-    ConstDeclaration,
     AssignmentStatement,
-    CompoundAssignment,
-    FunctionDef,
-    IfStatement,
-    ForStatement,
-    WhileStatement,
-    ReturnStatement,
+    ASTNode,
+    BaseASTVisitor,
+    BinaryExpression,
+    BinaryOperator,
+    Block,
+    BooleanLiteral,
     BreakStatement,
+    CallExpression,
+    CompoundAssignment,
+    ConditionalExpression,
+    ConstDeclaration,
     ContinueStatement,
+    Expression,
+    ExpressionStatement,
+    FloatLiteral,
+    ForStatement,
+    FunctionDef,
+    Identifier,
+    IfStatement,
+    IndexExpression,
+    IntegerLiteral,
+    LetStatement,
+    # Comprehensions
+    ListLiteral,
+    MemberAccess,
+    NoneLiteral,
+    Parameter,
     PassStatement,
     PrintStatement,
-    # OOP
-    StructDef,
-    ImplBlock,
-    TraitDef,
-    EnumDef,
-    SelfExpression,
-    StructLiteral,
     # Program
     Program,
-    # Patterns
-    MatchExpression,
-    MatchArm,
-    Pattern,
-    Parameter,
+    RangeExpression,
+    ReturnStatement,
+    Statement,
+    StringLiteral,
+    # OOP
+    TupleLiteral,
+    # Type annotations
+    UnaryExpression,
+    UnaryOperator,
+    WhileStatement,
 )
-from mathviz.compiler.const_evaluator import ConstEvaluator, ConstEvalError
+from mathviz.compiler.const_evaluator import ConstEvalError, ConstEvaluator
 from mathviz.utils.errors import SourceLocation
-
 
 # =============================================================================
 # Optimizer Pass Interface
@@ -495,7 +471,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
         # For literals and identifiers, return as-is
         return expr
 
-    def _fold_binary(self, left: Any, op: BinaryOperator, right: Any) -> Optional[Any]:
+    def _fold_binary(self, left: Any, op: BinaryOperator, right: Any) -> Any | None:
         """
         Fold a binary operation on constant values.
 
@@ -542,7 +518,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
             return None
         return None
 
-    def _fold_unary(self, op: UnaryOperator, operand: Any) -> Optional[Any]:
+    def _fold_unary(self, op: UnaryOperator, operand: Any) -> Any | None:
         """
         Fold a unary operation on a constant value.
 
@@ -584,9 +560,7 @@ class ConstantFolder(BaseASTVisitor, OptimizerPass):
             return None
         raise ValueError(f"Not a literal: {expr}")
 
-    def _value_to_literal(
-        self, value: Any, location: Optional[SourceLocation] = None
-    ) -> Expression:
+    def _value_to_literal(self, value: Any, location: SourceLocation | None = None) -> Expression:
         """Convert a Python value to a literal expression."""
         if isinstance(value, bool):
             return BooleanLiteral(value=value, location=location)
@@ -626,9 +600,9 @@ class ConstantScope:
     """
 
     constants: dict[str, Any] = field(default_factory=dict)
-    parent: Optional["ConstantScope"] = None
+    parent: ConstantScope | None = None
 
-    def get(self, name: str) -> Optional[Any]:
+    def get(self, name: str) -> Any | None:
         """Get a constant value, searching parent scopes."""
         if name in self.constants:
             return self.constants[name]
@@ -653,7 +627,7 @@ class ConstantScope:
         if name in self.constants:
             del self.constants[name]
 
-    def child(self) -> "ConstantScope":
+    def child(self) -> ConstantScope:
         """Create a child scope."""
         return ConstantScope(parent=self)
 
@@ -1131,10 +1105,7 @@ class DeadCodeEliminator(OptimizerPass):
         """Collect all variable names that are read in the program."""
         if isinstance(node, Identifier):
             self._used_variables.add(node.name)
-        elif isinstance(node, Program):
-            for stmt in node.statements:
-                self._collect_used_variables(stmt)
-        elif isinstance(node, Block):
+        elif isinstance(node, (Program, Block)):
             for stmt in node.statements:
                 self._collect_used_variables(stmt)
         elif isinstance(node, LetStatement):
@@ -1197,10 +1168,7 @@ class DeadCodeEliminator(OptimizerPass):
             self._collect_used_variables(node.format_string)
             for arg in node.arguments:
                 self._collect_used_variables(arg)
-        elif isinstance(node, ListLiteral):
-            for elem in node.elements:
-                self._collect_used_variables(elem)
-        elif isinstance(node, TupleLiteral):
+        elif isinstance(node, (ListLiteral, TupleLiteral)):
             for elem in node.elements:
                 self._collect_used_variables(elem)
         elif isinstance(node, RangeExpression):
@@ -1241,7 +1209,7 @@ class DeadCodeEliminator(OptimizerPass):
 
         return result
 
-    def _eliminate_statement(self, stmt: Statement) -> Optional[Union[Statement, list[Statement]]]:
+    def _eliminate_statement(self, stmt: Statement) -> Statement | list[Statement] | None:
         """
         Eliminate dead code from a single statement.
 
@@ -1255,9 +1223,8 @@ class DeadCodeEliminator(OptimizerPass):
 
         if isinstance(stmt, WhileStatement):
             # While with constant false condition is dead code
-            if isinstance(stmt.condition, BooleanLiteral):
-                if not stmt.condition.value:
-                    return None
+            if isinstance(stmt.condition, BooleanLiteral) and not stmt.condition.value:
+                return None
 
             new_body = self._eliminate_block(stmt.body)
             if new_body is not stmt.body:
@@ -1312,9 +1279,7 @@ class DeadCodeEliminator(OptimizerPass):
 
         return stmt
 
-    def _fold_if_with_constant_condition(
-        self, stmt: IfStatement
-    ) -> Union[Statement, list[Statement]]:
+    def _fold_if_with_constant_condition(self, stmt: IfStatement) -> Statement | list[Statement]:
         """
         Simplify if statements with constant conditions.
 
@@ -1396,7 +1361,7 @@ class DeadCodeEliminator(OptimizerPass):
         """Eliminate dead code from a block."""
         new_statements = self._eliminate_statements(list(block.statements))
         if len(new_statements) != len(block.statements) or any(
-            s1 is not s2 for s1, s2 in zip(new_statements, block.statements)
+            s1 is not s2 for s1, s2 in zip(new_statements, block.statements, strict=False)
         ):
             return Block(statements=tuple(new_statements), location=block.location)
         return block
@@ -1702,8 +1667,8 @@ class AlgebraicSimplifier(OptimizerPass):
         left: Expression,
         op: BinaryOperator,
         right: Expression,
-        location: Optional[SourceLocation],
-    ) -> Optional[Expression]:
+        location: SourceLocation | None,
+    ) -> Expression | None:
         """
         Apply binary algebraic identities.
 
@@ -1786,8 +1751,8 @@ class AlgebraicSimplifier(OptimizerPass):
         self,
         op: UnaryOperator,
         operand: Expression,
-        location: Optional[SourceLocation],
-    ) -> Optional[Expression]:
+        location: SourceLocation | None,
+    ) -> Expression | None:
         """
         Apply unary algebraic identities.
 
@@ -2060,8 +2025,8 @@ class StrengthReducer(OptimizerPass):
         left: Expression,
         op: BinaryOperator,
         right: Expression,
-        location: Optional[SourceLocation],
-    ) -> Optional[Expression]:
+        location: SourceLocation | None,
+    ) -> Expression | None:
         """
         Apply strength reduction rules.
 
@@ -2085,14 +2050,13 @@ class StrengthReducer(OptimizerPass):
                 )
 
         # x / 2 -> x * 0.5
-        if op == BinaryOperator.DIV:
-            if self._is_int_value(right, 2):
-                return BinaryExpression(
-                    left=left,
-                    operator=BinaryOperator.MUL,
-                    right=FloatLiteral(value=0.5, location=location),
-                    location=location,
-                )
+        if op == BinaryOperator.DIV and self._is_int_value(right, 2):
+            return BinaryExpression(
+                left=left,
+                operator=BinaryOperator.MUL,
+                right=FloatLiteral(value=0.5, location=location),
+                location=location,
+            )
 
         # x ** 2 -> x * x
         if op == BinaryOperator.POW:
@@ -2141,7 +2105,7 @@ class ExpressionKey:
     data: tuple
 
     @staticmethod
-    def from_expression(expr: Expression) -> Optional["ExpressionKey"]:
+    def from_expression(expr: Expression) -> ExpressionKey | None:
         """Create a key from an expression if it's suitable for CSE."""
         if isinstance(expr, BinaryExpression):
             left_key = ExpressionKey.from_expression(expr.left)
@@ -2170,18 +2134,17 @@ class ExpressionKey:
             return ExpressionKey(type_name="String", data=(expr.value,))
         if isinstance(expr, BooleanLiteral):
             return ExpressionKey(type_name="Boolean", data=(expr.value,))
-        if isinstance(expr, CallExpression):
-            if isinstance(expr.callee, Identifier):
-                arg_keys = []
-                for arg in expr.arguments:
-                    key = ExpressionKey.from_expression(arg)
-                    if key is None:
-                        return None
-                    arg_keys.append(key)
-                return ExpressionKey(
-                    type_name="Call",
-                    data=(expr.callee.name, tuple(arg_keys)),
-                )
+        if isinstance(expr, CallExpression) and isinstance(expr.callee, Identifier):
+            arg_keys = []
+            for arg in expr.arguments:
+                key = ExpressionKey.from_expression(arg)
+                if key is None:
+                    return None
+                arg_keys.append(key)
+            return ExpressionKey(
+                type_name="Call",
+                data=(expr.callee.name, tuple(arg_keys)),
+            )
         if isinstance(expr, MemberAccess):
             obj_key = ExpressionKey.from_expression(expr.object)
             if obj_key is None:

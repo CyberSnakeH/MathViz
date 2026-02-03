@@ -4,17 +4,16 @@ Unit tests for the MathViz Module Loader.
 Tests module resolution, circular dependency detection, and visibility checking.
 """
 
-import pytest
-from pathlib import Path
 from textwrap import dedent
 
+import pytest
+
 from mathviz.compiler.module_loader import (
-    ModuleInfo,
-    ModuleRegistry,
     DependencyGraph,
+    ModuleInfo,
     ModuleLoader,
+    ModuleRegistry,
     is_python_module,
-    PYTHON_MODULES,
 )
 from mathviz.utils.errors import ModuleResolutionError
 
@@ -319,7 +318,7 @@ class TestModuleLoader:
         loader = ModuleLoader(root_path=tmp_path)
 
         # Load a first
-        a_module = loader.load_file(a_file)
+        loader.load_file(a_file)
 
         # Now try to resolve use b from a - this should work
         from mathviz.compiler.ast_nodes import UseStatement
@@ -328,7 +327,7 @@ class TestModuleLoader:
 
         # b will try to load a which is already loaded - no cycle there
         # But if we then try to resolve a from b...
-        b_module = loader.resolve_use_statement(use_b, a_file)
+        loader.resolve_use_statement(use_b, a_file)
 
         # The modules are loaded, but we should track the dependency
         assert (
@@ -455,11 +454,11 @@ class TestModuleLoader:
     def test_load_from_ast(self, tmp_path):
         """Test registering a module from an already-parsed AST."""
         from mathviz.compiler.ast_nodes import (
-            Program,
-            FunctionDef,
             Block,
-            ReturnStatement,
+            FunctionDef,
             IntegerLiteral,
+            Program,
+            ReturnStatement,
         )
 
         # Create a simple AST

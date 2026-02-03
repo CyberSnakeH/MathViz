@@ -23,19 +23,16 @@ Example:
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from mathviz.compiler.ast_nodes import (
-        FunctionDef,
-        ModuleDecl,
         Program,
         UseStatement,
     )
-
-from mathviz.utils.errors import SourceLocation
 
 
 # =============================================================================
@@ -58,8 +55,8 @@ class ModuleInfo:
     """
 
     name: str
-    file_path: Optional[Path]
-    ast: "Program"
+    file_path: Path | None
+    ast: Program
     exports: set[str] = field(default_factory=set)
     dependencies: set[str] = field(default_factory=set)
     is_inline: bool = False
@@ -84,7 +81,7 @@ class ModuleRegistry:
     load_order: list[str] = field(default_factory=list)
     _loading: set[str] = field(default_factory=set)
 
-    def get(self, name: str) -> Optional[ModuleInfo]:
+    def get(self, name: str) -> ModuleInfo | None:
         """Get a module by name, or None if not loaded."""
         return self.modules.get(name)
 
@@ -145,7 +142,7 @@ class DependencyGraph:
         self.add_module(depends_on)
         self.edges[module].add(depends_on)
 
-    def detect_cycle(self, start: str) -> Optional[list[str]]:
+    def detect_cycle(self, start: str) -> list[str] | None:
         """
         Detect if adding a dependency would create a cycle.
 
@@ -161,7 +158,7 @@ class DependencyGraph:
         visited: set[str] = set()
         path: list[str] = []
 
-        def dfs(node: str) -> Optional[list[str]]:
+        def dfs(node: str) -> list[str] | None:
             if node in path:
                 # Found a cycle - return the cycle portion
                 cycle_start = path.index(node)
@@ -198,7 +195,7 @@ class DependencyGraph:
             ValueError: If a cycle is detected
         """
         # Kahn's algorithm
-        in_degree: dict[str, int] = {m: 0 for m in self.edges}
+        in_degree: dict[str, int] = dict.fromkeys(self.edges, 0)
 
         # Calculate in-degrees
         for deps in self.edges.values():
@@ -329,7 +326,7 @@ class ModuleLoader:
     def __init__(
         self,
         root_path: Path,
-        search_paths: Optional[list[Path]] = None,
+        search_paths: list[Path] | None = None,
     ) -> None:
         """
         Initialize the module loader.
@@ -439,9 +436,9 @@ class ModuleLoader:
 
     def load_from_ast(
         self,
-        ast: "Program",
+        ast: Program,
         module_name: str,
-        file_path: Optional[Path] = None,
+        file_path: Path | None = None,
     ) -> ModuleInfo:
         """
         Register a module from an already-parsed AST.
@@ -486,9 +483,9 @@ class ModuleLoader:
 
     def resolve_use_statement(
         self,
-        use_stmt: "UseStatement",
+        use_stmt: UseStatement,
         current_file: Path,
-    ) -> Optional[ModuleInfo]:
+    ) -> ModuleInfo | None:
         """
         Resolve a `use` statement to a module.
 
@@ -527,7 +524,7 @@ class ModuleLoader:
         self,
         module_path: tuple[str, ...],
         relative_to: Path,
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """
         Resolve a module path to an actual file.
 
@@ -567,7 +564,7 @@ class ModuleLoader:
 
         return None
 
-    def _collect_exports(self, ast: "Program") -> set[str]:
+    def _collect_exports(self, ast: Program) -> set[str]:
         """
         Collect all public exports from a module AST.
 
@@ -591,41 +588,19 @@ class ModuleLoader:
             stmt_class = stmt.__class__.__name__
 
             # Export all top-level functions
-            if stmt_class == "FunctionDef":
+            if (
+                stmt_class == "FunctionDef"
+                or stmt_class == "ClassDef"
+                or stmt_class == "SceneDef"
+                or stmt_class == "ModuleDecl"
+                or stmt_class == "StructDef"
+                or stmt_class == "EnumDef"
+                or stmt_class == "TraitDef"
+                or stmt_class == "ConstDeclaration"
+                or stmt_class == "LetStatement"
+                and hasattr(stmt, "name")
+            ):
                 exports.add(stmt.name)
-
-            # Export classes
-            elif stmt_class == "ClassDef":
-                exports.add(stmt.name)
-
-            # Export scenes
-            elif stmt_class == "SceneDef":
-                exports.add(stmt.name)
-
-            # Export module declarations
-            elif stmt_class == "ModuleDecl":
-                exports.add(stmt.name)
-
-            # Export struct definitions
-            elif stmt_class == "StructDef":
-                exports.add(stmt.name)
-
-            # Export enum definitions
-            elif stmt_class == "EnumDef":
-                exports.add(stmt.name)
-
-            # Export trait definitions
-            elif stmt_class == "TraitDef":
-                exports.add(stmt.name)
-
-            # Export const declarations
-            elif stmt_class == "ConstDeclaration":
-                exports.add(stmt.name)
-
-            # Export let statements at module level (module constants)
-            elif stmt_class == "LetStatement":
-                if hasattr(stmt, "name"):
-                    exports.add(stmt.name)
 
         return exports
 
@@ -642,11 +617,9 @@ class ModuleLoader:
         file_path = file_path.resolve()
 
         # Try to make path relative to root first
-        rel_path: Optional[Path] = None
-        try:
+        rel_path: Path | None = None
+        with contextlib.suppress(ValueError):
             rel_path = file_path.relative_to(self.root_path)
-        except ValueError:
-            pass
 
         # If not relative to root, try search paths
         if rel_path is None:
@@ -678,7 +651,7 @@ class ModuleLoader:
         self,
         module: str,
         depends_on: str,
-    ) -> Optional[list[str]]:
+    ) -> list[str] | None:
         """
         Check if adding a dependency would create a circular dependency.
 

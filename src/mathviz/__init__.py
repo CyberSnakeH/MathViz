@@ -6,10 +6,10 @@ native support for mathematical symbols and seamless integration with Manim
 for creating animated mathematical visualizations.
 """
 
-from mathviz.compiler import compile_source, compile_file
+from mathviz.compiler import compile_file, compile_source
+from mathviz.compiler.codegen import CodeGenerator
 from mathviz.compiler.lexer import Lexer
 from mathviz.compiler.parser import Parser
-from mathviz.compiler.codegen import CodeGenerator
 
 __version__ = "0.1.0"
 __all__ = [
