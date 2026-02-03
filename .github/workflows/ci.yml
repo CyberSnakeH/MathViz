@@ -30,7 +30,14 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpango1.0-dev libcairo2-dev ffmpeg
+          sudo apt-get install -y \
+            libpango1.0-dev \
+            libcairo2-dev \
+            libpangocairo-1.0-0 \
+            pkg-config \
+            ffmpeg \
+            libgirepository1.0-dev \
+            gir1.2-pango-1.0
 
       - name: Install system dependencies (macOS)
         if: matrix.os == 'macos-latest'
