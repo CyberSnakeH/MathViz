@@ -31,13 +31,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libpango1.0-dev \
-            libcairo2-dev \
-            libpangocairo-1.0-0 \
+            build-essential \
             pkg-config \
+            python3-dev \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libglib2.0-dev \
+            libffi-dev \
             ffmpeg \
-            libgirepository1.0-dev \
-            gir1.2-pango-1.0
+            texlive \
+            texlive-latex-extra
+          # Verify pangocairo is available via pkg-config
+          pkg-config --modversion pangocairo
 
       - name: Install system dependencies (macOS)
         if: matrix.os == 'macos-latest'
