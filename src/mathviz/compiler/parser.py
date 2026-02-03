@@ -449,6 +449,7 @@ class Parser:
                 TokenType.IF,
                 TokenType.FOR,
                 TokenType.WHILE,
+                TokenType.LOOP,
                 TokenType.RETURN,
                 TokenType.IMPORT,
             ):
@@ -522,6 +523,8 @@ class Parser:
             return self._parse_for()
         if self._check(TokenType.WHILE):
             return self._parse_while()
+        if self._check(TokenType.LOOP):
+            return self._parse_loop()
         if self._check(TokenType.RETURN):
             return self._parse_return()
         if self._check(TokenType.BREAK):
@@ -596,7 +599,7 @@ class Parser:
 
             return ImportStatement(module=module, alias=alias, location=loc)
 
-    def _parse_let(self) -> LetStatement:
+    def _parse_let(self) -> Statement:
         """
         Parse a let (variable declaration) statement.
 
@@ -605,12 +608,34 @@ class Parser:
             let x: Type = value
             let x: Type
             let mut x = value  (mutable variable)
+            let (x, y, z) = tuple  (destructuring)
         """
+        from mathviz.compiler.ast_nodes import DestructuringLetStatement
+
         loc = self._current.location
         self._advance()  # consume 'let'
 
         # Check for mut keyword
         mutable = self._match(TokenType.MUT)
+
+        # Check for tuple destructuring: let (x, y, z) = value
+        if self._check(TokenType.LPAREN):
+            self._advance()  # consume '('
+            names: list[str] = []
+            while not self._check(TokenType.RPAREN):
+                name = self._expect(TokenType.IDENTIFIER, "Expected variable name").value
+                names.append(name)
+                if not self._match(TokenType.COMMA):
+                    break
+            self._expect(TokenType.RPAREN, "Expected ')' after destructuring names")
+            self._expect(TokenType.ASSIGN, "Destructuring let requires initializer")
+            value = self._parse_expression()
+            return DestructuringLetStatement(
+                names=tuple(names),
+                value=value,
+                mutable=mutable,
+                location=loc,
+            )
 
         name = self._expect(TokenType.IDENTIFIER, "Expected variable name").value
 
@@ -1067,11 +1092,24 @@ class Parser:
 
         Handles:
             for var in iterable { body }
+            for (a, b) in iterable { body }  (destructuring)
         """
         loc = self._current.location
         self._advance()  # consume 'for'
 
-        variable = self._expect(TokenType.IDENTIFIER, "Expected loop variable").value
+        # Check for tuple destructuring: for (a, b) in ...
+        if self._check(TokenType.LPAREN):
+            self._advance()  # consume '('
+            variables: list[str] = []
+            while not self._check(TokenType.RPAREN):
+                var = self._expect(TokenType.IDENTIFIER, "Expected loop variable").value
+                variables.append(var)
+                if not self._match(TokenType.COMMA):
+                    break
+            self._expect(TokenType.RPAREN, "Expected ')' after destructuring variables")
+            variable: str | tuple[str, ...] = tuple(variables)
+        else:
+            variable = self._expect(TokenType.IDENTIFIER, "Expected loop variable").value
 
         self._expect(TokenType.IN, "Expected 'in' after loop variable")
 
@@ -1192,6 +1230,26 @@ class Parser:
 
         return WhileStatement(
             condition=condition,
+            body=body,
+            location=loc,
+        )
+
+    def _parse_loop(self) -> "LoopStatement":
+        """
+        Parse an infinite loop.
+
+        Handles:
+            loop { body }
+        """
+        from mathviz.compiler.ast_nodes import LoopStatement
+
+        loc = self._current.location
+        self._advance()  # consume 'loop'
+
+        self._skip_newlines()
+        body = self._parse_block()
+
+        return LoopStatement(
             body=body,
             location=loc,
         )

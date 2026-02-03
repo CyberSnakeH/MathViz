@@ -1252,6 +1252,25 @@ class LetStatement(Statement):
 
 
 @dataclass(frozen=True, slots=True)
+class DestructuringLetStatement(Statement):
+    """
+    A destructuring variable declaration statement.
+
+    Example:
+        let (x, y, z) = (1, 2, 3)
+        let (a, b) = get_pair()
+    """
+
+    names: tuple[str, ...]
+    value: Expression
+    mutable: bool = False
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_destructuring_let_statement(self)
+
+
+@dataclass(frozen=True, slots=True)
 class ConstDeclaration(Statement):
     """
     A compile-time constant declaration.
@@ -1577,9 +1596,13 @@ class ForStatement(Statement):
         for x in items {
             process(x)
         }
+
+        for (i, x) in enumerate(items) {
+            println(f"{i}: {x}")
+        }
     """
 
-    variable: str
+    variable: str | tuple[str, ...]
     iterable: Expression
     body: Block
     location: Optional[SourceLocation] = None
@@ -1629,6 +1652,27 @@ class WhileStatement(Statement):
 
     def accept(self, visitor: ASTVisitor) -> Any:
         return visitor.visit_while_statement(self)
+
+
+@dataclass(frozen=True, slots=True)
+class LoopStatement(Statement):
+    """
+    An infinite loop statement.
+
+    Example:
+        loop {
+            // do something
+            if done {
+                break
+            }
+        }
+    """
+
+    body: Block
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_loop_statement(self)
 
 
 @dataclass(frozen=True, slots=True)
@@ -2388,6 +2432,9 @@ class BaseASTVisitor(ASTVisitor):
         if node.value:
             self.visit(node.value)
 
+    def visit_destructuring_let_statement(self, node: "DestructuringLetStatement") -> Any:
+        self.visit(node.value)
+
     def visit_const_declaration(self, node: "ConstDeclaration") -> Any:
         """Visit a const declaration."""
         if node.type_annotation:
@@ -2453,6 +2500,9 @@ class BaseASTVisitor(ASTVisitor):
 
     def visit_while_statement(self, node: WhileStatement) -> Any:
         self.visit(node.condition)
+        self.visit(node.body)
+
+    def visit_loop_statement(self, node: "LoopStatement") -> Any:
         self.visit(node.body)
 
     def visit_return_statement(self, node: ReturnStatement) -> Any:

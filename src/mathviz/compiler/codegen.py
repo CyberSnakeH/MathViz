@@ -87,6 +87,7 @@ from mathviz.compiler.ast_nodes import (
     Statement,
     ExpressionStatement,
     LetStatement,
+    DestructuringLetStatement,
     ConstDeclaration,
     AssignmentStatement,
     CompoundAssignment,
@@ -98,6 +99,7 @@ from mathviz.compiler.ast_nodes import (
     ForStatement,
     AsyncForStatement,
     WhileStatement,
+    LoopStatement,
     ReturnStatement,
     BreakStatement,
     ContinueStatement,
@@ -2018,6 +2020,12 @@ class CodeGenerator(BaseASTVisitor):
             else:
                 self._emit(f"{node.name} = None")
 
+    def visit_destructuring_let_statement(self, node: "DestructuringLetStatement") -> None:
+        """Generate code for a destructuring variable declaration."""
+        names = ", ".join(node.names)
+        value = self._generate_expr(node.value)
+        self._emit(f"{names} = {value}")
+
     def visit_const_declaration(self, node: ConstDeclaration) -> None:
         """
         Generate code for a compile-time constant declaration.
@@ -2326,6 +2334,12 @@ class CodeGenerator(BaseASTVisitor):
 
         iterable = self._generate_expr(node.iterable)
 
+        # Handle tuple destructuring in for loop: for (a, b) in ...
+        if isinstance(node.variable, tuple):
+            var_str = ", ".join(node.variable)
+        else:
+            var_str = node.variable
+
         if use_prange:
             # Convert range() to prange() for parallel execution
             # Handle both direct range expressions and range() calls
@@ -2339,9 +2353,9 @@ class CodeGenerator(BaseASTVisitor):
                 else:
                     self._emit("# Parallel loop - iterations are independent")
 
-            self._emit(f"for {node.variable} in {prange_iterable}:")
+            self._emit(f"for {var_str} in {prange_iterable}:")
         else:
-            self._emit(f"for {node.variable} in {iterable}:")
+            self._emit(f"for {var_str} in {iterable}:")
 
         self._indent()
         self.visit(node.body)
@@ -2388,6 +2402,13 @@ class CodeGenerator(BaseASTVisitor):
         """Generate code for a while loop."""
         condition = self._generate_expr(node.condition)
         self._emit(f"while {condition}:")
+        self._indent()
+        self.visit(node.body)
+        self._dedent()
+
+    def visit_loop_statement(self, node: LoopStatement) -> None:
+        """Generate code for an infinite loop."""
+        self._emit("while True:")
         self._indent()
         self.visit(node.body)
         self._dedent()

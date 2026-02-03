@@ -46,6 +46,7 @@ class TokenType(Enum):
     ELIF = auto()
     FOR = auto()
     WHILE = auto()
+    LOOP = auto()  # Infinite loop
     RETURN = auto()
     IMPORT = auto()
     FROM = auto()
@@ -216,6 +217,7 @@ KEYWORDS: dict[str, TokenType] = {
     "elif": TokenType.ELIF,
     "for": TokenType.FOR,
     "while": TokenType.WHILE,
+    "loop": TokenType.LOOP,
     "return": TokenType.RETURN,
     "import": TokenType.IMPORT,
     "from": TokenType.FROM,
