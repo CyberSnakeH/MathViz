@@ -1676,6 +1676,47 @@ class LoopStatement(Statement):
 
 
 @dataclass(frozen=True, slots=True)
+class IfLetStatement(Statement):
+    """
+    An if-let statement for pattern matching in conditionals.
+
+    Example:
+        if let Option::Some(x) = opt {
+            println(f"Got: {x}")
+        }
+    """
+
+    pattern: "Pattern"
+    value: Expression
+    then_block: Block
+    else_block: Optional[Block] = None
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_if_let_statement(self)
+
+
+@dataclass(frozen=True, slots=True)
+class WhileLetStatement(Statement):
+    """
+    A while-let statement for pattern matching loops.
+
+    Example:
+        while let Option::Some(x) = iter.next() {
+            println(f"Got: {x}")
+        }
+    """
+
+    pattern: "Pattern"
+    value: Expression
+    body: Block
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_while_let_statement(self)
+
+
+@dataclass(frozen=True, slots=True)
 class ReturnStatement(Statement):
     """
     A return statement.
@@ -2162,14 +2203,16 @@ class EnumVariantAccess(Expression):
 @dataclass(frozen=True, slots=True)
 class StructLiteral(Expression):
     """
-    A struct literal with named fields.
+    A struct literal with named fields and optional spread.
 
     Example:
         Point { x: 1.0, y: 2.0 }
+        Point { x: 10.0, ...p1 }  # spread/update syntax
     """
 
     struct_name: str
     fields: tuple[tuple[str, Expression], ...]  # (field_name, value) pairs
+    spread: Optional[Expression] = None  # The base struct for spread syntax
     location: Optional[SourceLocation] = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
@@ -2503,6 +2546,18 @@ class BaseASTVisitor(ASTVisitor):
         self.visit(node.body)
 
     def visit_loop_statement(self, node: "LoopStatement") -> Any:
+        self.visit(node.body)
+
+    def visit_if_let_statement(self, node: "IfLetStatement") -> Any:
+        self.visit(node.pattern)
+        self.visit(node.value)
+        self.visit(node.then_block)
+        if node.else_block:
+            self.visit(node.else_block)
+
+    def visit_while_let_statement(self, node: "WhileLetStatement") -> Any:
+        self.visit(node.pattern)
+        self.visit(node.value)
         self.visit(node.body)
 
     def visit_return_statement(self, node: ReturnStatement) -> Any:

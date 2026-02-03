@@ -668,7 +668,16 @@ class Lexer:
 
         start_loc = self._location()
 
-        # Try two-character operators first
+        # Try three-character operators first (...)
+        if (self._current_char == "." and
+            self._peek_char == "." and
+            self._peek_ahead(2) == "."):
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.ELLIPSIS, "...", start_loc)
+
+        # Try two-character operators
         if self._peek_char is not None:
             two_char = self._current_char + self._peek_char
             if two_char in DOUBLE_CHAR_TOKENS:

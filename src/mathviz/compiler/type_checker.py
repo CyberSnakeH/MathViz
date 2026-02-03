@@ -3609,6 +3609,65 @@ class TypeChecker(BaseASTVisitor):
         self._in_loop = False
         self.symbol_table.exit_scope()
 
+    def visit_if_let_statement(self, node: "IfLetStatement") -> None:
+        """Type check an if let statement."""
+        from mathviz.compiler.ast_nodes import IfLetStatement
+
+        # Infer the type of the value expression
+        self._infer_expression_type(node.value)
+
+        # Enter scope for the then block (pattern bindings are visible here)
+        self.symbol_table.enter_scope("if_let")
+
+        # Define bindings from pattern as ANY_TYPE (we don't have full pattern typing yet)
+        self._define_pattern_bindings(node.pattern)
+
+        self.visit(node.then_block)
+        self.symbol_table.exit_scope()
+
+        if node.else_block:
+            self.symbol_table.enter_scope("if_let_else")
+            self.visit(node.else_block)
+            self.symbol_table.exit_scope()
+
+    def visit_while_let_statement(self, node: "WhileLetStatement") -> None:
+        """Type check a while let statement."""
+        from mathviz.compiler.ast_nodes import WhileLetStatement
+
+        # Infer the type of the value expression
+        self._infer_expression_type(node.value)
+
+        # Enter loop scope
+        self.symbol_table.enter_scope("while_let")
+        self._in_loop = True
+
+        # Define bindings from pattern as ANY_TYPE
+        self._define_pattern_bindings(node.pattern)
+
+        self.visit(node.body)
+
+        self._in_loop = False
+        self.symbol_table.exit_scope()
+
+    def _define_pattern_bindings(self, pattern: "Pattern") -> None:
+        """Define variables from a pattern in the current scope."""
+        from mathviz.compiler.ast_nodes import (
+            IdentifierPattern, TuplePattern, ConstructorPattern, BindingPattern
+        )
+
+        if isinstance(pattern, IdentifierPattern):
+            if pattern.name != "_":
+                self.symbol_table.define(pattern.name, ANY_TYPE)
+        elif isinstance(pattern, TuplePattern):
+            for elem in pattern.elements:
+                self._define_pattern_bindings(elem)
+        elif isinstance(pattern, ConstructorPattern):
+            for arg in pattern.arguments:
+                self._define_pattern_bindings(arg)
+        elif isinstance(pattern, BindingPattern):
+            self.symbol_table.define(pattern.name, ANY_TYPE)
+            self._define_pattern_bindings(pattern.pattern)
+
     def visit_return_statement(self, node: ReturnStatement) -> None:
         """Type check a return statement."""
         if self._current_function_return_type is None:

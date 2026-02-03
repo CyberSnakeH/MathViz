@@ -182,6 +182,19 @@ TYPE_TO_PYTHON: dict[str, str] = {
     "Vec": "np.ndarray",
     "Mat": "np.ndarray",
     "Matrix": "np.ndarray",
+    # Rust-style type aliases
+    "i8": "int",
+    "i16": "int",
+    "i32": "int",
+    "i64": "int",
+    "u8": "int",
+    "u16": "int",
+    "u32": "int",
+    "u64": "int",
+    "f32": "float",
+    "f64": "float",
+    "bool": "bool",
+    "str": "str",
 }
 
 # Functions that should be converted to numpy calls
@@ -636,6 +649,7 @@ class CodeGenerator(BaseASTVisitor):
         self._has_scene = False
         # OOP import flags
         self._needs_dataclass_import = False
+        self._needs_dataclass_replace = False  # For struct spread syntax
         self._needs_abc_import = False
         self._needs_enum_import = False
         # Generic type support
@@ -653,6 +667,8 @@ class CodeGenerator(BaseASTVisitor):
         self._enum_variants: dict[str, set[str]] = {}
         # Track enum variants that have data (fields)
         self._enum_variants_with_data: set[tuple[str, str]] = set()
+        # Track which enums use Python Enum (simple enums without any data)
+        self._simple_enums: set[str] = set()
 
     def generate(self, program: Program) -> str:
         """
@@ -716,8 +732,13 @@ class CodeGenerator(BaseASTVisitor):
             self._emit("")
 
         # OOP imports
-        if self._needs_dataclass_import:
-            self._emit("from dataclasses import dataclass")
+        if self._needs_dataclass_import or self._needs_dataclass_replace:
+            imports = []
+            if self._needs_dataclass_import:
+                imports.append("dataclass")
+            if self._needs_dataclass_replace:
+                imports.append("replace")
+            self._emit(f"from dataclasses import {', '.join(imports)}")
             self._emit("")
 
         if self._needs_abc_import:
@@ -1057,6 +1078,8 @@ class CodeGenerator(BaseASTVisitor):
                     self.parent._needs_dataclass_import = True
                 else:
                     self.parent._needs_enum_import = True
+                    # Track simple enums (those using Python Enum)
+                    self.parent._simple_enums.add(node.name)
                 # Track enum variants for correct codegen
                 self.parent._enum_variants[node.name] = {v.name for v in node.variants}
                 # Track which variants have data
@@ -1075,6 +1098,12 @@ class CodeGenerator(BaseASTVisitor):
                         # Static methods: Type.method(args) -> Type_method(args)
                         self.parent._static_methods.add((node.target_type, method.name))
                 super().visit_impl_block(node)
+
+            def visit_struct_literal(self, node: StructLiteral) -> None:
+                # Check for struct spread syntax which needs dataclasses.replace
+                if node.spread:
+                    self.parent._needs_dataclass_replace = True
+                super().visit_struct_literal(node)
 
         analyzer = ImportAnalyzer()
         analyzer.visit(program)
@@ -1747,7 +1776,15 @@ class CodeGenerator(BaseASTVisitor):
         elif isinstance(pattern, EnumPattern):
             # Enum pattern: check isinstance for the variant class
             # For dataclass-based enums: isinstance(subject, VariantName)
-            conditions = [f"isinstance({subject_var}, {pattern.variant_name})"]
+            # Handle reserved keywords like None -> _None
+            variant_name = pattern.variant_name
+            if variant_name == "None":
+                variant_name = "_None"
+            elif variant_name == "True":
+                variant_name = "_True"
+            elif variant_name == "False":
+                variant_name = "_False"
+            conditions = [f"isinstance({subject_var}, {variant_name})"]
             for i, binding in enumerate(pattern.bindings):
                 binding_cond = self._generate_pattern_condition(binding, f"{subject_var}._{i}")
                 if binding_cond != "True":
@@ -2413,6 +2450,87 @@ class CodeGenerator(BaseASTVisitor):
         self.visit(node.body)
         self._dedent()
 
+    def visit_if_let_statement(self, node: "IfLetStatement") -> None:
+        """
+        Generate code for an if let statement.
+
+        Example:
+            if let Option::Some(x) = opt { body }
+            ->
+            _if_let_val = opt
+            if isinstance(_if_let_val, Option_Some):
+                x = _if_let_val._0
+                body
+        """
+        from mathviz.compiler.ast_nodes import IfLetStatement
+
+        # Generate a temporary variable for the value
+        temp_var = "_if_let_val"
+        value_code = self._generate_expr(node.value)
+        self._emit(f"{temp_var} = {value_code}")
+
+        # Generate the condition
+        condition = self._generate_pattern_condition(node.pattern, temp_var)
+        self._emit(f"if {condition}:")
+        self._indent()
+
+        # Generate bindings
+        bindings = self._generate_pattern_bindings(node.pattern, temp_var)
+        for name, expr in bindings.items():
+            self._emit(f"{name} = {expr}")
+
+        # Generate the then block
+        self.visit(node.then_block)
+        self._dedent()
+
+        # Generate the else block if present
+        if node.else_block:
+            self._emit("else:")
+            self._indent()
+            self.visit(node.else_block)
+            self._dedent()
+
+    def visit_while_let_statement(self, node: "WhileLetStatement") -> None:
+        """
+        Generate code for a while let statement.
+
+        Example:
+            while let Option::Some(x) = iter.next() { body }
+            ->
+            while True:
+                _while_let_val = iter.next()
+                if not isinstance(_while_let_val, Option_Some):
+                    break
+                x = _while_let_val._0
+                body
+        """
+        from mathviz.compiler.ast_nodes import WhileLetStatement
+
+        temp_var = "_while_let_val"
+
+        self._emit("while True:")
+        self._indent()
+
+        # Generate the value
+        value_code = self._generate_expr(node.value)
+        self._emit(f"{temp_var} = {value_code}")
+
+        # Generate the break condition (negated pattern match)
+        condition = self._generate_pattern_condition(node.pattern, temp_var)
+        self._emit(f"if not ({condition}):")
+        self._indent()
+        self._emit("break")
+        self._dedent()
+
+        # Generate bindings
+        bindings = self._generate_pattern_bindings(node.pattern, temp_var)
+        for name, expr in bindings.items():
+            self._emit(f"{name} = {expr}")
+
+        # Generate the body
+        self.visit(node.body)
+        self._dedent()
+
     def visit_return_statement(self, node: ReturnStatement) -> None:
         """Generate code for a return statement."""
         if node.value:
@@ -2941,19 +3059,32 @@ class CodeGenerator(BaseASTVisitor):
 
         Example:
             Shape::Circle -> Circle (for dataclass variants with data)
-            Color::Red -> Red() (for simple enums without data)
+            Color::Red -> Color.Red (for Python Enum without data)
             Point::new -> Point_new (for struct static methods)
+            Option::None -> _None() (None is a reserved keyword)
         """
+        # Handle reserved keywords - must match the transformation in visit_enum_def
+        variant_name = node.variant_name
+        if variant_name == "None":
+            variant_name = "_None"
+        elif variant_name == "True":
+            variant_name = "_True"
+        elif variant_name == "False":
+            variant_name = "_False"
+
         # Check if this is an enum variant access
         if node.enum_name in self._enum_variants:
             if node.variant_name in self._enum_variants[node.enum_name]:
                 # It's an enum variant
-                if (node.enum_name, node.variant_name) in self._enum_variants_with_data:
+                if node.enum_name in self._simple_enums:
+                    # Simple enum (Python Enum) - use EnumName.VariantName
+                    return f"{node.enum_name}.{node.variant_name}"
+                elif (node.enum_name, node.variant_name) in self._enum_variants_with_data:
                     # Variant has data - will be called as function, just return class name
-                    return node.variant_name
+                    return variant_name
                 else:
-                    # Variant has no data - create instance directly
-                    return f"{node.variant_name}()"
+                    # Dataclass-based enum variant without data - create instance
+                    return f"{variant_name}()"
 
         # Otherwise it's a static method from an impl block
         return f"{node.enum_name}_{node.variant_name}"
@@ -2964,12 +3095,27 @@ class CodeGenerator(BaseASTVisitor):
 
         Example:
             Point { x: 1.0, y: 2.0 } -> Point(x=1.0, y=2.0)
+            Point { x: 10.0, ...p1 } -> replace(p1, x=10.0)
         """
-        field_args = ", ".join(
-            f"{name}={self._generate_expr(value)}"
-            for name, value in node.fields
-        )
-        return f"{node.struct_name}({field_args})"
+        if node.spread:
+            # Struct update syntax using dataclasses.replace
+            self._needs_dataclass_replace = True
+            spread_expr = self._generate_expr(node.spread)
+            if node.fields:
+                field_args = ", ".join(
+                    f"{name}={self._generate_expr(value)}"
+                    for name, value in node.fields
+                )
+                return f"replace({spread_expr}, {field_args})"
+            else:
+                # Just copy the struct
+                return f"replace({spread_expr})"
+        else:
+            field_args = ", ".join(
+                f"{name}={self._generate_expr(value)}"
+                for name, value in node.fields
+            )
+            return f"{node.struct_name}({field_args})"
 
     def visit_enum_pattern(self, node: EnumPattern) -> str:
         """Generate condition for enum pattern matching."""

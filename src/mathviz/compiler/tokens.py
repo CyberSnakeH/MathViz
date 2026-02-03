@@ -191,6 +191,7 @@ class TokenType(Enum):
     FAT_ARROW = auto()     # =>
     AT = auto()            # @ (decorator)
     PIPE = auto()          # | (for pipe lambdas)
+    ELLIPSIS = auto()      # ... (spread/rest operator)
 
     # Special
     NEWLINE = auto()

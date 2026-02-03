@@ -351,6 +351,29 @@ class Parser:
 
         raise self._error_with_context("Expected member name")
 
+    def _parse_variant_name(self) -> str:
+        """Parse an enum variant name (identifier or Some/None/Ok/Err keywords).
+
+        This allows keywords Some, None, Ok, Err to be used as enum variant names,
+        enabling natural Option and Result type patterns.
+        """
+        if self._check(TokenType.IDENTIFIER):
+            return self._advance().value
+        if self._check(TokenType.SOME):
+            self._advance()
+            return "Some"
+        if self._check(TokenType.NONE):
+            self._advance()
+            return "None"
+        if self._check(TokenType.OK):
+            self._advance()
+            return "Ok"
+        if self._check(TokenType.ERR):
+            self._advance()
+            return "Err"
+
+        raise self._error_with_context("Expected variant name after '::'")
+
     def _error(self, message: str) -> ParserError:
         """Create a parser error with location info."""
         token = self._current
@@ -1047,7 +1070,7 @@ class Parser:
 
         return SceneDef(name=name, body=body, location=loc)
 
-    def _parse_if(self) -> IfStatement:
+    def _parse_if(self) -> Statement:
         """
         Parse an if statement with optional elif and else clauses.
 
@@ -1055,9 +1078,15 @@ class Parser:
             if cond { body }
             if cond { body } else { body }
             if cond { body } elif cond { body } else { body }
+            if let Pattern = expr { body }
+            if let Pattern = expr { body } else { body }
         """
         loc = self._current.location
         self._advance()  # consume 'if'
+
+        # Check for if let syntax
+        if self._check(TokenType.LET):
+            return self._parse_if_let(loc)
 
         condition = self._parse_expression()
         self._skip_newlines()
@@ -1082,6 +1111,43 @@ class Parser:
             condition=condition,
             then_block=then_block,
             elif_clauses=tuple(elif_clauses),
+            else_block=else_block,
+            location=loc,
+        )
+
+    def _parse_if_let(self, loc: SourceLocation) -> "IfLetStatement":
+        """
+        Parse an if let statement.
+
+        Example:
+            if let Option::Some(x) = opt { body }
+            if let Option::Some(x) = opt { body } else { body }
+        """
+        from mathviz.compiler.ast_nodes import IfLetStatement
+
+        self._advance()  # consume 'let'
+
+        # Parse the pattern
+        pattern = self._parse_pattern()
+
+        self._expect(TokenType.ASSIGN, "Expected '=' after pattern in if let")
+
+        # Parse the value expression
+        value = self._parse_expression()
+
+        self._skip_newlines()
+        then_block = self._parse_block()
+
+        else_block: Optional[Block] = None
+        self._skip_newlines()
+        if self._match(TokenType.ELSE):
+            self._skip_newlines()
+            else_block = self._parse_block()
+
+        return IfLetStatement(
+            pattern=pattern,
+            value=value,
+            then_block=then_block,
             else_block=else_block,
             location=loc,
         )
@@ -1214,15 +1280,20 @@ class Parser:
             location=loc,
         )
 
-    def _parse_while(self) -> WhileStatement:
+    def _parse_while(self) -> Statement:
         """
         Parse a while loop.
 
         Handles:
             while condition { body }
+            while let Pattern = expr { body }
         """
         loc = self._current.location
         self._advance()  # consume 'while'
+
+        # Check for while let syntax
+        if self._check(TokenType.LET):
+            return self._parse_while_let(loc)
 
         condition = self._parse_expression()
         self._skip_newlines()
@@ -1230,6 +1301,35 @@ class Parser:
 
         return WhileStatement(
             condition=condition,
+            body=body,
+            location=loc,
+        )
+
+    def _parse_while_let(self, loc: SourceLocation) -> "WhileLetStatement":
+        """
+        Parse a while let statement.
+
+        Example:
+            while let Option::Some(x) = iter.next() { body }
+        """
+        from mathviz.compiler.ast_nodes import WhileLetStatement
+
+        self._advance()  # consume 'let'
+
+        # Parse the pattern
+        pattern = self._parse_pattern()
+
+        self._expect(TokenType.ASSIGN, "Expected '=' after pattern in while let")
+
+        # Parse the value expression
+        value = self._parse_expression()
+
+        self._skip_newlines()
+        body = self._parse_block()
+
+        return WhileLetStatement(
+            pattern=pattern,
+            value=value,
             body=body,
             location=loc,
         )
@@ -1969,9 +2069,7 @@ class Parser:
             name = self._previous.value
             # Check for enum variant access: Name::Variant
             if self._match(TokenType.DOUBLE_COLON):
-                variant_name = self._expect(
-                    TokenType.IDENTIFIER, "Expected variant name after '::'"
-                ).value
+                variant_name = self._parse_variant_name()
                 return EnumVariantAccess(
                     enum_name=name, variant_name=variant_name, location=loc
                 )
@@ -2213,16 +2311,28 @@ class Parser:
 
     def _parse_struct_literal(self, struct_name: str, loc: SourceLocation) -> StructLiteral:
         """
-        Parse a struct literal with named fields.
+        Parse a struct literal with named fields and optional spread.
 
         Example:
             Point { x: 1.0, y: 2.0 }
+            Point { x: 10.0, ...p1 }  # spread/update syntax
         """
         self._expect(TokenType.LBRACE, "Expected '{' for struct literal")
         self._skip_newlines()
 
         fields: list[tuple[str, Expression]] = []
+        spread: Optional[Expression] = None
+
         while not self._check(TokenType.RBRACE, TokenType.EOF):
+            # Check for spread syntax: ...expr
+            if self._match(TokenType.ELLIPSIS):
+                spread = self._parse_expression()
+                self._skip_newlines()
+                # Spread must be last, optionally followed by comma
+                self._match(TokenType.COMMA)
+                self._skip_newlines()
+                break
+
             field_name = self._expect(TokenType.IDENTIFIER, "Expected field name").value
             self._expect(TokenType.COLON, "Expected ':' after field name")
             field_value = self._parse_expression()
@@ -2238,6 +2348,7 @@ class Parser:
         return StructLiteral(
             struct_name=struct_name,
             fields=tuple(fields),
+            spread=spread,
             location=loc,
         )
 
@@ -2530,9 +2641,7 @@ class Parser:
 
             # Check for enum pattern: Name::Variant or Name::Variant(args)
             if self._match(TokenType.DOUBLE_COLON):
-                variant_name = self._expect(
-                    TokenType.IDENTIFIER, "Expected variant name after '::'"
-                ).value
+                variant_name = self._parse_variant_name()
                 bindings: list[Pattern] = []
                 if self._match(TokenType.LPAREN):
                     if not self._check(TokenType.RPAREN):
@@ -3197,10 +3306,29 @@ class Parser:
             Circle(Float)
             Rectangle(Float, Float)
             Point
+            Some(T)  # Some, None, Ok, Err are keywords but valid as variant names
+            None
         """
         loc = self._current.location
 
-        name = self._expect(TokenType.IDENTIFIER, "Expected variant name").value
+        # Allow keywords Some, None, Ok, Err as variant names (common in Option/Result enums)
+        if self._check(TokenType.IDENTIFIER):
+            name = self._current.value
+            self._advance()
+        elif self._check(TokenType.SOME):
+            name = "Some"
+            self._advance()
+        elif self._check(TokenType.NONE):
+            name = "None"
+            self._advance()
+        elif self._check(TokenType.OK):
+            name = "Ok"
+            self._advance()
+        elif self._check(TokenType.ERR):
+            name = "Err"
+            self._advance()
+        else:
+            self._error("Expected variant name")
 
         # Check for associated data
         fields: list[TypeAnnotation] = []
