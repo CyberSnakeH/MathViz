@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples - MathViz Documentation</title>
+  <meta name="description" content="MathViz code examples - learn by example.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="../docs/getting-started.html" class="nav-link">Docs</a>
+        <a href="../docs/language-reference.html" class="nav-link">Language</a>
+        <a href="../docs/scenes.html" class="nav-link">Manim</a>
+        <a href="../docs/cli.html" class="nav-link">CLI</a>
+        <a href="index.html" class="nav-link active">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="nav-search" data-search-trigger>
+          <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Search docs..." readonly data-search-trigger>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </div>
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Examples</div>
+        <nav class="sidebar-nav">
+          <a href="#basics" class="sidebar-link">Basics</a>
+          <a href="#functions" class="sidebar-link">Functions</a>
+          <a href="#structs" class="sidebar-link">Structs</a>
+          <a href="#enums" class="sidebar-link">Enums</a>
+          <a href="#control-flow" class="sidebar-link">Control Flow</a>
+          <a href="#animations" class="sidebar-link">Animations</a>
+          <a href="#numba" class="sidebar-link">Numba/Performance</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="../docs/getting-started.html" class="sidebar-link">Getting Started</a>
+          <a href="../docs/language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="../docs/scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="../docs/cli.html" class="sidebar-link">CLI Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>MathViz Examples</h1>
+
+      <p>
+        Learn MathViz by example. All examples on this page compile and run correctly with the MathViz compiler.
+      </p>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Run Examples</div>
+          <p class="callout-text">Save any example to a <code>.mviz</code> file and run with <code>mathviz exec file.mviz</code></p>
+        </div>
+      </div>
+
+      <!-- Basics -->
+      <h2 id="basics">Basics</h2>
+
+      <h3>Hello World</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    println("Hello, MathViz!")
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Variables</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let x = 10
+    let y = 20
+    let sum = x + y
+    println(f"Sum: {sum}")
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Lists</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let numbers = [1, 2, 3, 4, 5]
+    for n in numbers {
+        println(f"Number: {n}")
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Tuples</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let point = (3.0, 4.0)
+    let (x, y) = point
+    println(f"x={x}, y={y}")
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Functions -->
+      <h2 id="functions">Functions</h2>
+
+      <h3>Basic Function</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn add(a: Int, b: Int) -> Int {
+    return a + b
+}
+
+fn main() {
+    let result = add(5, 3)
+    println(f"5 + 3 = {result}")
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Lambda Expressions</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let square = |x| x * x
+    let result = square(5)
+    println(f"5 squared = {result}")
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Structs -->
+      <h2 id="structs">Structs</h2>
+
+      <h3>Basic Struct</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">struct Point {
+    x: Float
+    y: Float
+}
+
+impl Point {
+    fn new(x: Float, y: Float) -> Point {
+        return Point { x: x, y: y }
+    }
+
+    fn distance(self, other: Point) -> Float {
+        let dx = self.x - other.x
+        let dy = self.y - other.y
+        return sqrt(dx * dx + dy * dy)
+    }
+}
+
+fn main() {
+    let p1 = Point.new(0.0, 0.0)
+    let p2 = Point.new(3.0, 4.0)
+    let d = p1.distance(p2)
+    println(f"Distance: {d}")
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Enums -->
+      <h2 id="enums">Enums</h2>
+
+      <h3>Simple Enum</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">enum Color {
+    Red
+    Green
+    Blue
+}
+
+fn main() {
+    let c = Color.Red
+    println("Color selected")
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Control Flow -->
+      <h2 id="control-flow">Control Flow</h2>
+
+      <h3>If/Else</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let x = 10
+    if x > 5 {
+        println("x is greater than 5")
+    } else {
+        println("x is 5 or less")
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>For Loop</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    for i in 0..5 {
+        println(f"i = {i}")
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>While Loop</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let i = 0
+    while i < 5 {
+        println(f"i = {i}")
+        i = i + 1
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Match Expression</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn main() {
+    let value = 2
+    let result = match value {
+        1 -> "one"
+        2 -> "two"
+        3 -> "three"
+        _ -> "other"
+    }
+    println(result)
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Animations -->
+      <h2 id="animations">Manim Animations</h2>
+
+      <h3>Hello World Animation</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">scene HelloWorld {
+    fn construct(self) {
+        let text = Text("Hello, World!")
+        play(Write(text))
+        wait(1.0)
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Circle Animation</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">scene CircleAnimation {
+    fn construct(self) {
+        let circle = Circle(radius: 2.0)
+        circle.set_color(BLUE)
+
+        let label = MathTex("A = \\pi r^2")
+        label.next_to(circle, DOWN)
+
+        play(Create(circle))
+        play(Write(label))
+        wait(2.0)
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <p>Run animations with:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz run animation.mviz --preview</code></pre>
+        </div>
+      </div>
+
+      <!-- Numba -->
+      <h2 id="numba">Numba / Performance</h2>
+
+      <h3>JIT Compiled Function</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">@njit
+fn compute_sum(n: Int) -> Int {
+    let total = 0
+    for i in 0..n {
+        total = total + i
+    }
+    return total
+}
+
+fn main() {
+    let result = compute_sum(100)
+    println(f"Sum: {result}")
+}</code></pre>
+        </div>
+      </div>
+
+      <h2>Next Steps</h2>
+
+      <ul>
+        <li><a href="../docs/language-reference.html">Language Reference</a> - Complete syntax documentation</li>
+        <li><a href="../docs/scenes.html">Scenes & Manim</a> - Animation guide</li>
+        <li><a href="../docs/cli.html">CLI Reference</a> - All commands</li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <input type="text" class="search-modal-input" placeholder="Search documentation...">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>
