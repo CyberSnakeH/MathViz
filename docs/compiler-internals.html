@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compiler Internals - MathViz Documentation</title>
+  <meta name="description" content="Deep dive into the MathViz compiler architecture, implementation details, and optimization passes.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .architecture-diagram {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+    .architecture-diagram pre {
+      margin: 0;
+      color: var(--text-secondary);
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .metric-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+    .metric-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    .phase-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .phase-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+    .phase-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .file-tree {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+    }
+    .file-tree ul {
+      list-style: none;
+      padding-left: 1.5rem;
+      margin: 0;
+    }
+    .file-tree > ul {
+      padding-left: 0;
+    }
+    .file-tree li {
+      padding: 0.25rem 0;
+      color: var(--text-secondary);
+    }
+    .file-tree .folder {
+      color: var(--accent-cyan);
+    }
+    .file-tree .file {
+      color: var(--text-primary);
+    }
+    .file-tree .size {
+      color: var(--text-tertiary);
+      font-size: 0.75rem;
+    }
+    table.tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    table.tech-table th,
+    table.tech-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    table.tech-table th {
+      background: var(--bg-secondary);
+      font-weight: 600;
+    }
+    table.tech-table code {
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="getting-started.html" class="nav-link">Docs</a>
+        <a href="language-reference.html" class="nav-link">Language</a>
+        <a href="scenes.html" class="nav-link">Manim</a>
+        <a href="cli.html" class="nav-link">CLI</a>
+        <a href="../examples/index.html" class="nav-link">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Compiler Internals</div>
+        <nav class="sidebar-nav">
+          <a href="#overview" class="sidebar-link">Overview</a>
+          <a href="#architecture" class="sidebar-link">Architecture</a>
+          <a href="#lexer" class="sidebar-link">Lexer</a>
+          <a href="#parser" class="sidebar-link">Parser</a>
+          <a href="#ast" class="sidebar-link">AST</a>
+          <a href="#type-checker" class="sidebar-link">Type Checker</a>
+          <a href="#analyzers" class="sidebar-link">Analyzers</a>
+          <a href="#codegen" class="sidebar-link">Code Generator</a>
+          <a href="#optimizations" class="sidebar-link">Optimizations</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Getting Started</a>
+          <a href="language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="cli.html" class="sidebar-link">CLI Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Compiler Internals</h1>
+
+      <p class="lead">
+        A comprehensive technical deep-dive into the MathViz compiler architecture,
+        implementation details, and optimization strategies. This document is intended
+        for contributors, language implementers, and anyone interested in compiler design.
+      </p>
+
+      <!-- Metrics -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-value">31,310</div>
+          <div class="metric-label">Lines of Code</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">22</div>
+          <div class="metric-label">Compiler Modules</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">8</div>
+          <div class="metric-label">Pipeline Stages</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">100+</div>
+          <div class="metric-label">AST Node Types</div>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <h2 id="overview">Overview</h2>
+
+      <p>
+        The MathViz compiler is a multi-stage source-to-source transpiler that transforms
+        <code>.mviz</code> source files into optimized Python code. It follows a traditional
+        compiler pipeline architecture with additional analysis passes for performance optimization.
+      </p>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Design Philosophy</div>
+          <p class="callout-text">
+            The compiler prioritizes <strong>correctness</strong>, <strong>readable output</strong>,
+            and <strong>seamless Python interoperability</strong>. Generated code is clean,
+            idiomatic Python that can be inspected and debugged easily.
+          </p>
+        </div>
+      </div>
+
+      <h3>Key Design Decisions</h3>
+      <ul>
+        <li><strong>Immutable AST</strong>: All AST nodes are frozen dataclasses for thread safety and predictability</li>
+        <li><strong>Visitor Pattern</strong>: Tree traversal via the visitor pattern enables clean separation of concerns</li>
+        <li><strong>Multi-pass Architecture</strong>: Separate analysis passes for type checking, purity, complexity, and parallelization</li>
+        <li><strong>Optional Strictness</strong>: Type errors can be warnings or fatal errors depending on configuration</li>
+        <li><strong>Zero Runtime Overhead</strong>: No MathViz runtime library required; output is standalone Python</li>
+      </ul>
+
+      <!-- Architecture -->
+      <h2 id="architecture">Compilation Pipeline</h2>
+
+      <p>
+        The compiler executes the following stages in order. Each stage is independent and
+        can be enabled/disabled via the <code>CompilationPipeline</code> configuration.
+      </p>
+
+      <div class="architecture-diagram">
+        <pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         MathViz Compilation Pipeline                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Source Code (.mviz)                                                       │
+│         │                                                                   │
+│         ▼                                                                   │
+│   ┌─────────────┐                                                           │
+│   │   LEXER     │  Tokenization: Unicode math symbols, f-strings, keywords  │
+│   │  lexer.py   │  Output: Token stream                                     │
+│   └──────┬──────┘                                                           │
+│          │                                                                  │
+│          ▼                                                                  │
+│   ┌─────────────┐                                                           │
+│   │   PARSER    │  Recursive descent parser with operator precedence        │
+│   │  parser.py  │  Output: Abstract Syntax Tree (AST)                       │
+│   └──────┬──────┘                                                           │
+│          │                                                                  │
+│          ▼                                                                  │
+│   ┌─────────────┐                                                           │
+│   │   MODULE    │  Resolves `use` statements, loads dependencies            │
+│   │   LOADER    │  Detects circular dependencies                            │
+│   └──────┬──────┘                                                           │
+│          │                                                                  │
+│          ▼                                                                  │
+│   ┌─────────────┐                                                           │
+│   │    TYPE     │  Hindley-Milner style inference with bidirectional hints  │
+│   │   CHECKER   │  Output: Type errors, function signatures                 │
+│   └──────┬──────┘                                                           │
+│          │                                                                  │
+│          ├────────────────────┬────────────────────┐                        │
+│          ▼                    ▼                    ▼                        │
+│   ┌─────────────┐      ┌─────────────┐      ┌─────────────┐                 │
+│   │   PURITY    │      │ COMPLEXITY  │      │  PARALLEL   │                 │
+│   │  ANALYZER   │      │  ANALYZER   │      │  ANALYZER   │                 │
+│   └──────┬──────┘      └──────┬──────┘      └──────┬──────┘                 │
+│          │                    │                    │                        │
+│          └────────────────────┼────────────────────┘                        │
+│                               │                                             │
+│                               ▼                                             │
+│                        ┌─────────────┐                                      │
+│                        │    CODE     │  Emits Python with Numba decorators  │
+│                        │  GENERATOR  │  Output: Executable Python code      │
+│                        └──────┬──────┘                                      │
+│                               │                                             │
+│                               ▼                                             │
+│                        Generated Python (.py)                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+        </pre>
+      </div>
+
+      <h3>File Structure</h3>
+
+      <div class="file-tree">
+        <ul>
+          <li><span class="folder">src/mathviz/compiler/</span></li>
+          <li>
+            <ul>
+              <li><span class="file">__init__.py</span> <span class="size">(31 KB) - Pipeline orchestration</span></li>
+              <li><span class="file">tokens.py</span> <span class="size">(14 KB) - Token definitions</span></li>
+              <li><span class="file">lexer.py</span> <span class="size">(28 KB) - Lexical analysis</span></li>
+              <li><span class="file">parser.py</span> <span class="size">(115 KB) - Syntax parser</span></li>
+              <li><span class="file">ast_nodes.py</span> <span class="size">(69 KB) - AST node definitions</span></li>
+              <li><span class="file">type_checker.py</span> <span class="size">(143 KB) - Type inference</span></li>
+              <li><span class="file">codegen.py</span> <span class="size">(122 KB) - Python code generation</span></li>
+              <li><span class="file">module_loader.py</span> <span class="size">(22 KB) - Module resolution</span></li>
+              <li><span class="file">purity_analyzer.py</span> <span class="size">(28 KB) - Side effect analysis</span></li>
+              <li><span class="file">complexity_analyzer.py</span> <span class="size">(23 KB) - Big-O estimation</span></li>
+              <li><span class="file">parallel_analyzer.py</span> <span class="size">(34 KB) - Loop parallelization</span></li>
+              <li><span class="file">jit_optimizer.py</span> <span class="size">(63 KB) - Numba optimization</span></li>
+              <li><span class="file">vectorizer.py</span> <span class="size">(63 KB) - SIMD vectorization</span></li>
+              <li><span class="file">memory_optimizer.py</span> <span class="size">(61 KB) - Memory optimization</span></li>
+              <li><span class="file">const_fold.py</span> <span class="size">(99 KB) - Constant folding</span></li>
+              <li><span class="file">linter.py</span> <span class="size">(56 KB) - Static analysis</span></li>
+              <li><span class="file">diagnostics.py</span> <span class="size">(25 KB) - Error formatting</span></li>
+              <li><span class="file">call_graph.py</span> <span class="size">(24 KB) - Call graph analysis</span></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Lexer -->
+      <h2 id="lexer">Stage 1: Lexical Analysis</h2>
+
+      <p>
+        The lexer (<code>lexer.py</code>) transforms source code into a stream of tokens.
+        It supports both ASCII and Unicode operators for mathematical notation.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">1</div>
+          <h3 class="phase-title">Lexer Implementation</h3>
+        </div>
+
+        <h4>Token Categories</h4>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Examples</th>
+              <th>Token Types</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Keywords</td>
+              <td><code>fn</code>, <code>let</code>, <code>struct</code>, <code>scene</code></td>
+              <td>FN, LET, STRUCT, SCENE</td>
+            </tr>
+            <tr>
+              <td>Literals</td>
+              <td><code>42</code>, <code>3.14</code>, <code>"hello"</code>, <code>true</code></td>
+              <td>INTEGER, FLOAT, STRING, BOOLEAN</td>
+            </tr>
+            <tr>
+              <td>Math Unicode</td>
+              <td><code>∈</code>, <code>∪</code>, <code>∩</code>, <code>⊆</code>, <code>π</code></td>
+              <td>ELEMENT_OF, UNION, INTERSECTION, SUBSET, PI</td>
+            </tr>
+            <tr>
+              <td>Operators</td>
+              <td><code>+</code>, <code>-</code>, <code>*</code>, <code>^</code>, <code>-></code>, <code>::</code></td>
+              <td>PLUS, MINUS, STAR, CARET, THIN_ARROW, DOUBLE_COLON</td>
+            </tr>
+            <tr>
+              <td>F-strings</td>
+              <td><code>f"x = {x}"</code></td>
+              <td>FSTRING_START, FSTRING_PART, FSTRING_EXPR_*</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Special Features</h4>
+        <ul>
+          <li><strong>F-string Tokenization</strong>: Handles nested expressions in <code>f"..."</code> strings with proper brace matching</li>
+          <li><strong>Range Syntax</strong>: Recognizes <code>..</code> and <code>..=</code> for exclusive/inclusive ranges</li>
+          <li><strong>Doc Comments</strong>: Parses <code>///</code> and <code>/** */</code> documentation comments</li>
+          <li><strong>Unicode Support</strong>: First-class support for mathematical symbols (∈, ∪, ∩, ⊆, ⊇, π, ∞)</li>
+        </ul>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Lexer Token Example</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-python"># Input: let x = {1, 2} ∪ {3, 4}
+# Output tokens:
+Token(LET, "let")
+Token(IDENTIFIER, "x")
+Token(ASSIGN, "=")
+Token(LBRACE, "{")
+Token(INTEGER, 1)
+Token(COMMA, ",")
+Token(INTEGER, 2)
+Token(RBRACE, "}")
+Token(UNION, "∪")        # Unicode operator!
+Token(LBRACE, "{")
+Token(INTEGER, 3)
+Token(COMMA, ",")
+Token(INTEGER, 4)
+Token(RBRACE, "}")
+Token(EOF, None)</code></pre>
+        </div>
+      </div>
+
+      <!-- Parser -->
+      <h2 id="parser">Stage 2: Parsing</h2>
+
+      <p>
+        The parser (<code>parser.py</code>) is a hand-written recursive descent parser with
+        Pratt parsing for expressions. It produces an immutable Abstract Syntax Tree.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">2</div>
+          <h3 class="phase-title">Parser Implementation</h3>
+        </div>
+
+        <h4>Parsing Strategy</h4>
+        <ul>
+          <li><strong>Recursive Descent</strong>: Top-down parsing for statements and declarations</li>
+          <li><strong>Pratt Parsing</strong>: Operator precedence parsing for expressions</li>
+          <li><strong>Error Recovery</strong>: Continues parsing after errors to report multiple issues</li>
+          <li><strong>Location Tracking</strong>: Every AST node includes source location for error messages</li>
+        </ul>
+
+        <h4>Operator Precedence (Low to High)</h4>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Operators</th>
+              <th>Associativity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><code>or</code></td><td>Left</td></tr>
+            <tr><td>2</td><td><code>and</code></td><td>Left</td></tr>
+            <tr><td>3</td><td><code>not</code></td><td>Prefix</td></tr>
+            <tr><td>4</td><td><code>==</code>, <code>!=</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>∈</code>, <code>⊆</code></td><td>Left</td></tr>
+            <tr><td>5</td><td><code>∪</code>, <code>∩</code>, <code>∖</code></td><td>Left</td></tr>
+            <tr><td>6</td><td><code>+</code>, <code>-</code></td><td>Left</td></tr>
+            <tr><td>7</td><td><code>*</code>, <code>/</code>, <code>%</code></td><td>Left</td></tr>
+            <tr><td>8</td><td><code>^</code>, <code>**</code></td><td>Right</td></tr>
+            <tr><td>9</td><td><code>-</code> (unary), <code>not</code></td><td>Prefix</td></tr>
+            <tr><td>10</td><td><code>.</code>, <code>::</code>, <code>()</code>, <code>[]</code></td><td>Left</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- AST -->
+      <h2 id="ast">Abstract Syntax Tree</h2>
+
+      <p>
+        The AST (<code>ast_nodes.py</code>) consists of over 100 node types organized into
+        hierarchies for expressions, statements, patterns, and types.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">3</div>
+          <h3 class="phase-title">AST Design</h3>
+        </div>
+
+        <h4>Node Hierarchy</h4>
+        <div class="code-block">
+          <div class="code-block-body">
+            <pre><code>ASTNode (abstract base)
+├── Expression
+│   ├── Literal (Integer, Float, String, Boolean, None)
+│   ├── Identifier
+│   ├── BinaryExpression
+│   ├── UnaryExpression
+│   ├── CallExpression
+│   ├── MemberAccess
+│   ├── IndexExpression
+│   ├── LambdaExpression (PipeLambda)
+│   ├── MatchExpression
+│   ├── ConditionalExpression (ternary)
+│   ├── RangeExpression
+│   ├── CollectionLiteral (List, Set, Dict, Tuple)
+│   └── FString
+├── Statement
+│   ├── LetStatement
+│   ├── AssignmentStatement
+│   ├── FunctionDef
+│   ├── ClassDef / SceneDef
+│   ├── StructDef / EnumDef / ImplBlock
+│   ├── IfStatement / IfLetStatement
+│   ├── ForStatement / WhileStatement / LoopStatement
+│   ├── MatchStatement
+│   ├── ReturnStatement / BreakStatement / ContinueStatement
+│   └── UseStatement / ModuleDecl
+├── Pattern (for pattern matching)
+│   ├── LiteralPattern
+│   ├── IdentifierPattern
+│   ├── TuplePattern / ListPattern
+│   ├── ConstructorPattern
+│   ├── OrPattern / BindingPattern
+│   └── WildcardPattern / RestPattern
+└── TypeAnnotation
+    ├── SimpleType
+    ├── GenericType
+    └── FunctionType</code></pre>
+          </div>
+        </div>
+
+        <h4>Immutability</h4>
+        <p>All AST nodes are defined as frozen dataclasses with slots:</p>
+        <div class="code-block">
+          <div class="code-block-body">
+            <pre><code class="language-python">@dataclass(frozen=True, slots=True)
+class BinaryExpression(Expression):
+    left: Expression
+    operator: BinaryOperator
+    right: Expression
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_binary_expression(self)</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type Checker -->
+      <h2 id="type-checker">Stage 3: Type Checking</h2>
+
+      <p>
+        The type checker (<code>type_checker.py</code>) implements bidirectional type inference
+        with support for generics, structs, enums, and algebraic data types.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">4</div>
+          <h3 class="phase-title">Type System</h3>
+        </div>
+
+        <h4>Type Representation</h4>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Type Class</th>
+              <th>Description</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>PrimitiveType</code></td>
+              <td>Built-in scalar types</td>
+              <td>Int, Float, Bool, String</td>
+            </tr>
+            <tr>
+              <td><code>GenericTypeInstance</code></td>
+              <td>Parameterized types</td>
+              <td>List[Int], Dict[String, Float], Optional[T]</td>
+            </tr>
+            <tr>
+              <td><code>FunctionType</code></td>
+              <td>Function signatures</td>
+              <td>(Int, Int) -> Int</td>
+            </tr>
+            <tr>
+              <td><code>ClassType</code></td>
+              <td>User-defined structs/classes</td>
+              <td>Point, Vector3D</td>
+            </tr>
+            <tr>
+              <td><code>ArrayType</code></td>
+              <td>NumPy-style arrays</td>
+              <td>Array[Float, 2]</td>
+            </tr>
+            <tr>
+              <td><code>UnknownType</code></td>
+              <td>Unresolved type variable</td>
+              <td>Used during inference</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Inference Algorithm</h4>
+        <ol>
+          <li><strong>Bidirectional</strong>: Combines synthesis (bottom-up) and checking (top-down)</li>
+          <li><strong>Local Inference</strong>: Types propagate within functions without global constraint solving</li>
+          <li><strong>Explicit Annotations</strong>: Type annotations serve as ground truth</li>
+          <li><strong>Coercion</strong>: Implicit Int → Float promotion where safe</li>
+        </ol>
+
+        <h4>Built-in Types</h4>
+        <div class="code-block">
+          <div class="code-block-body">
+            <pre><code class="language-python"># Primitive types
+INT_TYPE = PrimitiveType("Int")
+FLOAT_TYPE = PrimitiveType("Float")
+BOOL_TYPE = PrimitiveType("Bool")
+STRING_TYPE = PrimitiveType("String")
+NONE_TYPE = PrimitiveType("None")
+
+# Math types
+VEC_TYPE = ArrayType(FLOAT_TYPE, 1)  # Vector
+MAT_TYPE = ArrayType(FLOAT_TYPE, 2)  # Matrix
+
+# Special types
+ANY_TYPE = AnyType()  # Accepts anything</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analyzers -->
+      <h2 id="analyzers">Analysis Passes</h2>
+
+      <p>
+        Multiple analysis passes run in parallel to gather information for optimization
+        and code generation.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">5</div>
+          <h3 class="phase-title">Purity Analyzer</h3>
+        </div>
+        <p>
+          Determines function purity by tracking side effects. Pure functions are candidates
+          for memoization and JIT compilation.
+        </p>
+        <h4>Side Effect Categories</h4>
+        <ul>
+          <li><strong>IO</strong>: print, file operations</li>
+          <li><strong>Mutation</strong>: Modifying non-local state</li>
+          <li><strong>Manim</strong>: Animation calls (play, wait)</li>
+          <li><strong>External</strong>: Calling impure functions</li>
+        </ul>
+        <div class="code-block">
+          <div class="code-block-body">
+            <pre><code class="language-python">class Purity(Enum):
+    PURE = auto()           # No side effects
+    READ_ONLY = auto()      # Reads external state
+    IMPURE = auto()         # Has side effects
+    UNKNOWN = auto()        # Cannot determine</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">6</div>
+          <h3 class="phase-title">Complexity Analyzer</h3>
+        </div>
+        <p>
+          Estimates Big-O algorithmic complexity by analyzing loop nesting and recursion patterns.
+        </p>
+        <div class="code-block">
+          <div class="code-block-body">
+            <pre><code class="language-python">class Complexity(Enum):
+    O_1 = "O(1)"           # Constant
+    O_LOG_N = "O(log n)"   # Logarithmic
+    O_N = "O(n)"           # Linear
+    O_N_LOG_N = "O(n log n)"
+    O_N_SQUARED = "O(n²)"  # Quadratic
+    O_N_CUBED = "O(n³)"    # Cubic
+    O_2_N = "O(2ⁿ)"        # Exponential</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">7</div>
+          <h3 class="phase-title">Parallel Analyzer</h3>
+        </div>
+        <p>
+          Identifies loops that can be parallelized with Numba's <code>prange</code>. Analyzes
+          data dependencies, reduction patterns, and loop-carried dependencies.
+        </p>
+        <h4>Parallelization Criteria</h4>
+        <ul>
+          <li>No loop-carried dependencies (each iteration independent)</li>
+          <li>Reduction variables detected (sum, product, min, max)</li>
+          <li>No I/O or mutation of shared state</li>
+          <li>Iteration count known or estimable</li>
+        </ul>
+      </div>
+
+      <!-- Code Generator -->
+      <h2 id="codegen">Stage 4: Code Generation</h2>
+
+      <p>
+        The code generator (<code>codegen.py</code>) transforms the AST into executable Python
+        code, handling operator translation, Manim integration, and Numba decorators.
+      </p>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-number">8</div>
+          <h3 class="phase-title">Code Generator</h3>
+        </div>
+
+        <h4>Operator Translation</h4>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>MathViz</th>
+              <th>Python</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>x ^ y</code></td><td><code>x ** y</code></td><td>Exponentiation</td></tr>
+            <tr><td><code>A ∪ B</code></td><td><code>A | B</code> or <code>A.union(B)</code></td><td>Set union</td></tr>
+            <tr><td><code>A ∩ B</code></td><td><code>A & B</code> or <code>A.intersection(B)</code></td><td>Set intersection</td></tr>
+            <tr><td><code>x ∈ S</code></td><td><code>x in S</code></td><td>Set membership</td></tr>
+            <tr><td><code>A ⊆ B</code></td><td><code>A.issubset(B)</code></td><td>Subset</td></tr>
+            <tr><td><code>sqrt(x)</code></td><td><code>np.sqrt(x)</code></td><td>Square root</td></tr>
+            <tr><td><code>sin(x)</code></td><td><code>np.sin(x)</code></td><td>Trigonometric</td></tr>
+            <tr><td><code>PI</code></td><td><code>np.pi</code></td><td>Pi constant</td></tr>
+          </tbody>
+        </table>
+
+        <h4>Struct to Dataclass</h4>
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">MathViz → Python</span>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-mviz">// MathViz
+struct Point {
+    x: Float
+    y: Float
+}
+
+impl Point {
+    fn new(x: Float, y: Float) -> Point {
+        return Point { x: x, y: y }
+    }
+}</code></pre>
+            <pre><code class="language-python"># Generated Python
+@dataclass
+class Point:
+    x: float
+    y: float
+
+def Point_new(x: float, y: float) -> Point:
+    return Point(x=x, y=y)</code></pre>
+          </div>
+        </div>
+
+        <h4>Scene to Manim Class</h4>
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">MathViz → Python</span>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-mviz">// MathViz
+scene HelloWorld {
+    fn construct(self) {
+        let text = Text("Hello")
+        play(Write(text))
+    }
+}</code></pre>
+            <pre><code class="language-python"># Generated Python
+from manim import *
+
+class HelloWorld(Scene):
+    def construct(self):
+        text = Text('Hello')
+        self.play(Write(text))</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optimizations -->
+      <h2 id="optimizations">Optimization Passes</h2>
+
+      <p>
+        The compiler includes multiple optimization passes that can be enabled for
+        high-performance numerical code.
+      </p>
+
+      <h3>Numba JIT Integration</h3>
+      <p>
+        Functions that pass purity analysis are automatically decorated with <code>@njit</code>
+        for Just-In-Time compilation to native code.
+      </p>
+      <div class="code-block">
+        <div class="code-block-body">
+          <pre><code class="language-python"># Automatic JIT decoration
+@njit(cache=True)
+def compute_sum(n: int) -> int:
+    total = 0
+    for i in range(0, n):
+        total = (total + i)
+    return total</code></pre>
+        </div>
+      </div>
+
+      <h3>Constant Folding</h3>
+      <p>
+        The <code>const_fold.py</code> module (99KB) implements multiple optimization passes:
+      </p>
+      <ul>
+        <li><strong>Constant Folding</strong>: Evaluate constant expressions at compile time</li>
+        <li><strong>Constant Propagation</strong>: Replace variables with known constant values</li>
+        <li><strong>Dead Code Elimination</strong>: Remove unreachable code</li>
+        <li><strong>Algebraic Simplification</strong>: Simplify expressions (x * 1 → x, x + 0 → x)</li>
+        <li><strong>Strength Reduction</strong>: Replace expensive ops (x * 2 → x << 1)</li>
+        <li><strong>Common Subexpression Elimination</strong>: Reuse repeated computations</li>
+      </ul>
+
+      <h3>Vectorization</h3>
+      <p>
+        The <code>vectorizer.py</code> module detects patterns that can be vectorized to
+        NumPy operations for SIMD acceleration:
+      </p>
+      <ul>
+        <li>Element-wise array operations</li>
+        <li>Reduction operations (sum, product, min, max)</li>
+        <li>Stencil computations</li>
+        <li>Broadcasting patterns</li>
+      </ul>
+
+      <h3>Memory Optimization</h3>
+      <p>
+        The <code>memory_optimizer.py</code> module optimizes memory access patterns:
+      </p>
+      <ul>
+        <li>Buffer reuse analysis</li>
+        <li>In-place operation detection</li>
+        <li>Cache-friendly loop ordering</li>
+        <li>Temporary variable elimination</li>
+        <li>Memory pool generation</li>
+      </ul>
+
+      <!-- Summary -->
+      <h2>Summary</h2>
+
+      <p>
+        The MathViz compiler is a production-grade source-to-source transpiler with:
+      </p>
+
+      <ul>
+        <li><strong>31,000+ lines</strong> of carefully crafted Python code</li>
+        <li><strong>22 modules</strong> covering all aspects of compilation</li>
+        <li><strong>8-stage pipeline</strong> with optional analysis passes</li>
+        <li><strong>Full type inference</strong> with generics and algebraic data types</li>
+        <li><strong>Automatic optimization</strong> via Numba JIT, vectorization, and constant folding</li>
+        <li><strong>Rich diagnostics</strong> with source locations and suggestions</li>
+      </ul>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Contributing</div>
+          <p class="callout-text">
+            The compiler is open source. Contributions are welcome! See the
+            <a href="https://github.com/CyberSnakeH/MathViz">GitHub repository</a> for
+            contribution guidelines.
+          </p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p class="footer-copyright">MathViz - Open Source under MIT License</p>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="footer-social-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="../assets/prism-mviz.js"></script>
+</body>
+</html>
