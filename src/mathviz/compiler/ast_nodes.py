@@ -654,16 +654,34 @@ class UnaryExpression(Expression):
 
 
 @dataclass(frozen=True, slots=True)
+class KeywordArgument(Expression):
+    """
+    A keyword/named argument in a function call.
+
+    Example:
+        Circle(radius: 1.0), func(x: 10, y: 20)
+    """
+
+    name: str
+    value: Expression
+    location: Optional[SourceLocation] = None
+
+    def accept(self, visitor: ASTVisitor) -> Any:
+        return visitor.visit_keyword_argument(self)
+
+
+@dataclass(frozen=True, slots=True)
 class CallExpression(Expression):
     """
     A function/method call expression.
 
     Example:
-        print("hello"), obj.method(x, y)
+        print("hello"), obj.method(x, y), Circle(radius: 1.0)
     """
 
     callee: Expression
     arguments: tuple[Expression, ...]
+    keyword_arguments: tuple["KeywordArgument", ...] = ()
     location: Optional[SourceLocation] = None
 
     def accept(self, visitor: ASTVisitor) -> Any:
@@ -1220,11 +1238,13 @@ class LetStatement(Statement):
     Example:
         let x: Int = 42
         let name = "Alice"
+        let mut counter = 0
     """
 
     name: str
     type_annotation: Optional[TypeAnnotation] = None
     value: Optional[Expression] = None
+    mutable: bool = False
     location: Optional[SourceLocation] = None
 
     def accept(self, visitor: ASTVisitor) -> Any:

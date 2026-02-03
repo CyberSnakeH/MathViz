@@ -36,6 +36,7 @@ class TokenType(Enum):
 
     # Keywords
     LET = auto()
+    MUT = auto()  # mut keyword for mutable variables
     CONST = auto()  # const keyword for compile-time constants
     FN = auto()
     CLASS = auto()
@@ -205,6 +206,7 @@ class TokenType(Enum):
 # Mapping of keywords to token types
 KEYWORDS: dict[str, TokenType] = {
     "let": TokenType.LET,
+    "mut": TokenType.MUT,
     "const": TokenType.CONST,
     "fn": TokenType.FN,
     "class": TokenType.CLASS,
@@ -354,12 +356,12 @@ SINGLE_CHAR_TOKENS: dict[str, TokenType] = {
 }
 
 # Two character operators (order matters - check these before single char)
+# Note: // is NOT here because it's used for comments, not integer division
 DOUBLE_CHAR_TOKENS: dict[str, TokenType] = {
     "==": TokenType.EQ,
     "!=": TokenType.NE,
     "<=": TokenType.LE,
     ">=": TokenType.GE,
-    "//": TokenType.DOUBLE_SLASH,
     "**": TokenType.DOUBLE_STAR,
     "->": TokenType.THIN_ARROW,
     "=>": TokenType.FAT_ARROW,

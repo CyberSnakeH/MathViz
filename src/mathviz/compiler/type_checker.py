@@ -1443,6 +1443,9 @@ class TypeChecker(BaseASTVisitor):
         """Record a type error (legacy simple error interface)."""
         self.errors.append(MathVizTypeError(message, location))
 
+    # Alias for _error (some code paths use _emit_error)
+    _emit_error = _error
+
     def _error_undefined_variable(
         self,
         name: str,

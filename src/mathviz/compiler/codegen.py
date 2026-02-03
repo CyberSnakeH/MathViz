@@ -54,6 +54,7 @@ from mathviz.compiler.ast_nodes import (
     BinaryExpression,
     UnaryExpression,
     CallExpression,
+    KeywordArgument,
     # Pattern matching
     Pattern,
     LiteralPattern,
@@ -640,6 +641,16 @@ class CodeGenerator(BaseASTVisitor):
         self._type_vars_declared: set[str] = set()  # Track declared TypeVars
         # Track generated modules to avoid duplicates
         self._generated_modules: set[str] = set()
+        # Track static methods from impl blocks: (type_name, method_name)
+        self._static_methods: set[tuple[str, str]] = set()
+        # Track instance methods from impl blocks: (type_name, method_name)
+        self._instance_methods: set[tuple[str, str]] = set()
+        # Track struct types for instance method detection
+        self._struct_types: set[str] = set()
+        # Track enum types and their variants: enum_name -> set of variant names
+        self._enum_variants: dict[str, set[str]] = {}
+        # Track enum variants that have data (fields)
+        self._enum_variants_with_data: set[tuple[str, str]] = set()
 
     def generate(self, program: Program) -> str:
         """
@@ -996,10 +1007,13 @@ class CodeGenerator(BaseASTVisitor):
                 super().visit_wait_statement(node)
 
             def visit_call_expression(self, node: CallExpression) -> None:
-                # Detect I/O function usage
+                # Detect I/O function usage and numpy functions
                 if isinstance(node.callee, Identifier):
                     if node.callee.name in BUILTIN_IO_FUNCTIONS:
                         self.parent._needs_io_runtime = True
+                    # Math functions that map to numpy
+                    if node.callee.name in NUMPY_FUNCTION_MAP:
+                        self.parent._needs_numpy_import = True
                 # Detect iterator method usage
                 if isinstance(node.callee, MemberAccess):
                     if node.callee.member in ITERATOR_METHOD_MAP:
@@ -1027,6 +1041,7 @@ class CodeGenerator(BaseASTVisitor):
             # OOP construct visitors
             def visit_struct_def(self, node: StructDef) -> None:
                 self.parent._needs_dataclass_import = True
+                self.parent._struct_types.add(node.name)
                 super().visit_struct_def(node)
 
             def visit_trait_def(self, node: TraitDef) -> None:
@@ -1040,9 +1055,23 @@ class CodeGenerator(BaseASTVisitor):
                     self.parent._needs_dataclass_import = True
                 else:
                     self.parent._needs_enum_import = True
+                # Track enum variants for correct codegen
+                self.parent._enum_variants[node.name] = {v.name for v in node.variants}
+                # Track which variants have data
+                for variant in node.variants:
+                    if variant.fields:
+                        self.parent._enum_variants_with_data.add((node.name, variant.name))
                 super().visit_enum_def(node)
 
             def visit_impl_block(self, node: ImplBlock) -> None:
+                # Track methods for call conversion
+                for method in node.methods:
+                    if method.has_self:
+                        # Instance methods: obj.method(args) -> Type_method(obj, args)
+                        self.parent._instance_methods.add((node.target_type, method.name))
+                    else:
+                        # Static methods: Type.method(args) -> Type_method(args)
+                        self.parent._static_methods.add((node.target_type, method.name))
                 super().visit_impl_block(node)
 
         analyzer = ImportAnalyzer()
@@ -1273,7 +1302,18 @@ class CodeGenerator(BaseASTVisitor):
             if method_name in ITERATOR_METHOD_MAP:
                 return self._generate_iterator_method_call(node)
 
-        args = ", ".join(self._generate_expr(arg) for arg in node.arguments)
+        # Generate positional arguments
+        positional_args = [self._generate_expr(arg) for arg in node.arguments]
+
+        # Generate keyword arguments
+        keyword_args = [
+            f"{kwarg.name}={self._generate_expr(kwarg.value)}"
+            for kwarg in node.keyword_arguments
+        ]
+
+        # Combine all arguments
+        all_args = positional_args + keyword_args
+        args = ", ".join(all_args)
 
         # Check if we should convert to numpy function or I/O function
         if isinstance(node.callee, Identifier):
@@ -1289,6 +1329,25 @@ class CodeGenerator(BaseASTVisitor):
                 if func_name in NUMPY_FUNCTION_MAP:
                     self._needs_numpy_import = True
                     return f"{NUMPY_FUNCTION_MAP[func_name]}({args})"
+
+        # Check for static method calls: Type.method() -> Type_method()
+        if isinstance(node.callee, MemberAccess):
+            if isinstance(node.callee.object, Identifier):
+                type_name = node.callee.object.name
+                method_name = node.callee.member
+                if (type_name, method_name) in self._static_methods:
+                    return f"{type_name}_{method_name}({args})"
+
+            # Check for instance method calls: obj.method(args) -> Type_method(obj, args)
+            method_name = node.callee.member
+            for struct_type, m_name in self._instance_methods:
+                if m_name == method_name:
+                    # Found matching instance method - convert call
+                    obj = self._generate_expr(node.callee.object)
+                    if args:
+                        return f"{struct_type}_{method_name}({obj}, {args})"
+                    else:
+                        return f"{struct_type}_{method_name}({obj})"
 
         callee = self._generate_expr(node.callee)
         return f"{callee}({args})"
@@ -2484,12 +2543,20 @@ class CodeGenerator(BaseASTVisitor):
 
     def visit_play_statement(self, node: PlayStatement) -> None:
         """Generate code for a Manim play statement."""
-        animation = self._generate_expr(node.animation)
+        # Check if animation is a tuple literal (multiple animations)
+        if isinstance(node.animation, TupleLiteral):
+            # Unpack tuple elements as separate arguments
+            animations = ", ".join(
+                self._generate_expr(elem) for elem in node.animation.elements
+            )
+        else:
+            animations = self._generate_expr(node.animation)
+
         if node.run_time:
             run_time = self._generate_expr(node.run_time)
-            self._emit(f"self.play({animation}, run_time={run_time})")
+            self._emit(f"self.play({animations}, run_time={run_time})")
         else:
-            self._emit(f"self.play({animation})")
+            self._emit(f"self.play({animations})")
 
     def visit_wait_statement(self, node: WaitStatement) -> None:
         """Generate code for a Manim wait statement."""
@@ -2599,6 +2666,11 @@ class CodeGenerator(BaseASTVisitor):
             method_name = method.name
             if trait_info and method.name == trait_info.method_name:
                 method_name = trait_info.python_magic
+            else:
+                # Both instance and static methods get prefixed with type name
+                # Static: Type.method(args) -> Type_method(args)
+                # Instance: obj.method(args) -> Type_method(obj, args)
+                method_name = f"{node.target_type}_{method.name}"
 
             self._generate_method(method, node.target_type, method_name_override=method_name)
             self._emit("")
@@ -2844,16 +2916,26 @@ class CodeGenerator(BaseASTVisitor):
 
     def visit_enum_variant_access(self, node: EnumVariantAccess) -> str:
         """
-        Generate code for enum variant access.
+        Generate code for enum variant access or struct static method.
 
         Example:
             Shape::Circle -> Circle (for dataclass variants with data)
-            Color::Red -> Color.Red (for simple enums)
+            Color::Red -> Red() (for simple enums without data)
+            Point::new -> Point_new (for struct static methods)
         """
-        # For dataclass-based enums (with associated data), use the variant class directly
-        # For Python Enum (simple enums), use dot notation
-        # We use variant name directly since dataclass variants are top-level classes
-        return node.variant_name
+        # Check if this is an enum variant access
+        if node.enum_name in self._enum_variants:
+            if node.variant_name in self._enum_variants[node.enum_name]:
+                # It's an enum variant
+                if (node.enum_name, node.variant_name) in self._enum_variants_with_data:
+                    # Variant has data - will be called as function, just return class name
+                    return node.variant_name
+                else:
+                    # Variant has no data - create instance directly
+                    return f"{node.variant_name}()"
+
+        # Otherwise it's a static method from an impl block
+        return f"{node.enum_name}_{node.variant_name}"
 
     def visit_struct_literal(self, node: StructLiteral) -> str:
         """

@@ -120,6 +120,24 @@ class Lexer:
             while self._current_char is not None and self._current_char != "\n":
                 self._advance()
 
+    def _skip_double_slash_comment(self) -> bool:
+        """Skip single-line comments starting with //.
+
+        Returns True if a comment was skipped.
+        """
+        if self._current_char == "/" and self._peek_char == "/":
+            # Make sure it's not a doc comment (///)
+            if self._peek_ahead(2) == "/":
+                return False  # Let doc comment handler deal with it
+            # Skip the //
+            self._advance()
+            self._advance()
+            # Skip until end of line
+            while self._current_char is not None and self._current_char != "\n":
+                self._advance()
+            return True
+        return False
+
     def _read_doc_comment(self) -> Token | None:
         """
         Read a documentation comment.
@@ -691,6 +709,10 @@ class Lexer:
                     doc_token = self._read_doc_comment()
                     if doc_token:
                         return doc_token
+
+            # Check for // single-line comments (before treating / as operator)
+            if self._skip_double_slash_comment():
+                continue
 
             if self._current_char == "#":
                 self._skip_comment()

@@ -37,6 +37,7 @@ from mathviz.compiler.ast_nodes import (
     BinaryExpression,
     UnaryExpression,
     CallExpression,
+    KeywordArgument,
     MemberAccess,
     IndexExpression,
     ConditionalExpression,
@@ -603,9 +604,13 @@ class Parser:
             let x = value
             let x: Type = value
             let x: Type
+            let mut x = value  (mutable variable)
         """
         loc = self._current.location
         self._advance()  # consume 'let'
+
+        # Check for mut keyword
+        mutable = self._match(TokenType.MUT)
 
         name = self._expect(TokenType.IDENTIFIER, "Expected variable name").value
 
@@ -621,6 +626,7 @@ class Parser:
             name=name,
             type_annotation=type_annotation,
             value=value,
+            mutable=mutable,
             location=loc,
         )
 
@@ -787,6 +793,7 @@ class Parser:
         Handles:
             fn name(params) { body }
             fn name(params) -> ReturnType { body }
+            fn name(params) -> ReturnType = expr  (expression body)
             fn name<T, U>(params) -> ReturnType { body }
             fn name<T: Bound>(params) -> ReturnType { body }
             fn name<T>(params) -> ReturnType where T: Bound { body }
@@ -816,9 +823,17 @@ class Parser:
         if self._check(TokenType.WHERE):
             where_clause = self._parse_where_clause()
 
-        # Body
+        # Body: either block { } or expression body = expr
         self._skip_newlines()
-        body = self._parse_block()
+        if self._match(TokenType.ASSIGN):
+            # Expression body: fn name(params) -> Type = expr
+            expr = self._parse_expression()
+            # Wrap expression in a return statement inside a block
+            return_stmt = ReturnStatement(value=expr, location=expr.location)
+            body = Block(statements=(return_stmt,), location=loc)
+        else:
+            # Block body: fn name(params) { body }
+            body = self._parse_block()
 
         return FunctionDef(
             name=name,
@@ -1336,29 +1351,53 @@ class Parser:
 
     def _parse_play(self) -> PlayStatement:
         """
-        Parse a Manim play statement.
+        Parse a Manim play statement (supports multiline and multiple animations).
 
         Handles:
             play(Create(circle))
+            play(FadeIn(a), Write(b))
             play(Transform(a, b), run_time=2.0)
+            play(
+                circle.animate.set_color(PURPLE),
+                square.animate.set_color(ORANGE)
+            )
         """
         loc = self._current.location
         self._advance()  # consume 'play'
 
         self._expect(TokenType.LPAREN, "Expected '(' after play")
 
-        animation = self._parse_expression()
+        # Skip newlines after opening paren
+        self._skip_newlines()
 
-        # Check for run_time keyword argument
+        # Parse first animation
+        animations: list[Expression] = [self._parse_expression()]
+
+        self._skip_newlines()
+
+        # Check for more animations or run_time keyword argument
         run_time = None
-        if self._match(TokenType.COMMA):
-            # Could be run_time=value
+        while self._match(TokenType.COMMA):
+            self._skip_newlines()
+            # Check if it's run_time=value
             if self._check(TokenType.IDENTIFIER) and self._current.value == "run_time":
                 self._advance()
                 self._expect(TokenType.ASSIGN, "Expected '=' after run_time")
                 run_time = self._parse_expression()
+                break
+            # Otherwise it's another animation
+            animations.append(self._parse_expression())
+            self._skip_newlines()
 
+        self._skip_newlines()
         self._expect(TokenType.RPAREN, "Expected ')' after play arguments")
+
+        # If multiple animations, wrap in a tuple for codegen
+        if len(animations) == 1:
+            animation = animations[0]
+        else:
+            # Create a tuple of animations
+            animation = TupleLiteral(elements=tuple(animations), location=loc)
 
         return PlayStatement(
             animation=animation,
@@ -1693,9 +1732,14 @@ class Parser:
 
         # Function call
         if self._match(TokenType.LPAREN):
-            args = self._parse_arguments()
+            positional_args, keyword_args = self._parse_arguments()
             self._expect(TokenType.RPAREN, "Expected ')' after arguments")
-            left = CallExpression(callee=left, arguments=tuple(args), location=loc)
+            left = CallExpression(
+                callee=left,
+                arguments=tuple(positional_args),
+                keyword_arguments=tuple(keyword_args),
+                location=loc
+            )
             return self._continue_postfix(left)
 
         # Index access
@@ -1750,11 +1794,12 @@ class Parser:
         """Continue parsing postfix operations (calls, indexing, member access, unwrap)."""
         while True:
             if self._match(TokenType.LPAREN):
-                args = self._parse_arguments()
+                positional_args, keyword_args = self._parse_arguments()
                 self._expect(TokenType.RPAREN, "Expected ')' after arguments")
                 expr = CallExpression(
                     callee=expr,
-                    arguments=tuple(args),
+                    arguments=tuple(positional_args),
+                    keyword_arguments=tuple(keyword_args),
                     location=expr.location,
                 )
             elif self._match(TokenType.LBRACKET):
@@ -2138,17 +2183,45 @@ class Parser:
             location=loc,
         )
 
-    def _parse_arguments(self) -> list[Expression]:
-        """Parse function call arguments."""
-        args: list[Expression] = []
+    def _parse_arguments(self) -> tuple[list[Expression], list[KeywordArgument]]:
+        """Parse function call arguments (supports multiline and keyword args).
 
+        Returns a tuple of (positional_args, keyword_args).
+        """
+        positional_args: list[Expression] = []
+        keyword_args: list[KeywordArgument] = []
+        seen_keyword = False
+
+        self._skip_newlines()
         if not self._check(TokenType.RPAREN):
             while True:
-                args.append(self._parse_expression())
+                self._skip_newlines()
+
+                # Check for keyword argument: identifier followed by colon
+                if (self._check(TokenType.IDENTIFIER) and
+                    self.pos + 1 < len(self.tokens) and
+                    self.tokens[self.pos + 1].type == TokenType.COLON):
+                    # It's a keyword argument
+                    loc = self._current.location
+                    name = self._current.value
+                    self._advance()  # consume identifier
+                    self._advance()  # consume colon
+                    value = self._parse_expression()
+                    keyword_args.append(KeywordArgument(name=name, value=value, location=loc))
+                    seen_keyword = True
+                else:
+                    # Positional argument
+                    if seen_keyword:
+                        self._error("Positional argument cannot follow keyword argument")
+                    positional_args.append(self._parse_expression())
+
+                self._skip_newlines()
                 if not self._match(TokenType.COMMA):
                     break
+                self._skip_newlines()
 
-        return args
+        self._skip_newlines()
+        return positional_args, keyword_args
 
     def _parse_expression_list(self, end_token: TokenType) -> list[Expression]:
         """Parse a comma-separated list of expressions."""
