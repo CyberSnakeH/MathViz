@@ -19,13 +19,21 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "manim>=0.18.0",
     "numba>=0.60.0",
     "numpy>=1.26.0",
 ]
 
 [project.optional-dependencies]
+manim = [
+    "manim>=0.18.0",
+]
 dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+]
+ci = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
     "ruff>=0.3.0",
@@ -39,6 +47,7 @@ lsp = [
     "lsprotocol>=2023.0.0", # LSP type definitions
 ]
 all = [
+    "manim>=0.18.0",
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
     "ruff>=0.3.0",

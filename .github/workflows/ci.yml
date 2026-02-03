@@ -26,29 +26,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install system dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            pkg-config \
-            python3-dev \
-            libcairo2-dev \
-            libpango1.0-dev \
-            libglib2.0-dev \
-            libffi-dev \
-            ffmpeg \
-            texlive \
-            texlive-latex-extra
-          # Verify pangocairo is available via pkg-config
-          pkg-config --modversion pangocairo
-
-      - name: Install system dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install pango cairo ffmpeg
-
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
@@ -58,7 +35,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --extra ci
 
       - name: Run tests (excluding LSP)
         run: uv run pytest --tb=short -q --ignore=tests/unit/lsp/
@@ -80,7 +57,7 @@ jobs:
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --extra ci
 
       - name: Check formatting
         run: uv run ruff format --check src tests
