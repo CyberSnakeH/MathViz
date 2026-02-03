@@ -13,14 +13,16 @@
   <a href="https://github.com/CyberSnakeH/MathViz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/CyberSnakeH/MathViz?style=flat-square&color=9ece6a" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12+-bb9af7?style=flat-square" alt="Python"></a>
   <a href="https://github.com/CyberSnakeH/MathViz/stargazers"><img src="https://img.shields.io/github/stars/CyberSnakeH/MathViz?style=flat-square&color=e0af68" alt="Stars"></a>
+  <a href="https://cybersnakeh.github.io/MathViz"><img src="https://img.shields.io/badge/docs-website-7dcfff?style=flat-square" alt="Website"></a>
 </p>
 
 <p align="center">
+  <a href="https://cybersnakeh.github.io/MathViz">Website</a> •
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#editor">Editor</a> •
-  <a href="#documentation">Documentation</a>
+  <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 ---
@@ -270,13 +272,26 @@ mathviz-lsp
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our **[Contributing Guide](CONTRIBUTING.md)** for details on:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- Development environment setup
+- Code style and conventions
+- Commit message guidelines
+- Testing requirements
+- Pull request process
+
+Quick start:
+
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/MathViz.git
+cd MathViz
+
+# Create a branch
+git checkout -b feature/my-feature
+
+# Make changes, then submit a PR
+```
 
 ## License
 
