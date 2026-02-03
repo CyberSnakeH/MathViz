@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/CyberSnakeH/MathViz/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/CyberSnakeH/MathViz/ci.yml?style=flat-square&label=CI" alt="CI"></a>
   <a href="https://github.com/CyberSnakeH/MathViz/releases"><img src="https://img.shields.io/github/v/release/CyberSnakeH/MathViz?style=flat-square&color=7aa2f7" alt="Release"></a>
   <a href="https://github.com/CyberSnakeH/MathViz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/CyberSnakeH/MathViz?style=flat-square&color=9ece6a" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12+-bb9af7?style=flat-square" alt="Python"></a>
