@@ -285,7 +285,7 @@ Quick start:
 
 ```bash
 # Fork and clone
-git clone https://github.com/YOUR_USERNAME/MathViz.git
+git clone https://github.com/CyberSnakeH/MathViz.git
 cd MathViz
 
 # Create a branch
