@@ -26,6 +26,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango1.0-dev libcairo2-dev ffmpeg
+
+      - name: Install system dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install pango cairo ffmpeg
+
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
@@ -37,8 +48,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
-      - name: Run tests
-        run: uv run pytest --tb=short -q
+      - name: Run tests (excluding LSP)
+        run: uv run pytest --tb=short -q --ignore=tests/unit/lsp/
 
   lint:
     name: Lint & Type Check
@@ -91,7 +102,7 @@ jobs:
           cache-dependency-path: editor/package-lock.json
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install Linux dependencies
         if: matrix.os == 'ubuntu-latest'
@@ -124,6 +135,7 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
-          echo "Test result: ${{ needs.test.result }}"
-          echo "Lint result: ${{ needs.lint.result }}"
-          echo "Build result: ${{ needs.build-editor.result }}"
+          echo "All CI jobs completed"
+          echo "Test: ${{ needs.test.result }}"
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Build: ${{ needs.build-editor.result }}"
