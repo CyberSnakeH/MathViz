@@ -54,11 +54,25 @@ jobs:
         uses: tauri-apps/tauri-action@action-v0.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_SIGNING_IDENTITY: "-"
         with:
           projectPath: editor
           tagName: ${{ github.ref_name }}
           releaseName: "MathViz Editor ${{ github.ref_name }}"
-          releaseBody: "Téléchargez l'installateur correspondant à votre OS."
+          releaseBody: |
+            ## Installation
+
+            ### Windows
+            Téléchargez et exécutez le fichier `.msi` ou `.exe`.
+
+            ### macOS
+            1. Téléchargez le fichier `.dmg`
+            2. Ouvrez le DMG et glissez l'app dans Applications
+            3. **Important:** Faites clic-droit sur l'app → "Ouvrir" (première fois uniquement)
+               - Ou dans Terminal: `xattr -cr /Applications/MathViz\ Editor.app`
+
+            ### Linux
+            Téléchargez le fichier `.AppImage`, rendez-le exécutable (`chmod +x`), puis lancez-le.
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
