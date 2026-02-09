@@ -29,5 +29,6 @@ Thumbs.db
 # Manim output (except tutorial videos)
 *.mp4
 !examples/videos/tutorials/*.mp4
+!examples/videos/advanced/*.mp4
 *.png
 *.svg

@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Module Examples - MathViz</title>
+  <meta name="description" content="15 advanced MathViz examples showcasing the module system: graphs, sorting, algebra, fractals, probability, and more.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="nav-header">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <div class="nav-brand-icon">M</div>
+        MathViz
+      </a>
+      <nav class="nav-links">
+        <a href="../docs/getting-started.html" class="nav-link">Docs</a>
+        <a href="../docs/language-reference.html" class="nav-link">Language</a>
+        <a href="../docs/scenes.html" class="nav-link">Manim</a>
+        <a href="../docs/cli.html" class="nav-link">CLI</a>
+        <a href="index.html" class="nav-link active">Examples</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar" id="advanced-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Examples</div>
+        <nav class="sidebar-nav">
+          <a href="index.html" class="sidebar-link">Code Examples</a>
+          <a href="gallery.html" class="sidebar-link">Tutorials</a>
+          <a href="advanced.html" class="sidebar-link active">Advanced Modules</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Graph Theory</div>
+        <nav class="sidebar-nav" id="adv-nav-graphs">
+          <a href="#ex-graphe" class="sidebar-link tutorial-nav-link"><span class="step-num">1</span> Graphs</a>
+          <a href="#ex-bfs" class="sidebar-link tutorial-nav-link"><span class="step-num">2</span> BFS</a>
+          <a href="#ex-dfs" class="sidebar-link tutorial-nav-link"><span class="step-num">3</span> DFS</a>
+          <a href="#ex-dijkstra" class="sidebar-link tutorial-nav-link"><span class="step-num">4</span> Dijkstra</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Sorting</div>
+        <nav class="sidebar-nav" id="adv-nav-sort">
+          <a href="#ex-tri-bulles" class="sidebar-link tutorial-nav-link"><span class="step-num">5</span> Bubble Sort</a>
+          <a href="#ex-tri-rapide" class="sidebar-link tutorial-nav-link"><span class="step-num">6</span> Quicksort</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Linear Algebra</div>
+        <nav class="sidebar-nav" id="adv-nav-algebra">
+          <a href="#ex-matrices" class="sidebar-link tutorial-nav-link"><span class="step-num">7</span> Matrices</a>
+          <a href="#ex-vecteurs" class="sidebar-link tutorial-nav-link"><span class="step-num">8</span> Vectors</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Data Structures</div>
+        <nav class="sidebar-nav" id="adv-nav-ds">
+          <a href="#ex-arbre" class="sidebar-link tutorial-nav-link"><span class="step-num">9</span> Binary Tree</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Mathematics</div>
+        <nav class="sidebar-nav" id="adv-nav-math">
+          <a href="#ex-fractales" class="sidebar-link tutorial-nav-link"><span class="step-num">10</span> Fractals</a>
+          <a href="#ex-premiers" class="sidebar-link tutorial-nav-link"><span class="step-num">11</span> Primes</a>
+          <a href="#ex-fibonacci" class="sidebar-link tutorial-nav-link"><span class="step-num">12</span> Fibonacci</a>
+          <a href="#ex-ensembles" class="sidebar-link tutorial-nav-link"><span class="step-num">13</span> Sets</a>
+          <a href="#ex-complexes" class="sidebar-link tutorial-nav-link"><span class="step-num">14</span> Complex</a>
+          <a href="#ex-probabilites" class="sidebar-link tutorial-nav-link"><span class="step-num">15</span> Probability</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Documentation</div>
+        <nav class="sidebar-nav">
+          <a href="../docs/modules.html" class="sidebar-link">Module System</a>
+          <a href="../docs/language-reference.html" class="sidebar-link">Language Reference</a>
+          <a href="../docs/cli.html" class="sidebar-link">CLI Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Advanced Module Examples</h1>
+      <p class="tutorial-subtitle">15 real-world examples showcasing the MathViz module system</p>
+
+      <div class="callout">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">The Module System</div>
+          <p class="callout-text">
+            MathViz modules let you organize reusable logic into separate <code>.mviz</code> files.
+            Use <code>pub fn</code> to export functions and <code>use module_name</code> to import them.
+            The compiler inlines modules as Python classes with <code>@staticmethod</code> methods.
+            Each example below shows the <strong>module</strong>, the <strong>scene</strong>, and the <strong>compiled output</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="tutorial-progress" id="tutorial-progress">
+        <div class="tutorial-progress-bar">
+          <div class="tutorial-progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="tutorial-progress-text" id="progress-text">0 / 15</span>
+      </div>
+
+      <!-- ============================
+           GRAPH THEORY
+           ============================ -->
+      <div class="tutorial-level-header" id="level-graphs">
+        <span class="tutorial-level-badge beginner">Graph Theory</span>
+        <h2 class="tutorial-level-title">Graphs, BFS, DFS, Dijkstra</h2>
+        <p class="tutorial-level-desc">Build a reusable graph module and use it in multiple traversal algorithms.</p>
+      </div>
+
+      <!-- EXAMPLE 1: Graph Basics -->
+      <section class="tutorial-section" id="ex-graphe">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">1</span>
+          <h2 class="tutorial-section-title">Graph Basics</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Create a reusable <code>graphe</code> module with <code>pub fn</code> exports</li>
+            <li>Import modules with <code>use graphe</code></li>
+            <li>Call module functions: <code>graphe.create_graph()</code>, <code>graphe.get_neighbors()</code></li>
+            <li>Visualize nodes, edges, and highlight neighbors</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-1">
+              <span class="tab-dot mviz"></span> graphe.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-1">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-1">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-1">
+            <pre><code class="language-mviz">// Module graphe - structures de donnees et operations sur les graphes
+
+/// Cree un graphe a partir d'une liste de noeuds et d'aretes
+pub fn create_graph(nodes, edges) {
+    return {"nodes": nodes, "edges": edges}
+}
+
+/// Retourne les voisins d'un noeud dans le graphe
+pub fn get_neighbors(graph, node) {
+    let neighbors = []
+    for edge in graph["edges"] {
+        if edge[0] == node {
+            neighbors = neighbors + [edge[1]]
+        }
+        if edge[1] == node {
+            neighbors = neighbors + [edge[0]]
+        }
+    }
+    return neighbors
+}
+
+/// Calcule le degre d'un noeud
+pub fn degree(graph, node) {
+    let count = 0
+    for edge in graph["edges"] {
+        if edge[0] == node or edge[1] == node {
+            count = count + 1
+        }
+    }
+    return count
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-1">
+            <pre><code class="language-mviz">// Visualisation d'un graphe simple avec noeuds et aretes
+use graphe
+
+scene GrapheBasicsScene {
+    fn construct(self) {
+        let title = Text("Graphe : Structure de base", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let pos_a = LEFT * 2 + UP
+        let pos_b = RIGHT * 2 + UP
+        let pos_c = RIGHT * 2 + DOWN
+        let pos_d = LEFT * 2 + DOWN
+        let pos_e = ORIGIN
+        let positions = {"A": pos_a, "B": pos_b, "C": pos_c, "D": pos_d, "E": pos_e}
+
+        let nodes = ["A", "B", "C", "D", "E"]
+        let edges = [["A", "B"], ["A", "E"], ["B", "C"], ["B", "E"], ["C", "D"], ["D", "E"]]
+        let g = graphe.create_graph(nodes, edges)
+
+        for edge in edges {
+            let line = Line(positions[edge[0]], positions[edge[1]], color: GRAY, stroke_width: 2)
+            self.play(Create(line), run_time: 0.2)
+        }
+
+        let node_circles = {}
+        for name in nodes {
+            let c = Circle(radius: 0.3, color: BLUE, fill_opacity: 0.8)
+            c.move_to(positions[name])
+            let label = Text(name, font_size: 24, color: WHITE)
+            label.move_to(positions[name])
+            node_circles[name] = c
+            self.play(Create(c), Write(label), run_time: 0.3)
+        }
+
+        self.wait(0.5)
+
+        let neighbors_e = graphe.get_neighbors(g, "E")
+        let deg_e = graphe.degree(g, "E")
+        let info = Text(f"Voisins de E : {neighbors_e}  Degre : {deg_e}", font_size: 24)
+        info.to_edge(DOWN)
+        self.play(Write(info))
+
+        self.play(node_circles["E"].animate.set_color(YELLOW))
+        for n in neighbors_e {
+            self.play(node_circles[n].animate.set_color(GREEN), run_time: 0.3)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-1">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: graphe
+class graphe:
+    @staticmethod
+    def create_graph(nodes, edges):
+        return {'nodes': nodes, 'edges': edges}
+    @staticmethod
+    def get_neighbors(graph, node):
+        neighbors = []
+        for edge in graph['edges']:
+            if (edge[0] == node):
+                neighbors = (neighbors + [edge[1]])
+            if (edge[1] == node):
+                neighbors = (neighbors + [edge[0]])
+        return neighbors
+    @staticmethod
+    def degree(graph, node):
+        count = 0
+        for edge in graph['edges']:
+            if ((edge[0] == node) or (edge[1] == node)):
+                count = (count + 1)
+        return count
+
+class GrapheBasicsScene(Scene):
+    def construct(self):
+        title = Text('Graphe : Structure de base', font_size=36)
+        title.to_edge(UP)
+        self.play(Write(title))
+        # ... scene code uses graphe.create_graph(), graphe.get_neighbors(), etc.</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/GrapheBasicsScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 2: BFS -->
+      <section class="tutorial-section" id="ex-bfs">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">2</span>
+          <h2 class="tutorial-section-title">Breadth-First Search (BFS)</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>bfs</code> module that depends on the <code>graphe</code> module</li>
+            <li>Chain module dependencies: <code>bfs.mviz</code> uses <code>graphe</code>, <code>main.mviz</code> uses both</li>
+            <li>Implement a queue-based BFS traversal</li>
+            <li>Animate traversal order with step numbering</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-2">
+              <span class="tab-dot mviz"></span> bfs.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-2">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-2">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-2">
+            <pre><code class="language-mviz">// Module BFS - Parcours en largeur d'un graphe
+use graphe
+
+/// Effectue un parcours en largeur et retourne l'ordre de visite
+pub fn bfs(graph, start) {
+    let visited = []
+    let queue = [start]
+    while len(queue) > 0 {
+        let current = queue.pop(0)
+        if current not in visited {
+            visited = visited + [current]
+            let neighbors = graphe.get_neighbors(graph, current)
+            for n in neighbors {
+                if n not in visited {
+                    queue = queue + [n]
+                }
+            }
+        }
+    }
+    return visited
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-2">
+            <pre><code class="language-mviz">// Animation du parcours en largeur (BFS)
+use graphe
+use bfs
+
+scene BFSScene {
+    fn construct(self) {
+        let title = Text("Parcours en Largeur (BFS)", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let pos_a = LEFT * 3
+        let pos_b = LEFT * 1.5 + UP * 1.5
+        let pos_c = LEFT * 1.5 + DOWN * 1.5
+        let pos_d = RIGHT * 0.5 + UP * 1.5
+        let pos_e = RIGHT * 0.5 + DOWN * 1.5
+        let pos_f = RIGHT * 2.5
+        let positions = {"A": pos_a, "B": pos_b, "C": pos_c, "D": pos_d, "E": pos_e, "F": pos_f}
+
+        let nodes = ["A", "B", "C", "D", "E", "F"]
+        let edges = [["A", "B"], ["A", "C"], ["B", "D"], ["C", "E"], ["D", "F"], ["E", "F"]]
+        let g = graphe.create_graph(nodes, edges)
+
+        for edge in edges {
+            let line = Line(positions[edge[0]], positions[edge[1]], color: GRAY, stroke_width: 2)
+            self.play(Create(line), run_time: 0.15)
+        }
+
+        let circles = {}
+        for name in nodes {
+            let c = Circle(radius: 0.3, color: BLUE_D, fill_opacity: 0.7)
+            c.move_to(positions[name])
+            let label = Text(name, font_size: 22, color: WHITE)
+            label.move_to(positions[name])
+            circles[name] = c
+            self.play(Create(c), Write(label), run_time: 0.2)
+        }
+
+        self.wait(0.5)
+
+        let visit_order = bfs.bfs(g, "A")
+        let step = 1
+        for node in visit_order {
+            let order_text = Text(str(step), font_size: 18, color: BLACK)
+            order_text.move_to(positions[node] + UP * 0.6)
+            self.play(circles[node].animate.set_color(YELLOW), Write(order_text), run_time: 0.5)
+            step = step + 1
+        }
+
+        let result_text = Text(f"Ordre BFS : {visit_order}", font_size: 22)
+        result_text.to_edge(DOWN)
+        self.play(Write(result_text))
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-2">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: graphe
+class graphe:
+    @staticmethod
+    def create_graph(nodes, edges):
+        return {'nodes': nodes, 'edges': edges}
+    @staticmethod
+    def get_neighbors(graph, node):
+        neighbors = []
+        for edge in graph['edges']:
+            if (edge[0] == node):
+                neighbors = (neighbors + [edge[1]])
+            if (edge[1] == node):
+                neighbors = (neighbors + [edge[0]])
+        return neighbors
+
+# MathViz module: bfs
+class bfs:
+    @staticmethod
+    def bfs(graph, start):
+        visited = []
+        queue = [start]
+        while len(queue) > 0:
+            current = queue.pop(0)
+            if current not in visited:
+                visited = visited + [current]
+                neighbors = graphe.get_neighbors(graph, current)
+                for n in neighbors:
+                    if n not in visited:
+                        queue = queue + [n]
+        return visited
+
+class BFSScene(Scene):
+    def construct(self):
+        # ... uses graphe.create_graph() and bfs.bfs()</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/BFSScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 3: DFS -->
+      <section class="tutorial-section" id="ex-dfs">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">3</span>
+          <h2 class="tutorial-section-title">Depth-First Search (DFS)</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Reuse the same <code>graphe</code> module with a different algorithm</li>
+            <li>Implement stack-based DFS traversal</li>
+            <li>Compare BFS (yellow) vs DFS (red) visually</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-3">
+              <span class="tab-dot mviz"></span> dfs.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-3">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-3">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-3">
+            <pre><code class="language-mviz">// Module DFS - Parcours en profondeur
+use graphe
+
+/// Effectue un parcours en profondeur et retourne l'ordre de visite
+pub fn dfs(graph, start) {
+    let visited = []
+    let stack = [start]
+    while len(stack) > 0 {
+        let current = stack.pop()
+        if current not in visited {
+            visited = visited + [current]
+            let neighbors = graphe.get_neighbors(graph, current)
+            for n in reversed(neighbors) {
+                if n not in visited {
+                    stack = stack + [n]
+                }
+            }
+        }
+    }
+    return visited
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-3">
+            <pre><code class="language-mviz">// Animation du parcours en profondeur (DFS)
+use graphe
+use dfs
+
+scene DFSScene {
+    fn construct(self) {
+        let title = Text("Parcours en Profondeur (DFS)", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let pos_1 = LEFT * 3
+        let pos_2 = LEFT * 1.5 + UP * 1.5
+        let pos_3 = LEFT * 1.5 + DOWN * 1.5
+        let pos_4 = ORIGIN + UP * 1.5
+        let pos_5 = ORIGIN + DOWN * 1.5
+        let pos_6 = RIGHT * 2
+        let positions = {"1": pos_1, "2": pos_2, "3": pos_3, "4": pos_4, "5": pos_5, "6": pos_6}
+
+        let nodes = ["1", "2", "3", "4", "5", "6"]
+        let edges = [["1", "2"], ["1", "3"], ["2", "4"], ["3", "5"], ["4", "6"], ["5", "6"]]
+        let g = graphe.create_graph(nodes, edges)
+
+        // ... draw edges and nodes, then animate DFS
+        let visit_order = dfs.dfs(g, "1")
+        let step = 1
+        for node in visit_order {
+            self.play(circles[node].animate.set_color(RED), run_time: 0.5)
+            step = step + 1
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-3">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: graphe  (same as before)
+class graphe:
+    @staticmethod
+    def create_graph(nodes, edges): ...
+    @staticmethod
+    def get_neighbors(graph, node): ...
+
+# MathViz module: dfs
+class dfs:
+    @staticmethod
+    def dfs(graph, start):
+        visited = []
+        stack = [start]
+        while len(stack) > 0:
+            current = stack.pop()
+            if current not in visited:
+                visited = visited + [current]
+                neighbors = graphe.get_neighbors(graph, current)
+                for n in reversed(neighbors):
+                    if n not in visited:
+                        stack = stack + [n]
+        return visited
+
+class DFSScene(Scene):
+    def construct(self):
+        # ... uses graphe and dfs modules</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/DFSScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 4: Dijkstra -->
+      <section class="tutorial-section" id="ex-dijkstra">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">4</span>
+          <h2 class="tutorial-section-title">Dijkstra's Algorithm</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Extend the graph module with weighted edges</li>
+            <li>Implement Dijkstra's shortest path algorithm</li>
+            <li>Animate distance labels and path highlighting</li>
+            <li>Return structured results with <code>{"path": ..., "dist": ..., "steps": ...}</code></li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-4">
+              <span class="tab-dot mviz"></span> dijkstra.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-4">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-4">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-4">
+            <pre><code class="language-mviz">// Module Dijkstra - plus court chemin dans un graphe pondere
+use graphe
+
+/// Algorithme de Dijkstra retournant les distances et le chemin
+pub fn dijkstra(graph, start, end) {
+    let dist = {}
+    let prev = {}
+    let unvisited = list(graph["nodes"])
+    for node in graph["nodes"] {
+        dist[node] = 999999
+        prev[node] = None
+    }
+    dist[start] = 0
+
+    let steps = []
+
+    while len(unvisited) > 0 {
+        // Trouver le noeud non visite avec la plus petite distance
+        let current = None
+        let min_dist = 999999
+        for node in unvisited {
+            if dist[node] &lt; min_dist {
+                min_dist = dist[node]
+                current = node
+            }
+        }
+
+        if current == None { break }
+        unvisited.remove(current)
+        steps = steps + [{"visit": current, "dist": dist[current]}]
+
+        if current == end { break }
+
+        let neighbors = graphe.get_weighted_neighbors(graph, current)
+        for neighbor in neighbors {
+            let alt = dist[current] + neighbor["weight"]
+            if alt &lt; dist[neighbor["node"]] {
+                dist[neighbor["node"]] = alt
+                prev[neighbor["node"]] = current
+            }
+        }
+    }
+
+    // Reconstruire le chemin
+    let path = []
+    let current = end
+    while current != None {
+        path = [current] + path
+        current = prev[current]
+    }
+
+    return {"path": path, "dist": dist, "steps": steps}
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-4">
+            <pre><code class="language-mviz">// Visualisation de l'algorithme de Dijkstra
+use graphe
+use dijkstra
+
+scene DijkstraScene {
+    fn construct(self) {
+        let title = Text("Algorithme de Dijkstra", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let nodes = ["A", "B", "C", "D", "E", "F"]
+        let edges = [["A", "B", 4], ["A", "C", 2], ["B", "D", 3],
+                     ["C", "E", 5], ["C", "D", 1], ["D", "F", 2], ["E", "F", 3]]
+        let g = graphe.create_graph(nodes, edges)
+
+        // ... draw weighted graph
+        let result = dijkstra.dijkstra(g, "A", "F")
+
+        // Animate visited nodes with distance labels
+        for step in result["steps"] {
+            let node = step["visit"]
+            self.play(circles[node].animate.set_color(ORANGE), run_time: 0.5)
+        }
+
+        // Highlight shortest path
+        let path = result["path"]
+        for i in range(len(path)) {
+            self.play(circles[path[i]].animate.set_color(GREEN), run_time: 0.3)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-4">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: graphe (with get_weighted_neighbors)
+class graphe:
+    @staticmethod
+    def create_graph(nodes, edges): ...
+    @staticmethod
+    def get_weighted_neighbors(graph, node):
+        neighbors = []
+        for edge in graph['edges']:
+            if edge[0] == node:
+                neighbors.append({'node': edge[1], 'weight': edge[2]})
+            elif edge[1] == node:
+                neighbors.append({'node': edge[0], 'weight': edge[2]})
+        return neighbors
+
+# MathViz module: dijkstra
+class dijkstra:
+    @staticmethod
+    def dijkstra(graph, start, end):
+        # Full Dijkstra implementation with path reconstruction
+        dist = {node: 999999 for node in graph['nodes']}
+        prev = {node: None for node in graph['nodes']}
+        dist[start] = 0
+        unvisited = list(graph['nodes'])
+        # ... returns {"path": [...], "dist": {...}, "steps": [...]}</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/DijkstraScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ============================
+           SORTING ALGORITHMS
+           ============================ -->
+      <div class="tutorial-level-header" id="level-sorting">
+        <span class="tutorial-level-badge intermediate">Sorting</span>
+        <h2 class="tutorial-level-title">Sorting Algorithms</h2>
+        <p class="tutorial-level-desc">Visualize classic sorting algorithms step by step with animated bar charts.</p>
+      </div>
+
+      <!-- EXAMPLE 5: Bubble Sort -->
+      <section class="tutorial-section" id="ex-tri-bulles">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">5</span>
+          <h2 class="tutorial-section-title">Bubble Sort</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>tri</code> module that records each swap as a state snapshot</li>
+            <li>Visualize sorting with proportional bar heights</li>
+            <li>Use <code>Transform</code> to animate state transitions</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-5">
+              <span class="tab-dot mviz"></span> tri.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-5">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-5">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-5">
+            <pre><code class="language-mviz">// Module tri - Tri a bulles avec trace des echanges
+/// Retourne les etapes d'echange du tri a bulles
+pub fn bubble_sort(arr) {
+    let a = list(arr)
+    let steps = [list(a)]
+    let n = len(a)
+    for i in range(n) {
+        for j in range(0, n - i - 1) {
+            if a[j] > a[j + 1] {
+                let temp = a[j]
+                a[j] = a[j + 1]
+                a[j + 1] = temp
+                steps = steps + [list(a)]
+            }
+        }
+    }
+    return steps
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-5">
+            <pre><code class="language-mviz">// Animation du tri a bulles
+use tri
+
+scene TriBullesScene {
+    fn construct(self) {
+        let title = Text("Tri a Bulles (Bubble Sort)", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let values = [5, 3, 8, 1, 9, 2, 7, 4, 6]
+        let steps = tri.bubble_sort(values)
+
+        // Create proportional bars and animate each step
+        for idx in range(1, min(total_steps, 13)) {
+            let state = steps[idx]
+            // ... Transform bars to new positions
+        }
+
+        let done = Text("Trie !", font_size: 28, color: GREEN)
+        done.to_edge(DOWN)
+        self.play(Write(done))
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-5">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: tri
+class tri:
+    @staticmethod
+    def bubble_sort(arr):
+        a = list(arr)
+        steps = [list(a)]
+        n = len(a)
+        for i in range(n):
+            for j in range(0, n - i - 1):
+                if a[j] > a[j + 1]:
+                    temp = a[j]
+                    a[j] = a[j + 1]
+                    a[j + 1] = temp
+                    steps = steps + [list(a)]
+        return steps
+
+class TriBullesScene(Scene):
+    def construct(self):
+        # ... visualize tri.bubble_sort() steps</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/TriBullesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 6: Quicksort -->
+      <section class="tutorial-section" id="ex-tri-rapide">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">6</span>
+          <h2 class="tutorial-section-title">Quicksort</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Use private helper functions (<code>fn partition</code>) alongside <code>pub fn quicksort</code></li>
+            <li>Record partition boundaries and pivot indices for visualization</li>
+            <li>Color-code: yellow = pivot, orange = active partition, green = sorted</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-6">
+              <span class="tab-dot mviz"></span> tri.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-6">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-6">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-6">
+            <pre><code class="language-mviz">// Module tri - Tri rapide (quicksort) avec trace des partitions
+
+// Fonction de partition interne (pas pub = privee)
+fn partition(a, low, high) {
+    let pivot = a[high]
+    let i = low - 1
+    for j in range(low, high) {
+        if a[j] &lt;= pivot {
+            i = i + 1
+            let temp = a[i]
+            a[i] = a[j]
+            a[j] = temp
+        }
+    }
+    let temp = a[i + 1]
+    a[i + 1] = a[high]
+    a[high] = temp
+    return i + 1
+}
+
+fn qs_helper(a, low, high, steps) {
+    if low &lt; high {
+        let pi = partition(a, low, high)
+        steps.append({"state": list(a), "pivot": pi, "low": low, "high": high})
+        qs_helper(a, low, pi - 1, steps)
+        qs_helper(a, pi + 1, high, steps)
+    }
+}
+
+/// Retourne les etapes de partition du quicksort
+pub fn quicksort(arr) {
+    let a = list(arr)
+    let steps = []
+    qs_helper(a, 0, len(a) - 1, steps)
+    return steps
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-6">
+            <pre><code class="language-mviz">// Animation du tri rapide (quicksort)
+use tri
+
+scene TriRapideScene {
+    fn construct(self) {
+        let title = Text("Tri Rapide (Quicksort)", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let values = [6, 3, 8, 1, 5, 9, 2, 7, 4]
+        let steps = tri.quicksort(values)
+
+        for step in steps {
+            let state = step["state"]
+            let pivot_idx = step["pivot"]
+            // Color: YELLOW for pivot, ORANGE for partition, GREEN for sorted
+            self.play(Transform(bars, new_bars), run_time: 0.5)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-6">
+            <pre><code class="language-python">from manim import *
+import numpy as np
+
+# MathViz module: tri
+class tri:
+    @staticmethod
+    def _partition(a, low, high):
+        pivot = a[high]
+        i = low - 1
+        for j in range(low, high):
+            if a[j] &lt;= pivot:
+                i = i + 1
+                a[i], a[j] = a[j], a[i]
+        a[i + 1], a[high] = a[high], a[i + 1]
+        return i + 1
+    @staticmethod
+    def _qs_helper(a, low, high, steps):
+        if low &lt; high:
+            pi = tri._partition(a, low, high)
+            steps.append({'state': list(a), 'pivot': pi, 'low': low, 'high': high})
+            tri._qs_helper(a, low, pi - 1, steps)
+            tri._qs_helper(a, pi + 1, high, steps)
+    @staticmethod
+    def quicksort(arr):
+        a = list(arr)
+        steps = []
+        tri._qs_helper(a, 0, len(a) - 1, steps)
+        return steps</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/TriRapideScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ============================
+           LINEAR ALGEBRA
+           ============================ -->
+      <div class="tutorial-level-header" id="level-algebra">
+        <span class="tutorial-level-badge intermediate">Linear Algebra</span>
+        <h2 class="tutorial-level-title">Matrices and Vectors</h2>
+        <p class="tutorial-level-desc">Encapsulate matrix and vector operations in reusable modules.</p>
+      </div>
+
+      <!-- EXAMPLE 7: Matrices -->
+      <section class="tutorial-section" id="ex-matrices">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">7</span>
+          <h2 class="tutorial-section-title">Matrix Operations</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>matrices</code> module with multiply, transpose, and determinant</li>
+            <li>Use Manim's <code>Matrix()</code> and <code>MathTex()</code> for LaTeX rendering</li>
+            <li>Display computation results alongside their formulas</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-7">
+              <span class="tab-dot mviz"></span> matrices.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-7">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-7">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-7">
+            <pre><code class="language-mviz">// Module matrices - Operations sur les matrices
+/// Multiplie deux matrices (listes de listes)
+pub fn multiply(a, b) {
+    let rows_a = len(a)
+    let cols_a = len(a[0])
+    let cols_b = len(b[0])
+    let result = []
+    for i in range(rows_a) {
+        let row = []
+        for j in range(cols_b) {
+            let s = 0
+            for k in range(cols_a) {
+                s = s + a[i][k] * b[k][j]
+            }
+            row = row + [s]
+        }
+        result = result + [row]
+    }
+    return result
+}
+
+/// Transpose une matrice
+pub fn transpose(m) {
+    let rows = len(m)
+    let cols = len(m[0])
+    let result = []
+    for j in range(cols) {
+        let row = []
+        for i in range(rows) {
+            row = row + [m[i][j]]
+        }
+        result = result + [row]
+    }
+    return result
+}
+
+/// Calcule le determinant d'une matrice 2x2
+pub fn determinant_2x2(m) {
+    return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-7">
+            <pre><code class="language-mviz">// Visualisation de la multiplication matricielle
+use matrices
+
+scene MatricesScene {
+    fn construct(self) {
+        let title = Text("Multiplication Matricielle", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let a = [[1, 2], [3, 4]]
+        let b = [[5, 6], [7, 8]]
+
+        let mat_a = Matrix(a)
+        mat_a.move_to(LEFT * 4)
+        let times = MathTex("\\times", font_size: 36)
+        let mat_b = Matrix(b)
+
+        let result = matrices.multiply(a, b)
+        let mat_r = Matrix(result)
+
+        // Show A * B = R
+        self.play(Create(mat_a), Write(times), Create(mat_b))
+        self.play(Create(mat_r))
+
+        // Show transpose and determinant
+        let trans = matrices.transpose(a)
+        let det = matrices.determinant_2x2(a)
+        let det_text = MathTex("\\det(A) = " + str(det), font_size: 32)
+        self.play(Write(det_text))
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-7">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: matrices
+class matrices:
+    @staticmethod
+    def multiply(a, b):
+        rows_a = len(a)
+        cols_a = len(a[0])
+        cols_b = len(b[0])
+        result = []
+        for i in range(rows_a):
+            row = []
+            for j in range(cols_b):
+                s = 0
+                for k in range(cols_a):
+                    s = s + a[i][k] * b[k][j]
+                row = row + [s]
+            result = result + [row]
+        return result
+    @staticmethod
+    def transpose(m): ...
+    @staticmethod
+    def determinant_2x2(m):
+        return m[0][0] * m[1][1] - m[0][1] * m[1][0]</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/MatricesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 8: Vectors -->
+      <section class="tutorial-section" id="ex-vecteurs">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">8</span>
+          <h2 class="tutorial-section-title">Vector Operations</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>vecteurs</code> module with add, dot product, norm, and scale</li>
+            <li>Visualize vectors on a <code>NumberPlane</code></li>
+            <li>Draw the parallelogram rule for vector addition</li>
+            <li>Mix LaTeX formulas with computed values</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-8">
+              <span class="tab-dot mviz"></span> vecteurs.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-8">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-8">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-8">
+            <pre><code class="language-mviz">// Module vecteurs - Operations vectorielles
+/// Addition de deux vecteurs 2D
+pub fn add(v1, v2) {
+    return [v1[0] + v2[0], v1[1] + v2[1]]
+}
+
+/// Produit scalaire de deux vecteurs
+pub fn dot_product(v1, v2) {
+    let s = 0
+    for i in range(len(v1)) {
+        s = s + v1[i] * v2[i]
+    }
+    return s
+}
+
+/// Norme d'un vecteur
+pub fn norm(v) {
+    let s = 0
+    for x in v { s = s + x * x }
+    return s ^ 0.5
+}
+
+/// Multiplication par un scalaire
+pub fn scale(v, s) {
+    let result = []
+    for x in v { result = result + [x * s] }
+    return result
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-8">
+            <pre><code class="language-mviz">// Visualisation des operations vectorielles
+use vecteurs
+
+scene VecteursScene {
+    fn construct(self) {
+        let title = Text("Operations Vectorielles", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let plane = NumberPlane(x_range: [-5, 5, 1], y_range: [-4, 4, 1],
+            background_line_style: {"stroke_opacity": 0.3})
+        self.play(Create(plane), run_time: 0.5)
+
+        let v1 = [3, 1]
+        let v2 = [1, 2]
+        let v_sum = vecteurs.add(v1, v2)
+
+        // Draw v1 (red), v2 (blue), sum (green)
+        let arrow_v1 = Arrow(plane.c2p(0, 0), plane.c2p(v1[0], v1[1]), color: RED, buff: 0)
+        let arrow_v2 = Arrow(plane.c2p(0, 0), plane.c2p(v2[0], v2[1]), color: BLUE, buff: 0)
+        let arrow_sum = Arrow(plane.c2p(0, 0), plane.c2p(v_sum[0], v_sum[1]), color: GREEN, buff: 0)
+
+        // Parallelogram rule with dashed lines
+        let dashed_1 = DashedLine(plane.c2p(v2[0], v2[1]), plane.c2p(v_sum[0], v_sum[1]))
+        let dashed_2 = DashedLine(plane.c2p(v1[0], v1[1]), plane.c2p(v_sum[0], v_sum[1]))
+
+        // Display dot product and norms
+        let dp = vecteurs.dot_product(v1, v2)
+        let info = MathTex("\\vec{v_1} \\cdot \\vec{v_2} = " + str(dp), font_size: 24)
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-8">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: vecteurs
+class vecteurs:
+    @staticmethod
+    def add(v1, v2):
+        return [v1[0] + v2[0], v1[1] + v2[1]]
+    @staticmethod
+    def dot_product(v1, v2):
+        s = 0
+        for i in range(len(v1)):
+            s = s + v1[i] * v2[i]
+        return s
+    @staticmethod
+    def norm(v):
+        s = 0
+        for x in v:
+            s = s + x * x
+        return s ** 0.5
+    @staticmethod
+    def scale(v, s):
+        return [x * s for x in v]</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/VecteursScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ============================
+           DATA STRUCTURES
+           ============================ -->
+      <div class="tutorial-level-header" id="level-ds">
+        <span class="tutorial-level-badge intermediate">Data Structures</span>
+        <h2 class="tutorial-level-title">Binary Search Tree</h2>
+        <p class="tutorial-level-desc">Implement a BST with recursive insert and inorder traversal.</p>
+      </div>
+
+      <!-- EXAMPLE 9: Binary Tree -->
+      <section class="tutorial-section" id="ex-arbre">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">9</span>
+          <h2 class="tutorial-section-title">Binary Search Tree</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a recursive <code>arbre</code> module with insert, inorder, and search</li>
+            <li>Represent a tree as nested dictionaries: <code>{"val": v, "left": ..., "right": ...}</code></li>
+            <li>Animate node insertion with edges connecting parent to child</li>
+            <li>Highlight inorder traversal sequence</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-9">
+              <span class="tab-dot mviz"></span> arbre.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-9">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-9">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-9">
+            <pre><code class="language-mviz">// Module arbre - Arbre binaire de recherche
+/// Insere une valeur dans l'arbre
+pub fn insert(tree, value) {
+    if tree == None {
+        return {"val": value, "left": None, "right": None}
+    }
+    if value &lt; tree["val"] {
+        tree["left"] = arbre.insert(tree["left"], value)
+    } else {
+        if value > tree["val"] {
+            tree["right"] = arbre.insert(tree["right"], value)
+        }
+    }
+    return tree
+}
+
+/// Parcours infixe (inorder) retournant les valeurs triees
+pub fn inorder(tree) {
+    if tree == None { return [] }
+    return arbre.inorder(tree["left"]) + [tree["val"]] + arbre.inorder(tree["right"])
+}
+
+/// Recherche une valeur dans l'arbre
+pub fn search(tree, value) {
+    if tree == None { return False }
+    if tree["val"] == value { return True }
+    if value &lt; tree["val"] {
+        return arbre.search(tree["left"], value)
+    }
+    return arbre.search(tree["right"], value)
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-9">
+            <pre><code class="language-mviz">// Visualisation de l'arbre binaire de recherche
+use arbre
+
+scene ArbreBinaireScene {
+    fn construct(self) {
+        let title = Text("Arbre Binaire de Recherche", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let values = [5, 3, 7, 1, 4, 6, 8]
+        // Pre-calculated positions for tree layout
+        let positions = {5: pos_5, 3: pos_3, 7: pos_7, ...}
+        let parent_map = {3: 5, 7: 5, 1: 3, 4: 3, 6: 7, 8: 7}
+
+        let tree = None
+        for val in values {
+            tree = arbre.insert(tree, val)
+            // Draw edge from parent, then node circle
+        }
+
+        let inorder_result = arbre.inorder(tree)
+        // Highlight nodes in inorder sequence
+        for val in inorder_result {
+            self.play(node_circles[val].animate.set_color(YELLOW), run_time: 0.3)
+            self.play(node_circles[val].animate.set_color(GREEN), run_time: 0.2)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-9">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: arbre
+class arbre:
+    @staticmethod
+    def insert(tree, value):
+        if (tree == None):
+            return {'val': value, 'left': None, 'right': None}
+        if (value &lt; tree['val']):
+            tree['left'] = arbre.insert(tree['left'], value)
+        else:
+            if (value > tree['val']):
+                tree['right'] = arbre.insert(tree['right'], value)
+        return tree
+    @staticmethod
+    def inorder(tree):
+        if (tree == None):
+            return []
+        return (arbre.inorder(tree['left']) + [tree['val']]
+                + arbre.inorder(tree['right']))
+    @staticmethod
+    def search(tree, value):
+        if (tree == None): return False
+        if (tree['val'] == value): return True
+        if (value &lt; tree['val']):
+            return arbre.search(tree['left'], value)
+        return arbre.search(tree['right'], value)</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/ArbreBinaireScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ============================
+           MATHEMATICS
+           ============================ -->
+      <div class="tutorial-level-header" id="level-math">
+        <span class="tutorial-level-badge advanced">Mathematics</span>
+        <h2 class="tutorial-level-title">Fractals, Primes, Fibonacci, Sets, Complex, Probability</h2>
+        <p class="tutorial-level-desc">Advanced mathematical concepts with dedicated computation modules.</p>
+      </div>
+
+      <!-- EXAMPLE 10: Fractals -->
+      <section class="tutorial-section" id="ex-fractales">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">10</span>
+          <h2 class="tutorial-section-title">Sierpinski Triangle</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>fractales</code> module that generates fractal geometry</li>
+            <li>Recursive midpoint subdivision for Sierpinski triangle</li>
+            <li>Animate increasing fractal depth with <code>Transform</code></li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-10">
+              <span class="tab-dot mviz"></span> fractales.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-10">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-10">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-10">
+            <pre><code class="language-mviz">// Module fractales - Generation de points pour fractales
+/// Genere les sommets du triangle de Sierpinski a la profondeur donnee
+pub fn sierpinski_points(depth) {
+    let triangles = [[[0, 2, 0], [-2, -1, 0], [2, -1, 0]]]
+
+    for d in range(depth) {
+        let new_triangles = []
+        for tri in triangles {
+            let a = tri[0]
+            let b = tri[1]
+            let c = tri[2]
+            // Points milieux
+            let ab = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, 0]
+            let bc = [(b[0] + c[0]) / 2, (b[1] + c[1]) / 2, 0]
+            let ac = [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, 0]
+            // 3 sous-triangles
+            new_triangles = new_triangles + [[a, ab, ac]]
+            new_triangles = new_triangles + [[ab, b, bc]]
+            new_triangles = new_triangles + [[ac, bc, c]]
+        }
+        triangles = new_triangles
+    }
+    return triangles
+}
+
+/// Genere les points de la courbe de Koch
+pub fn koch_points(depth) {
+    // ... Koch snowflake point generation
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-10">
+            <pre><code class="language-mviz">// Visualisation du triangle de Sierpinski
+use fractales
+
+scene FractalesScene {
+    fn construct(self) {
+        let title = Text("Triangle de Sierpinski", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let prev_group = None
+        for depth in range(5) {
+            let triangles = fractales.sierpinski_points(depth)
+            let polys = VGroup()
+            for tri in triangles {
+                let polygon = Polygon(tri[0], tri[1], tri[2],
+                    fill_opacity: 0.6, fill_color: PURPLE,
+                    stroke_color: WHITE, stroke_width: 0.5)
+                polys.add(polygon)
+            }
+            polys.scale(1.2)
+            polys.move_to(DOWN * 0.3)
+
+            if prev_group == None {
+                self.play(Create(polys), run_time: 1)
+                prev_group = polys
+            } else {
+                self.play(Transform(prev_group, polys), run_time: 0.8)
+            }
+            self.wait(0.5)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-10">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: fractales
+class fractales:
+    @staticmethod
+    def sierpinski_points(depth):
+        triangles = [[[0, 2, 0], [-2, -1, 0], [2, -1, 0]]]
+        for d in range(depth):
+            new_triangles = []
+            for tri in triangles:
+                a, b, c = tri[0], tri[1], tri[2]
+                ab = [(a[0]+b[0])/2, (a[1]+b[1])/2, 0]
+                bc = [(b[0]+c[0])/2, (b[1]+c[1])/2, 0]
+                ac = [(a[0]+c[0])/2, (a[1]+c[1])/2, 0]
+                new_triangles += [[a, ab, ac], [ab, b, bc], [ac, bc, c]]
+            triangles = new_triangles
+        return triangles</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/FractalesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 11: Primes -->
+      <section class="tutorial-section" id="ex-premiers">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">11</span>
+          <h2 class="tutorial-section-title">Sieve of Eratosthenes</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>nombres</code> module with sieve, is_prime, and factorize</li>
+            <li>Implement the Sieve of Eratosthenes using <code>while</code> loops</li>
+            <li>Animate a number grid: highlight primes, grey out composites</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-11">
+              <span class="tab-dot mviz"></span> nombres.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-11">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-11">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-11">
+            <pre><code class="language-mviz">// Module nombres - Operations sur les nombres premiers
+/// Crible d'Eratosthene retournant les nombres premiers &lt;= n
+pub fn sieve(n) {
+    let is_prime_arr = []
+    for i in range(n + 1) {
+        is_prime_arr = is_prime_arr + [True]
+    }
+    is_prime_arr[0] = False
+    is_prime_arr[1] = False
+
+    let p = 2
+    while p * p &lt;= n {
+        if is_prime_arr[p] {
+            let multiple = p * p
+            while multiple &lt;= n {
+                is_prime_arr[multiple] = False
+                multiple = multiple + p
+            }
+        }
+        p = p + 1
+    }
+
+    let primes = []
+    for i in range(2, n + 1) {
+        if is_prime_arr[i] {
+            primes = primes + [i]
+        }
+    }
+    return primes
+}
+
+/// Verifie si un nombre est premier
+pub fn is_prime(n) {
+    if n &lt; 2 { return False }
+    let i = 2
+    while i * i &lt;= n {
+        if n % i == 0 { return False }
+        i = i + 1
+    }
+    return True
+}
+
+/// Decomposition en facteurs premiers
+pub fn factorize(n) {
+    let factors = []
+    let d = 2
+    while d * d &lt;= n {
+        while n % d == 0 {
+            factors = factors + [d]
+            n = n / d
+        }
+        d = d + 1
+    }
+    if n > 1 { factors = factors + [n] }
+    return factors
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-11">
+            <pre><code class="language-mviz">// Visualisation du crible d'Eratosthene
+use nombres
+
+scene NombresPremScene {
+    fn construct(self) {
+        let title = Text("Crible d'Eratosthene", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let n = 49
+        let primes = nombres.sieve(n)
+
+        // Create number grid 2..49
+        let cells = {}
+        for num in range(2, n + 1) {
+            let cell = Square(side_length: 0.55)
+            let label = Text(str(num), font_size: 14)
+            cells[num] = VGroup(cell, label)
+        }
+
+        // Animate sieve: highlight primes, grey composites
+        for p in [2, 3, 5, 7] {
+            self.play(cells[p][0].animate.set_fill(YELLOW, opacity: 0.8))
+            let multiple = p * p
+            while multiple &lt;= n {
+                self.play(cells[multiple][0].animate.set_fill(RED_E, opacity: 0.5))
+                multiple = multiple + p
+            }
+        }
+
+        // Color all primes green
+        for p in primes {
+            self.play(cells[p][0].animate.set_fill(GREEN, opacity: 0.7))
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-11">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: nombres
+class nombres:
+    @staticmethod
+    def sieve(n):
+        is_prime_arr = [True] * (n + 1)
+        is_prime_arr[0] = is_prime_arr[1] = False
+        p = 2
+        while p * p &lt;= n:
+            if is_prime_arr[p]:
+                multiple = p * p
+                while multiple &lt;= n:
+                    is_prime_arr[multiple] = False
+                    multiple += p
+            p += 1
+        return [i for i in range(2, n+1) if is_prime_arr[i]]
+    @staticmethod
+    def is_prime(n): ...
+    @staticmethod
+    def factorize(n): ...</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/NombresPremScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 12: Fibonacci -->
+      <section class="tutorial-section" id="ex-fibonacci">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">12</span>
+          <h2 class="tutorial-section-title">Fibonacci and Golden Ratio</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>suites</code> module with Fibonacci computation and golden ratio approximation</li>
+            <li>Display Fibonacci terms using <code>MathTex</code> and <code>arrange_in_grid</code></li>
+            <li>Plot convergence to phi using <code>Axes</code> and <code>Dot</code></li>
+            <li>Use the pipe-lambda syntax: <code>|x| 1.618033988</code></li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-12">
+              <span class="tab-dot mviz"></span> suites.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-12">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-12">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-12">
+            <pre><code class="language-mviz">// Module suites - Suite de Fibonacci et nombre d'or
+/// Calcule le n-ieme nombre de Fibonacci
+pub fn fibonacci(n) {
+    if n &lt;= 0 { return 0 }
+    if n == 1 { return 1 }
+    let a = 0
+    let b = 1
+    for i in range(2, n + 1) {
+        let temp = a + b
+        a = b
+        b = temp
+    }
+    return b
+}
+
+/// Approximation du nombre d'or par le rapport F(n+1)/F(n)
+pub fn golden_ratio(n) {
+    let ratios = []
+    let prev = 1
+    let curr = 1
+    for i in range(2, n + 1) {
+        let temp = prev + curr
+        prev = curr
+        curr = temp
+        if prev > 0 {
+            ratios = ratios + [curr / prev]
+        }
+    }
+    return ratios
+}
+
+/// Genere les tailles pour la spirale de Fibonacci
+pub fn fibonacci_spiral_points(n) {
+    let sizes = []
+    let a = 0
+    let b = 1
+    for i in range(1, n + 1) {
+        let temp = a + b
+        a = b
+        b = temp
+        sizes = sizes + [b]
+    }
+    return sizes
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-12">
+            <pre><code class="language-mviz">// Visualisation de la suite de Fibonacci et du nombre d'or
+use suites
+
+scene FibonacciScene {
+    fn construct(self) {
+        let title = Text("Suite de Fibonacci", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let terms = VGroup()
+        for i in range(10) {
+            let fib_val = suites.fibonacci(i)
+            let t = MathTex(f"F({i}) = {fib_val}", font_size: 24)
+            terms.add(t)
+        }
+        terms.arrange_in_grid(rows: 2, cols: 5, buff: 0.4)
+        self.play(Write(terms), run_time: 1.5)
+
+        // Plot golden ratio convergence
+        let axes = Axes(x_range: [2, 15, 1], y_range: [1, 2.5, 0.5],
+            x_length: 8, y_length: 4)
+        let phi_line = axes.plot(|x| 1.618033988, x_range: [2, 15], color: YELLOW)
+
+        let ratios = suites.golden_ratio(15)
+        for i in range(len(ratios)) {
+            let dot = Dot(axes.c2p(i + 2, ratios[i]), color: BLUE, radius: 0.06)
+            self.play(Create(dot), run_time: 0.15)
+        }
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-12">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: suites
+class suites:
+    @staticmethod
+    def fibonacci(n):
+        if n &lt;= 0: return 0
+        if n == 1: return 1
+        a, b = 0, 1
+        for i in range(2, n + 1):
+            a, b = b, a + b
+        return b
+    @staticmethod
+    def golden_ratio(n):
+        ratios = []
+        prev, curr = 1, 1
+        for i in range(2, n + 1):
+            prev, curr = curr, prev + curr
+            if prev > 0:
+                ratios.append(curr / prev)
+        return ratios
+    @staticmethod
+    def fibonacci_spiral_points(n): ...</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/FibonacciScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 13: Sets -->
+      <section class="tutorial-section" id="ex-ensembles">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">13</span>
+          <h2 class="tutorial-section-title">Set Operations</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build an <code>ensembles</code> module with union, intersection, difference, and subset</li>
+            <li>Visualize set operations with Venn diagrams (overlapping circles)</li>
+            <li>Display LaTeX set notation: A &cup; B, A &cap; B, A &setminus; B</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-13">
+              <span class="tab-dot mviz"></span> ensembles.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-13">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-13">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-13">
+            <pre><code class="language-mviz">// Module ensembles - Operations sur les ensembles
+/// Union de deux ensembles (listes)
+pub fn union(a, b) {
+    let result = list(a)
+    for x in b {
+        if x not in result {
+            result = result + [x]
+        }
+    }
+    return result
+}
+
+/// Intersection de deux ensembles
+pub fn intersection(a, b) {
+    let result = []
+    for x in a {
+        if x in b { result = result + [x] }
+    }
+    return result
+}
+
+/// Difference A \ B
+pub fn difference(a, b) {
+    let result = []
+    for x in a {
+        if x not in b { result = result + [x] }
+    }
+    return result
+}
+
+/// Verifie si a est un sous-ensemble de b
+pub fn is_subset(a, b) {
+    for x in a {
+        if x not in b { return False }
+    }
+    return True
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-13">
+            <pre><code class="language-mviz">// Visualisation des operations sur les ensembles
+use ensembles
+
+scene EnsemblesScene {
+    fn construct(self) {
+        let title = Text("Operations sur les Ensembles", font_size: 36)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let a = [1, 2, 3, 4, 5]
+        let b = [3, 4, 5, 6, 7]
+
+        // Venn diagram circles
+        let circle_a = Circle(radius: 1.8, color: BLUE, fill_opacity: 0.2)
+        let circle_b = Circle(radius: 1.8, color: RED, fill_opacity: 0.2)
+
+        // Compute operations
+        let u = ensembles.union(a, b)
+        let inter = ensembles.intersection(a, b)
+        let diff = ensembles.difference(a, b)
+
+        // Display results with LaTeX
+        let r1 = MathTex("A \\cup B = " + str(u), font_size: 22)
+        let r2 = MathTex("A \\cap B = " + str(inter), font_size: 22)
+        let r3 = MathTex("A \\setminus B = " + str(diff), font_size: 22)
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-13">
+            <pre><code class="language-python">from manim import *
+
+# MathViz module: ensembles
+class ensembles:
+    @staticmethod
+    def union(a, b):
+        result = list(a)
+        for x in b:
+            if x not in result:
+                result = result + [x]
+        return result
+    @staticmethod
+    def intersection(a, b):
+        return [x for x in a if x in b]
+    @staticmethod
+    def difference(a, b):
+        return [x for x in a if x not in b]
+    @staticmethod
+    def is_subset(a, b):
+        for x in a:
+            if x not in b: return False
+        return True</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/EnsemblesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 14: Complex Numbers -->
+      <section class="tutorial-section" id="ex-complexes">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">14</span>
+          <h2 class="tutorial-section-title">Complex Numbers</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>complexes</code> module with add, multiply, modulus, argument, from_polar</li>
+            <li>Represent complex numbers as <code>[re, im]</code> pairs</li>
+            <li>Visualize on the Argand plane (<code>ComplexPlane</code>)</li>
+            <li>Show multiplication as rotation + dilation</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-14">
+              <span class="tab-dot mviz"></span> complexes.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-14">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-14">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-14">
+            <pre><code class="language-mviz">// Module complexes - Operations sur les nombres complexes
+// Un nombre complexe est represente comme [re, im]
+
+/// Addition de deux nombres complexes
+pub fn add(z1, z2) {
+    return [z1[0] + z2[0], z1[1] + z2[1]]
+}
+
+/// Multiplication de deux nombres complexes
+pub fn multiply(z1, z2) {
+    let re = z1[0] * z2[0] - z1[1] * z2[1]
+    let im = z1[0] * z2[1] + z1[1] * z2[0]
+    return [re, im]
+}
+
+/// Module (valeur absolue) d'un nombre complexe
+pub fn modulus(z) {
+    return (z[0]^2 + z[1]^2) ^ 0.5
+}
+
+/// Argument d'un nombre complexe (en radians)
+pub fn argument(z) {
+    return np.arctan2(z[1], z[0])
+}
+
+/// Convertit polaire vers cartesien
+pub fn from_polar(r, theta) {
+    return [r * np.cos(theta), r * np.sin(theta)]
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-14">
+            <pre><code class="language-mviz">// Visualisation des nombres complexes sur le plan d'Argand
+use complexes
+
+scene ComplexesScene {
+    fn construct(self) {
+        let title = Text("Nombres Complexes - Plan d'Argand", font_size: 32)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let plane = ComplexPlane(x_range: [-4, 4, 1], y_range: [-3, 3, 1])
+        plane.add_coordinates()
+
+        let z1 = [2, 1]
+        let z2 = [1, 2]
+        let product = complexes.multiply(z1, z2)
+
+        // Draw z1, z2, and z1*z2 as arrows
+        let arrow_z1 = Arrow(plane.n2p(0), plane.n2p(complex(z1[0], z1[1])), color: RED)
+        let arrow_prod = Arrow(plane.n2p(0), plane.n2p(complex(product[0], product[1])), color: GREEN)
+
+        // Show |z1| and |z1*z2|
+        let mod_z1 = complexes.modulus(z1)
+        let mod_prod = complexes.modulus(product)
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-14">
+            <pre><code class="language-python">from manim import *
+import numpy as np
+
+# MathViz module: complexes
+class complexes:
+    @staticmethod
+    def add(z1, z2):
+        return [z1[0] + z2[0], z1[1] + z2[1]]
+    @staticmethod
+    def multiply(z1, z2):
+        re = z1[0] * z2[0] - z1[1] * z2[1]
+        im = z1[0] * z2[1] + z1[1] * z2[0]
+        return [re, im]
+    @staticmethod
+    def modulus(z):
+        return (z[0]**2 + z[1]**2) ** 0.5
+    @staticmethod
+    def argument(z):
+        return np.arctan2(z[1], z[0])
+    @staticmethod
+    def from_polar(r, theta):
+        return [r * np.cos(theta), r * np.sin(theta)]</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/ComplexesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- EXAMPLE 15: Probability -->
+      <section class="tutorial-section" id="ex-probabilites">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">15</span>
+          <h2 class="tutorial-section-title">Probability Distributions</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Build a <code>probabilites</code> module with binomial coefficient, binomial PDF, normal PDF</li>
+            <li>Visualize binomial distribution as bar chart with normal curve overlay</li>
+            <li>Use <code>Axes.plot()</code> with pipe-lambda: <code>|x| probabilites.normal_pdf(x, mu, sigma)</code></li>
+            <li>Display statistical parameters with LaTeX</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mod-15">
+              <span class="tab-dot mviz"></span> probabilites.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="mviz-15">
+              <span class="tab-dot mviz"></span> main.mviz
+            </button>
+            <button class="code-compare-tab" data-panel="python-15">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mod-15">
+            <pre><code class="language-mviz">// Module probabilites - Distributions de probabilites
+/// Coefficient binomial C(n, k)
+pub fn binomial_coeff(n, k) {
+    if k > n { return 0 }
+    if k == 0 or k == n { return 1 }
+    let result = 1
+    for i in range(min(k, n - k)) {
+        result = result * (n - i) / (i + 1)
+    }
+    return int(result)
+}
+
+/// Probabilite binomiale P(X = k) pour X ~ B(n, p)
+pub fn binomial(n, k, p) {
+    return binomial_coeff(n, k) * p^k * (1 - p)^(n - k)
+}
+
+/// Densite de la loi normale
+pub fn normal_pdf(x, mu, sigma) {
+    return (1 / (sigma * (2 * np.pi)^0.5)) * np.exp(-0.5 * ((x - mu) / sigma)^2)
+}
+
+/// Esperance d'une variable discrete
+pub fn expected_value(values, probs) {
+    let s = 0
+    for i in range(len(values)) {
+        s = s + values[i] * probs[i]
+    }
+    return s
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="mviz-15">
+            <pre><code class="language-mviz">// Visualisation de la distribution binomiale et loi normale
+use probabilites
+
+scene ProbabilitesScene {
+    fn construct(self) {
+        let title = Text("Distribution Binomiale et Loi Normale", font_size: 30)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let n_val = 20
+        let p_val = 0.5
+
+        let axes = Axes(x_range: [0, 20, 2], y_range: [0, 0.25, 0.05],
+            x_length: 10, y_length: 4.5)
+
+        // Bars for binomial distribution
+        let bars = VGroup()
+        for k in range(n_val + 1) {
+            let prob = probabilites.binomial(n_val, k, p_val)
+            let bar = Rectangle(width: 0.35, height: prob * 18, color: BLUE)
+            bars.add(bar)
+        }
+
+        // Normal curve overlay
+        let mu = n_val * p_val
+        let sigma = (n_val * p_val * (1 - p_val)) ^ 0.5
+        let normal_curve = axes.plot(
+            |x| probabilites.normal_pdf(x, mu, sigma),
+            x_range: [0, 20], color: YELLOW, stroke_width: 3)
+
+        let params = VGroup(
+            MathTex(f"n = {n_val},\\ p = {p_val}", font_size: 20),
+            MathTex(f"\\mu = {mu:.1f},\\ \\sigma = {sigma:.2f}", font_size: 20)
+        ).arrange(DOWN)
+        self.wait(1)
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-15">
+            <pre><code class="language-python">from manim import *
+import numpy as np
+
+# MathViz module: probabilites
+class probabilites:
+    @staticmethod
+    def binomial_coeff(n, k):
+        if k > n: return 0
+        if k == 0 or k == n: return 1
+        result = 1
+        for i in range(min(k, n - k)):
+            result = result * (n - i) / (i + 1)
+        return int(result)
+    @staticmethod
+    def binomial(n, k, p):
+        return probabilites.binomial_coeff(n, k) * p**k * (1-p)**(n-k)
+    @staticmethod
+    def normal_pdf(x, mu, sigma):
+        return (1/(sigma*(2*np.pi)**0.5)) * np.exp(-0.5*((x-mu)/sigma)**2)
+    @staticmethod
+    def expected_value(values, probs):
+        return sum(v*p for v, p in zip(values, probs))</code></pre>
+          </div>
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/advanced/ProbabilitesScene.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- Completion Section -->
+      <section class="tutorial-completion" id="advanced-complete">
+        <h2>All 15 Module Examples Complete</h2>
+        <p>You have explored the full power of the MathViz module system across these domains:</p>
+        <ul>
+          <li><strong>Graph Theory</strong> -- Reusable graph module shared across BFS, DFS, and Dijkstra</li>
+          <li><strong>Sorting</strong> -- Algorithm modules that record steps for animated visualization</li>
+          <li><strong>Linear Algebra</strong> -- Matrix and vector operation libraries</li>
+          <li><strong>Data Structures</strong> -- Recursive BST with insert, search, and traversal</li>
+          <li><strong>Number Theory</strong> -- Sieve of Eratosthenes and Fibonacci sequences</li>
+          <li><strong>Set Theory</strong> -- Union, intersection, difference with Venn diagrams</li>
+          <li><strong>Complex Analysis</strong> -- Complex arithmetic on the Argand plane</li>
+          <li><strong>Probability</strong> -- Binomial and normal distributions with statistical parameters</li>
+        </ul>
+        <div class="tutorial-next-steps">
+          <h3>Next Steps</h3>
+          <div class="tutorial-next-links">
+            <a href="../docs/modules.html" class="btn btn-primary">Module System Docs</a>
+            <a href="../docs/language-reference.html" class="btn btn-secondary">Language Reference</a>
+            <a href="gallery.html" class="btn btn-secondary">Beginner Tutorials</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <script src="../assets/app.js"></script>
+  <script>
+    // Advanced examples progress tracking
+    (function() {
+      var TOTAL = 15;
+      var sections = document.querySelectorAll('.tutorial-section');
+      var progressFill = document.getElementById('progress-fill');
+      var progressText = document.getElementById('progress-text');
+      var navLinks = document.querySelectorAll('.tutorial-nav-link');
+      var storageKey = 'mathviz-advanced-progress';
+
+      var visited = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+      function updateProgress() {
+        var count = visited.size;
+        var pct = Math.round((count / TOTAL) * 100);
+        if (progressFill) progressFill.style.width = pct + '%';
+        if (progressText) progressText.textContent = count + ' / ' + TOTAL;
+        localStorage.setItem(storageKey, JSON.stringify([].concat(Array.from(visited))));
+      }
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var id = entry.target.id;
+            visited.add(id);
+            updateProgress();
+            navLinks.forEach(function(link) {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === '#' + id) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sections.forEach(function(section) {
+        observer.observe(section);
+      });
+
+      updateProgress();
+
+      // Tab switching
+      document.querySelectorAll('.code-compare-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var panelId = this.getAttribute('data-panel');
+          var container = this.closest('.code-compare');
+          container.querySelectorAll('.code-compare-tab').forEach(function(t) { t.classList.remove('active'); });
+          container.querySelectorAll('.code-compare-panel').forEach(function(p) { p.classList.remove('active'); });
+          this.classList.add('active');
+          document.getElementById(panelId).classList.add('active');
+        });
+      });
+
+      // Back to top button
+      var backToTop = document.getElementById('back-to-top');
+      if (backToTop) {
+        window.addEventListener('scroll', function() {
+          if (window.scrollY > 600) {
+            backToTop.classList.add('visible');
+          } else {
+            backToTop.classList.remove('visible');
+          }
+        });
+        backToTop.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      // Mobile sidebar toggle
+      var toggle = document.querySelector('.nav-mobile-toggle');
+      var sidebar = document.getElementById('advanced-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          sidebar.classList.toggle('open');
+        });
+        document.querySelectorAll('.sidebar-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            if (window.innerWidth < 1024) {
+              sidebar.classList.remove('open');
+            }
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
