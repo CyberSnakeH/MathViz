@@ -1,0 +1,32 @@
+# AI tools - never commit
+.claude/
+.claude*
+.anthropic*
+.cursor/
+
+# Python
+__pycache__/
+*.py[oc]
+*.py
+*.mviz
+
+# Build artifacts
+.venv/
+build/
+dist/
+node_modules/
+editor/
+src/
+tests/
+media/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Manim output
+*.mp4
+*.png
+*.svg

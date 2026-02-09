@@ -3,120 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animation Gallery - MathViz</title>
-  <meta name="description" content="MathViz animation examples with code and rendered videos.">
+  <title>MathViz Tutorials - Learn MathViz from A to Z</title>
+  <meta name="description" content="Complete MathViz tutorial: learn to create mathematical animations step by step, from Hello World to advanced theorem visualization.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
   <link rel="stylesheet" href="../assets/styles.css">
-  <style>
-    .gallery-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 3rem;
-      margin-top: 2rem;
-    }
-    .gallery-item {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .gallery-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-    @media (max-width: 900px) {
-      .gallery-content {
-        grid-template-columns: 1fr;
-      }
-    }
-    .gallery-code {
-      padding: 1.5rem;
-      border-right: 1px solid var(--border-color);
-      overflow-x: auto;
-    }
-    @media (max-width: 900px) {
-      .gallery-code {
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-      }
-    }
-    .gallery-code h3 {
-      margin: 0 0 1rem 0;
-      font-size: 1.125rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .gallery-code h3::before {
-      content: '';
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: var(--accent-green);
-      border-radius: 50%;
-    }
-    .gallery-code pre {
-      margin: 0;
-      font-size: 0.875rem;
-    }
-    .gallery-video {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-tertiary);
-    }
-    .gallery-video h3 {
-      margin: 0 0 1rem 0;
-      font-size: 1.125rem;
-      align-self: flex-start;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .gallery-video h3::before {
-      content: '';
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: var(--accent-magenta);
-      border-radius: 50%;
-    }
-    .gallery-video video {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-    .gallery-header {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .gallery-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0;
-    }
-    .gallery-badge {
-      background: var(--accent-primary);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .intro-section {
-      margin-bottom: 2rem;
-    }
-    .intro-section p {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-    }
-  </style>
 </head>
 <body>
   <!-- Navigation -->
@@ -148,27 +38,35 @@
 
   <div class="docs-layout">
     <!-- Sidebar -->
-    <aside class="docs-sidebar">
+    <aside class="docs-sidebar" id="tutorial-sidebar">
       <div class="sidebar-section">
         <div class="sidebar-title">Examples</div>
         <nav class="sidebar-nav">
           <a href="index.html" class="sidebar-link">Code Examples</a>
-          <a href="gallery.html" class="sidebar-link active">Animation Gallery</a>
+          <a href="gallery.html" class="sidebar-link active">Tutorials</a>
         </nav>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-title">Animations</div>
-        <nav class="sidebar-nav">
-          <a href="#hello-mathviz" class="sidebar-link">Hello MathViz</a>
-          <a href="#circle-area" class="sidebar-link">Circle Area</a>
-          <a href="#shape-transform" class="sidebar-link">Shape Transform</a>
-          <a href="#function-graph" class="sidebar-link">Function Graph</a>
+        <div class="sidebar-title">Tutorial Steps</div>
+        <nav class="sidebar-nav" id="tutorial-nav">
+          <a href="#step-1" class="sidebar-link"><span class="step-num">1</span> Getting Started</a>
+          <a href="#step-2" class="sidebar-link"><span class="step-num">2</span> Basic Animations</a>
+          <a href="#step-3" class="sidebar-link"><span class="step-num">3</span> Working with Shapes</a>
+          <a href="#step-4" class="sidebar-link"><span class="step-num">4</span> Text and LaTeX</a>
+          <a href="#step-5" class="sidebar-link"><span class="step-num">5</span> Positioning</a>
+          <a href="#step-6" class="sidebar-link"><span class="step-num">6</span> Colors and Styling</a>
+          <a href="#step-7" class="sidebar-link"><span class="step-num">7</span> Transforms</a>
+          <a href="#step-8" class="sidebar-link"><span class="step-num">8</span> Graphs and Functions</a>
+          <a href="#step-9" class="sidebar-link"><span class="step-num">9</span> Groups and VGroups</a>
+          <a href="#step-10" class="sidebar-link"><span class="step-num">10</span> Camera and Scene</a>
+          <a href="#step-11" class="sidebar-link"><span class="step-num">11</span> Advanced Scenes</a>
         </nav>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-title">Documentation</div>
         <nav class="sidebar-nav">
-          <a href="../docs/scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="../docs/scenes.html" class="sidebar-link">Scenes &amp; Manim</a>
+          <a href="../docs/language-reference.html" class="sidebar-link">Language Reference</a>
           <a href="../docs/cli.html" class="sidebar-link">CLI Reference</a>
         </nav>
       </div>
@@ -176,14 +74,7 @@
 
     <!-- Main Content -->
     <main class="docs-content">
-      <h1>Animation Gallery</h1>
-
-      <div class="intro-section">
-        <p>
-          See MathViz in action! Each example shows the source code alongside its rendered animation.
-          All animations are generated using <strong>Manim</strong> from compiled MathViz code.
-        </p>
-      </div>
+      <h1>MathViz Tutorials</h1>
 
       <div class="callout">
         <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -192,165 +83,1101 @@
           <line x1="12" y1="8" x2="12.01" y2="8"></line>
         </svg>
         <div class="callout-content">
-          <div class="callout-title">Render Your Own</div>
+          <div class="callout-title">Learn MathViz Step by Step</div>
           <p class="callout-text">
-            Save any example to a <code>.mviz</code> file and run:
-            <code>mathviz run example.mviz --preview</code>
+            Follow this complete tutorial from <strong>Hello World</strong> to <strong>advanced theorem animations</strong>.
+            Each step shows the <code>.mviz</code> source code alongside the compiled Python output.
+            Save any example to a <code>.mviz</code> file and run: <code>mathviz run example.mviz --preview</code>
           </p>
         </div>
       </div>
 
-      <div class="gallery-grid">
+      <!-- Progress Bar -->
+      <div class="tutorial-progress" id="tutorial-progress">
+        <div class="tutorial-progress-bar">
+          <div class="tutorial-progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="tutorial-progress-text" id="progress-text">Step 0 / 11</span>
+      </div>
 
-        <!-- Example 1: Hello MathViz -->
-        <article class="gallery-item" id="hello-mathviz">
-          <div class="gallery-header">
-            <h2 class="gallery-title">Hello MathViz</h2>
-            <span class="gallery-badge">Beginner</span>
+      <!-- ========================================
+           STEP 1: Getting Started - Hello World
+           ======================================== -->
+      <section class="tutorial-section" id="step-1">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">1</span>
+          <h2 class="tutorial-section-title">Getting Started - Hello World</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>The <code>scene</code> keyword defines a Manim Scene class</li>
+            <li><code>fn construct(self)</code> is the entry point for every animation</li>
+            <li><code>self.play()</code> runs an animation and <code>self.wait()</code> pauses</li>
+            <li><code>Write</code> and <code>FadeOut</code> are basic animation types</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-1">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-1">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
           </div>
-          <div class="gallery-content">
-            <div class="gallery-code">
-              <h3>MathViz Code</h3>
-              <pre><code class="language-mviz">scene HelloMathViz {
+          <div class="code-compare-panel active" id="mviz-1">
+            <pre><code class="language-mviz">// Tutorial 1: Getting Started - Hello World
+// Your first MathViz animation
+
+scene HelloWorld {
     fn construct(self) {
         let title = Text("Hello, MathViz!")
         title.scale(1.5)
 
-        play(Write(title))
-        wait(1.0)
-        play(title.animate.set_color(BLUE))
-        wait(0.5)
-        play(FadeOut(title))
+        self.play(Write(title))
+        self.wait(1.0)
+        self.play(title.animate.set_color(BLUE))
+        self.wait(0.5)
+        self.play(FadeOut(title))
     }
 }</code></pre>
-            </div>
-            <div class="gallery-video">
-              <h3>Rendered Output</h3>
-              <video controls loop muted playsinline>
-                <source src="videos/HelloMathViz.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
           </div>
-        </article>
+          <div class="code-compare-panel" id="python-1">
+            <pre><code class="language-python">from manim import *
 
-        <!-- Example 2: Circle Area -->
-        <article class="gallery-item" id="circle-area">
-          <div class="gallery-header">
-            <h2 class="gallery-title">Circle Area Formula</h2>
-            <span class="gallery-badge">Math</span>
+class HelloWorld(Scene):
+    def construct(self):
+        title = Text('Hello, MathViz!')
+        title.scale(1.5)
+        self.play(Write(title))
+        self.wait(1.0)
+        self.play(title.animate.set_color(BLUE))
+        self.wait(0.5)
+        self.play(FadeOut(title))</code></pre>
           </div>
-          <div class="gallery-content">
-            <div class="gallery-code">
-              <h3>MathViz Code</h3>
-              <pre><code class="language-mviz">scene CircleArea {
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/HelloMathViz.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 2: Basic Animations
+           ======================================== -->
+      <section class="tutorial-section" id="step-2">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">2</span>
+          <h2 class="tutorial-section-title">Basic Animations</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>from manim import</code> brings specific Manim objects into scope</li>
+            <li><code>Create()</code> draws a shape stroke by stroke</li>
+            <li><code>FadeIn()</code> and <code>FadeOut()</code> fade objects in and out</li>
+            <li><code>Transform(a, b)</code> morphs object <code>a</code> into shape <code>b</code></li>
+            <li><code>set_fill(color, opacity)</code> fills the interior of a shape</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-2">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-2">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-2">
+            <pre><code class="language-mviz">// Tutorial 2: Basic Animations
+// Create, FadeIn, FadeOut, Transform
+
+from manim import Circle, Square, Create, FadeIn, FadeOut, Transform, BLUE, RED
+
+scene BasicAnimations {
     fn construct(self) {
-        let circle = Circle(radius: 2.0, color: BLUE)
-        let formula = MathTex("A = \\pi r^2")
-        formula.next_to(circle, DOWN)
+        let circle = Circle()
+        circle.set_fill(BLUE, 0.5)
 
-        play(Create(circle))
-        play(Write(formula))
-        wait(1.0)
-        play(circle.animate.set_fill(BLUE, opacity: 0.5))
-        wait(0.5)
-        play(FadeOut(circle, formula))
+        // Create animation draws the shape
+        self.play(Create(circle))
+        self.wait(0.5)
+
+        // FadeOut makes objects disappear
+        self.play(FadeOut(circle))
+        self.wait(0.5)
+
+        // FadeIn makes objects appear
+        let square = Square()
+        square.set_fill(RED, 0.5)
+        self.play(FadeIn(square))
+        self.wait(0.5)
+
+        // Transform morphs one shape into another
+        let circle2 = Circle()
+        circle2.set_fill(BLUE, 0.5)
+        self.play(Transform(square, circle2))
+        self.wait(1.0)
     }
 }</code></pre>
-            </div>
-            <div class="gallery-video">
-              <h3>Rendered Output</h3>
-              <video controls loop muted playsinline>
-                <source src="videos/CircleArea.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
           </div>
-        </article>
+          <div class="code-compare-panel" id="python-2">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Circle, Square, Create, FadeIn, FadeOut, Transform, BLUE, RED
 
-        <!-- Example 3: Shape Transform -->
-        <article class="gallery-item" id="shape-transform">
-          <div class="gallery-header">
-            <h2 class="gallery-title">Shape Transformation</h2>
-            <span class="gallery-badge">Animation</span>
+class BasicAnimations(Scene):
+    def construct(self):
+        circle = Circle()
+        circle.set_fill(BLUE, 0.5)
+        self.play(Create(circle))
+        self.wait(0.5)
+        self.play(FadeOut(circle))
+        self.wait(0.5)
+        square = Square()
+        square.set_fill(RED, 0.5)
+        self.play(FadeIn(square))
+        self.wait(0.5)
+        circle2 = Circle()
+        circle2.set_fill(BLUE, 0.5)
+        self.play(Transform(square, circle2))
+        self.wait(1.0)</code></pre>
           </div>
-          <div class="gallery-content">
-            <div class="gallery-code">
-              <h3>MathViz Code</h3>
-              <pre><code class="language-mviz">scene ShapeTransform {
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 3: Working with Shapes
+           ======================================== -->
+      <section class="tutorial-section" id="step-3">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">3</span>
+          <h2 class="tutorial-section-title">Working with Shapes</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>MathViz uses <strong>colon syntax</strong> for named parameters: <code>radius: 1.0</code> instead of <code>radius=1.0</code></li>
+            <li><code>Circle</code>, <code>Square</code>, <code>Triangle</code>, <code>Line</code>, and <code>Arrow</code> are core shapes</li>
+            <li><code>shift()</code> moves objects by a direction vector (e.g., <code>LEFT * 3</code>)</li>
+            <li>Multiple animations can play simultaneously when passed to the same <code>self.play()</code></li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-3">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-3">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-3">
+            <pre><code class="language-mviz">// Tutorial 3: Working with Shapes
+// Circle, Square, Triangle, Line, Arrow
+
+from manim import Circle, Square, Triangle, Line, Arrow
+from manim import Create, FadeOut, BLUE, RED, GREEN, YELLOW, LEFT, RIGHT, UP, DOWN
+
+scene WorkingWithShapes {
     fn construct(self) {
-        let square = Square(side_length: 2.0, color: RED)
+        // Circle with radius
         let circle = Circle(radius: 1.0, color: BLUE)
+        circle.shift(LEFT * 3)
 
-        play(Create(square))
-        wait(0.5)
-        play(Transform(square, circle))
-        wait(0.5)
-        play(circle.animate.scale(2.0))
-        wait(0.5)
-        play(FadeOut(circle))
+        // Square with side length
+        let square = Square(side_length: 2.0, color: RED)
+
+        // Triangle
+        let tri = Triangle(color: GREEN)
+        tri.shift(RIGHT * 3)
+
+        self.play(Create(circle), Create(square), Create(tri))
+        self.wait(1.0)
+
+        // Line between two points
+        let line = Line(LEFT * 2, RIGHT * 2, color: YELLOW)
+        line.shift(DOWN * 2)
+        self.play(Create(line))
+        self.wait(1.0)
+
+        self.play(FadeOut(circle), FadeOut(square), FadeOut(tri), FadeOut(line))
     }
 }</code></pre>
-            </div>
-            <div class="gallery-video">
-              <h3>Rendered Output</h3>
-              <video controls loop muted playsinline>
-                <source src="videos/ShapeTransform.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
           </div>
-        </article>
+          <div class="code-compare-panel" id="python-3">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Circle, Square, Triangle, Line, Arrow
+from manim import Create, FadeOut, BLUE, RED, GREEN, YELLOW, LEFT, RIGHT, UP, DOWN
 
-        <!-- Example 4: Function Graph -->
-        <article class="gallery-item" id="function-graph">
-          <div class="gallery-header">
-            <h2 class="gallery-title">Function Graph</h2>
-            <span class="gallery-badge">Advanced</span>
+class WorkingWithShapes(Scene):
+    def construct(self):
+        circle = Circle(radius=1.0, color=BLUE)
+        circle.shift((LEFT * 3))
+        square = Square(side_length=2.0, color=RED)
+        tri = Triangle(color=GREEN)
+        tri.shift((RIGHT * 3))
+        self.play(Create(circle), Create(square), Create(tri))
+        self.wait(1.0)
+        line = Line((LEFT * 2), (RIGHT * 2), color=YELLOW)
+        line.shift((DOWN * 2))
+        self.play(Create(line))
+        self.wait(1.0)
+        self.play(FadeOut(circle), FadeOut(square), FadeOut(tri), FadeOut(line))</code></pre>
           </div>
-          <div class="gallery-content">
-            <div class="gallery-code">
-              <h3>MathViz Code</h3>
-              <pre><code class="language-mviz">scene FunctionGraph {
+        </div>
+
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/ShapeTransform.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 4: Text and LaTeX
+           ======================================== -->
+      <section class="tutorial-section" id="step-4">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">4</span>
+          <h2 class="tutorial-section-title">Text and LaTeX</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>Text("...")</code> creates styled text objects</li>
+            <li><code>MathTex("...")</code> renders LaTeX mathematical formulas</li>
+            <li><code>Write()</code> is the animation for text and formulas</li>
+            <li><code>next_to(obj, direction, buff: spacing)</code> positions relative to another object</li>
+            <li>Use double backslashes <code>\\</code> for LaTeX commands in strings</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-4">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-4">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-4">
+            <pre><code class="language-mviz">// Tutorial 4: Text and LaTeX
+// Text objects, MathTex, Tex
+
+scene TextAndLatex {
     fn construct(self) {
+        // Simple text
+        let title = Text("The Pythagorean Theorem", color: BLUE)
+        title.scale(0.8)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        // LaTeX mathematical formula
+        let formula = MathTex("a^2 + b^2 = c^2")
+        formula.scale(1.5)
+        self.play(Write(formula))
+        self.wait(1.0)
+
+        // More complex LaTeX
+        let integral = MathTex("\\int_0^1 x^2 \\, dx = \\frac{1}{3}")
+        integral.next_to(formula, DOWN, buff: 0.5)
+        self.play(Write(integral))
+        self.wait(1.0)
+
+        self.play(FadeOut(title), FadeOut(formula), FadeOut(integral))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-4">
+            <pre><code class="language-python">from manim import *
+
+class TextAndLatex(Scene):
+    def construct(self):
+        title = Text('The Pythagorean Theorem', color=BLUE)
+        title.scale(0.8)
+        title.to_edge(UP)
+        self.play(Write(title))
+        formula = MathTex('a^2 + b^2 = c^2')
+        formula.scale(1.5)
+        self.play(Write(formula))
+        self.wait(1.0)
+        integral = MathTex('\\int_0^1 x^2 \\, dx = \\frac{1}{3}')
+        integral.next_to(formula, DOWN, buff=0.5)
+        self.play(Write(integral))
+        self.wait(1.0)
+        self.play(FadeOut(title), FadeOut(formula), FadeOut(integral))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 5: Positioning and Layout
+           ======================================== -->
+      <section class="tutorial-section" id="step-5">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">5</span>
+          <h2 class="tutorial-section-title">Positioning and Layout</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>shift(direction * amount)</code> moves an object by a vector offset</li>
+            <li><code>to_edge(UP)</code> places an object at the screen edge</li>
+            <li><code>to_corner(UL)</code> places an object in a screen corner</li>
+            <li><code>next_to(other, direction, buff: spacing)</code> positions relative to another object</li>
+            <li>Direction constants: <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>UL</code>, <code>UR</code>, etc.</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-5">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-5">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-5">
+            <pre><code class="language-mviz">// Tutorial 5: Positioning and Layout
+// next_to, shift, to_edge, to_corner
+
+from manim import Circle, Square, Text, Create, Write, FadeOut
+from manim import BLUE, RED, GREEN, LEFT, RIGHT, UP, DOWN, UL, UR
+
+scene PositioningLayout {
+    fn construct(self) {
+        // Center object
+        let center_sq = Square(side_length: 1.0, color: RED)
+        self.play(Create(center_sq))
+        self.wait(0.5)
+
+        // Place object next_to another
+        let label = Text("Center", color: BLUE)
+        label.scale(0.6)
+        label.next_to(center_sq, DOWN, buff: 0.3)
+        self.play(Write(label))
+
+        // shift moves objects by a vector
+        let circle = Circle(radius: 0.5, color: GREEN)
+        circle.shift(RIGHT * 3)
+        self.play(Create(circle))
+
+        // to_edge places at screen edge
+        let top_text = Text("Top Edge", color: BLUE)
+        top_text.scale(0.5)
+        top_text.to_edge(UP)
+        self.play(Write(top_text))
+
+        // to_corner places at screen corner
+        let corner_text = Text("Corner", color: GREEN)
+        corner_text.scale(0.5)
+        corner_text.to_corner(UL)
+        self.play(Write(corner_text))
+
+        self.wait(1.0)
+        self.play(
+            FadeOut(center_sq), FadeOut(label),
+            FadeOut(circle), FadeOut(top_text), FadeOut(corner_text)
+        )
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-5">
+            <pre><code class="language-python">from manim import *
+from manim import Circle, Square, Text, Create, Write, FadeOut
+from manim import BLUE, RED, GREEN, LEFT, RIGHT, UP, DOWN, UL, UR
+
+class PositioningLayout(Scene):
+    def construct(self):
+        center_sq = Square(side_length=1.0, color=RED)
+        self.play(Create(center_sq))
+        self.wait(0.5)
+        label = Text('Center', color=BLUE)
+        label.scale(0.6)
+        label.next_to(center_sq, DOWN, buff=0.3)
+        self.play(Write(label))
+        circle = Circle(radius=0.5, color=GREEN)
+        circle.shift((RIGHT * 3))
+        self.play(Create(circle))
+        top_text = Text('Top Edge', color=BLUE)
+        top_text.scale(0.5)
+        top_text.to_edge(UP)
+        self.play(Write(top_text))
+        corner_text = Text('Corner', color=GREEN)
+        corner_text.scale(0.5)
+        corner_text.to_corner(UL)
+        self.play(Write(corner_text))
+        self.wait(1.0)
+        self.play(FadeOut(center_sq), FadeOut(label), FadeOut(circle), FadeOut(top_text), FadeOut(corner_text))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 6: Colors and Styling
+           ======================================== -->
+      <section class="tutorial-section" id="step-6">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">6</span>
+          <h2 class="tutorial-section-title">Colors and Styling</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>set_color(COLOR)</code> changes the overall color of a shape</li>
+            <li><code>set_fill(color, opacity: value)</code> fills the interior</li>
+            <li><code>set_stroke(color, width: value)</code> styles the border</li>
+            <li>Color changes can be animated with <code>.animate.set_color()</code></li>
+            <li>Available colors: <code>BLUE</code>, <code>RED</code>, <code>GREEN</code>, <code>YELLOW</code>, <code>WHITE</code>, and more</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-6">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-6">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-6">
+            <pre><code class="language-mviz">// Tutorial 6: Colors and Styling
+// set_color, set_fill, set_stroke
+
+from manim import Circle, Square, Create, FadeOut
+from manim import BLUE, RED, GREEN, YELLOW, WHITE, LEFT, RIGHT
+
+scene ColorsStyling {
+    fn construct(self) {
+        // set_color changes the overall color
+        let c1 = Circle(radius: 1.0)
+        c1.set_color(BLUE)
+        c1.shift(LEFT * 3)
+
+        // set_fill adds interior color with opacity
+        let c2 = Circle(radius: 1.0)
+        c2.set_fill(RED, opacity: 0.5)
+        c2.set_stroke(WHITE, width: 2)
+
+        // Combine fill and stroke
+        let c3 = Circle(radius: 1.0)
+        c3.set_fill(GREEN, opacity: 0.7)
+        c3.set_stroke(YELLOW, width: 4)
+        c3.shift(RIGHT * 3)
+
+        self.play(Create(c1), Create(c2), Create(c3))
+        self.wait(1.0)
+
+        // Animate color change
+        self.play(c1.animate.set_color(YELLOW))
+        self.play(c2.animate.set_fill(BLUE, opacity: 0.8))
+        self.wait(1.0)
+
+        self.play(FadeOut(c1), FadeOut(c2), FadeOut(c3))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-6">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Circle, Square, Create, FadeOut
+from manim import BLUE, RED, GREEN, YELLOW, WHITE, LEFT, RIGHT
+
+class ColorsStyling(Scene):
+    def construct(self):
+        c1 = Circle(radius=1.0)
+        c1.set_color(BLUE)
+        c1.shift((LEFT * 3))
+        c2 = Circle(radius=1.0)
+        c2.set_fill(RED, opacity=0.5)
+        c2.set_stroke(WHITE, width=2)
+        c3 = Circle(radius=1.0)
+        c3.set_fill(GREEN, opacity=0.7)
+        c3.set_stroke(YELLOW, width=4)
+        c3.shift((RIGHT * 3))
+        self.play(Create(c1), Create(c2), Create(c3))
+        self.wait(1.0)
+        self.play(c1.animate.set_color(YELLOW))
+        self.play(c2.animate.set_fill(BLUE, opacity=0.8))
+        self.wait(1.0)
+        self.play(FadeOut(c1), FadeOut(c2), FadeOut(c3))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 7: Transforms and Morphing
+           ======================================== -->
+      <section class="tutorial-section" id="step-7">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">7</span>
+          <h2 class="tutorial-section-title">Transforms and Morphing</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>Transform(a, b)</code> morphs <code>a</code> into the shape of <code>b</code> (keeps reference to <code>a</code>)</li>
+            <li><code>ReplacementTransform(a, b)</code> replaces <code>a</code> with <code>b</code> entirely</li>
+            <li><code>.animate</code> allows chaining multiple property changes in one animation</li>
+            <li>Chain methods: <code>obj.animate.scale(0.5).shift(UP * 2)</code></li>
+            <li><code>rotate(PI / 4)</code> rotates an object by an angle in radians</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-7">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-7">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-7">
+            <pre><code class="language-mviz">// Tutorial 7: Transforms and Morphing
+// Transform, ReplacementTransform, animate
+
+from manim import Circle, Square, Triangle, Transform, ReplacementTransform
+from manim import Create, FadeOut, BLUE, RED, GREEN
+
+scene TransformsMorphing {
+    fn construct(self) {
+        let square = Square(side_length: 2.0, color: BLUE)
+        self.play(Create(square))
+        self.wait(0.5)
+
+        // Transform morphs one shape into another
+        let circle = Circle(radius: 1.0, color: RED)
+        self.play(Transform(square, circle))
+        self.wait(0.5)
+
+        // ReplacementTransform replaces the mobject reference
+        let triangle = Triangle(color: GREEN)
+        triangle.scale(2.0)
+        self.play(ReplacementTransform(circle, triangle))
+        self.wait(0.5)
+
+        // animate allows chaining transformations
+        self.play(triangle.animate.scale(0.5).shift(UP * 2))
+        self.wait(0.5)
+
+        self.play(triangle.animate.rotate(PI / 4))
+        self.wait(1.0)
+
+        self.play(FadeOut(triangle))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-7">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Circle, Square, Triangle, Transform, ReplacementTransform
+from manim import Create, FadeOut, BLUE, RED, GREEN
+
+class TransformsMorphing(Scene):
+    def construct(self):
+        square = Square(side_length=2.0, color=BLUE)
+        self.play(Create(square))
+        self.wait(0.5)
+        circle = Circle(radius=1.0, color=RED)
+        self.play(Transform(square, circle))
+        self.wait(0.5)
+        triangle = Triangle(color=GREEN)
+        triangle.scale(2.0)
+        self.play(ReplacementTransform(circle, triangle))
+        self.wait(0.5)
+        self.play(triangle.animate.scale(0.5).shift((UP * 2)))
+        self.wait(0.5)
+        self.play(triangle.animate.rotate((PI / 4)))
+        self.wait(1.0)
+        self.play(FadeOut(triangle))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 8: Graphs and Functions
+           ======================================== -->
+      <section class="tutorial-section" id="step-8">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">8</span>
+          <h2 class="tutorial-section-title">Graphs and Functions</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>Axes(x_range: [...], y_range: [...])</code> creates coordinate axes</li>
+            <li><code>axes.plot(|x| sin(x), color: YELLOW)</code> plots a function using pipe-lambda syntax</li>
+            <li>Pipe-lambda <code>|x| expr</code> compiles to Python <code>lambda x: np.expr(x)</code></li>
+            <li><code>MathTex()</code> creates labels for formulas</li>
+            <li><code>to_corner(UR)</code> places labels in the upper-right corner</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-8">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-8">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-8">
+            <pre><code class="language-mviz">// Tutorial 8: Graphs and Functions
+// Axes, NumberPlane, plotting
+
+from manim import Axes, Create, Write, FadeOut, BLUE, YELLOW, UR
+
+scene GraphsFunctions {
+    fn construct(self) {
+        // Create coordinate axes
         let axes = Axes(
             x_range: [-3, 3, 1],
-            y_range: [-2, 2, 1],
-            axis_config: {"color": BLUE}
+            y_range: [-2, 2, 1]
         )
 
+        // Plot a sine function
         let graph = axes.plot(|x| sin(x), color: YELLOW)
         let label = MathTex("f(x) = \\sin(x)")
         label.to_corner(UR)
 
-        play(Create(axes))
-        play(Create(graph), Write(label))
-        wait(1.0)
-        play(FadeOut(axes, graph, label))
+        self.play(Create(axes))
+        self.play(Create(graph), Write(label))
+        self.wait(1.0)
+
+        // Plot a second function
+        let graph2 = axes.plot(|x| cos(x), color: BLUE)
+        let label2 = MathTex("g(x) = \\cos(x)", color: BLUE)
+        label2.next_to(label, DOWN)
+
+        self.play(Create(graph2), Write(label2))
+        self.wait(1.0)
+
+        self.play(FadeOut(axes), FadeOut(graph), FadeOut(graph2), FadeOut(label), FadeOut(label2))
     }
 }</code></pre>
-            </div>
-            <div class="gallery-video">
-              <h3>Rendered Output</h3>
-              <video controls loop muted playsinline>
-                <source src="videos/FunctionGraph.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
           </div>
-        </article>
+          <div class="code-compare-panel" id="python-8">
+            <pre><code class="language-python">import numpy as np
+from manim import *
+from manim import Axes, Create, Write, FadeOut, BLUE, YELLOW, UR
 
-      </div>
+class GraphsFunctions(Scene):
+    def construct(self):
+        axes = Axes(x_range=[(-3), 3, 1], y_range=[(-2), 2, 1])
+        graph = axes.plot(lambda x: np.sin(x), color=YELLOW)
+        label = MathTex('f(x) = \\sin(x)')
+        label.to_corner(UR)
+        self.play(Create(axes))
+        self.play(Create(graph), Write(label))
+        self.wait(1.0)
+        graph2 = axes.plot(lambda x: np.cos(x), color=BLUE)
+        label2 = MathTex('g(x) = \\cos(x)', color=BLUE)
+        label2.next_to(label, DOWN)
+        self.play(Create(graph2), Write(label2))
+        self.wait(1.0)
+        self.play(FadeOut(axes), FadeOut(graph), FadeOut(graph2), FadeOut(label), FadeOut(label2))</code></pre>
+          </div>
+        </div>
 
+        <div class="tutorial-video">
+          <video controls loop muted playsinline>
+            <source src="videos/FunctionGraph.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 9: Groups and VGroups
+           ======================================== -->
+      <section class="tutorial-section" id="step-9">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">9</span>
+          <h2 class="tutorial-section-title">Groups and VGroups</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>VGroup(obj1, obj2, obj3)</code> groups multiple mobjects together</li>
+            <li><code>group.arrange(RIGHT, buff: 0.5)</code> arranges objects in a direction with spacing</li>
+            <li>Animating the group affects all children: <code>group.animate.scale(1.5)</code></li>
+            <li>Individual elements remain accessible: <code>c1.animate.set_color(YELLOW)</code></li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-9">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-9">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-9">
+            <pre><code class="language-mviz">// Tutorial 9: Groups and VGroups
+// Grouping objects, batch operations
+
+from manim import Circle, Square, VGroup, Create, FadeOut
+from manim import BLUE, RED, GREEN, LEFT, RIGHT
+
+scene GroupsVGroups {
+    fn construct(self) {
+        // Create individual shapes
+        let c1 = Circle(radius: 0.5, color: RED)
+        let c2 = Circle(radius: 0.5, color: GREEN)
+        let c3 = Circle(radius: 0.5, color: BLUE)
+
+        // Create a VGroup and arrange them
+        let group = VGroup(c1, c2, c3)
+        group.arrange(RIGHT, buff: 0.5)
+
+        self.play(Create(group))
+        self.wait(0.5)
+
+        // Animate the entire group at once
+        self.play(group.animate.scale(1.5))
+        self.wait(0.5)
+
+        self.play(group.animate.shift(UP * 2))
+        self.wait(0.5)
+
+        // Animate individual elements in the group
+        self.play(c1.animate.set_color(YELLOW))
+        self.wait(1.0)
+
+        self.play(FadeOut(group))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-9">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Circle, Square, VGroup, Create, FadeOut
+from manim import BLUE, RED, GREEN, LEFT, RIGHT
+
+class GroupsVGroups(Scene):
+    def construct(self):
+        c1 = Circle(radius=0.5, color=RED)
+        c2 = Circle(radius=0.5, color=GREEN)
+        c3 = Circle(radius=0.5, color=BLUE)
+        group = VGroup(c1, c2, c3)
+        group.arrange(RIGHT, buff=0.5)
+        self.play(Create(group))
+        self.wait(0.5)
+        self.play(group.animate.scale(1.5))
+        self.wait(0.5)
+        self.play(group.animate.shift((UP * 2)))
+        self.wait(0.5)
+        self.play(c1.animate.set_color(YELLOW))
+        self.wait(1.0)
+        self.play(FadeOut(group))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 10: Camera and Scene Control
+           ======================================== -->
+      <section class="tutorial-section" id="step-10">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">10</span>
+          <h2 class="tutorial-section-title">Camera and Scene Control</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li><code>run_time: seconds</code> controls the duration of an animation</li>
+            <li>Successive <code>self.play()</code> calls create sequential animations</li>
+            <li><code>self.wait(seconds)</code> adds pauses between animations</li>
+            <li>Combine <code>set_fill</code> with <code>Create</code> for filled shapes</li>
+            <li>Chain <code>shift()</code> calls for back-and-forth motion patterns</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-10">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-10">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-10">
+            <pre><code class="language-mviz">// Tutorial 10: Camera and Scene Control
+// Scene configuration, background color, wait times
+
+from manim import Circle, Square, Text, Create, Write, FadeOut
+from manim import BLUE, RED, WHITE, UP
+
+scene CameraSceneControl {
+    fn construct(self) {
+        // Create a complex scene
+        let title = Text("Scene Control", color: BLUE)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        let circle = Circle(radius: 1.5, color: RED)
+        circle.set_fill(RED, opacity: 0.3)
+        self.play(Create(circle))
+
+        // Animate with run_time parameter for speed control
+        self.play(circle.animate.scale(2.0), run_time: 2.0)
+        self.wait(0.5)
+
+        self.play(circle.animate.scale(0.5), run_time: 0.5)
+        self.wait(0.5)
+
+        // Successive transformations
+        self.play(circle.animate.shift(LEFT * 2), run_time: 1.0)
+        self.play(circle.animate.shift(RIGHT * 4), run_time: 1.0)
+        self.play(circle.animate.shift(LEFT * 2), run_time: 1.0)
+
+        self.wait(1.0)
+        self.play(FadeOut(title), FadeOut(circle))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-10">
+            <pre><code class="language-python">from manim import *
+from manim import Circle, Square, Text, Create, Write, FadeOut
+from manim import BLUE, RED, WHITE, UP
+
+class CameraSceneControl(Scene):
+    def construct(self):
+        title = Text('Scene Control', color=BLUE)
+        title.to_edge(UP)
+        self.play(Write(title))
+        circle = Circle(radius=1.5, color=RED)
+        circle.set_fill(RED, opacity=0.3)
+        self.play(Create(circle))
+        self.play(circle.animate.scale(2.0), run_time=2.0)
+        self.wait(0.5)
+        self.play(circle.animate.scale(0.5), run_time=0.5)
+        self.wait(0.5)
+        self.play(circle.animate.shift((LEFT * 2)), run_time=1.0)
+        self.play(circle.animate.shift((RIGHT * 4)), run_time=1.0)
+        self.play(circle.animate.shift((LEFT * 2)), run_time=1.0)
+        self.wait(1.0)
+        self.play(FadeOut(title), FadeOut(circle))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           STEP 11: Advanced Mathematical Scenes
+           ======================================== -->
+      <section class="tutorial-section" id="step-11">
+        <div class="tutorial-section-header">
+          <span class="tutorial-step-badge">11</span>
+          <h2 class="tutorial-section-title">Advanced Mathematical Scenes</h2>
+        </div>
+
+        <div class="tutorial-explain">
+          <h4>What you will learn</h4>
+          <ul>
+            <li>Combine all previous concepts into a complex theorem animation</li>
+            <li>Use <code>MathTex</code> for multi-step proofs and formulas</li>
+            <li>Organize scenes with helper variables and labeled objects</li>
+            <li>Use <code>VGroup</code> to manage complex layouts with multiple elements</li>
+            <li>Apply <code>Transform</code> and <code>ReplacementTransform</code> for proof transitions</li>
+          </ul>
+        </div>
+
+        <div class="code-compare">
+          <div class="code-compare-tabs">
+            <button class="code-compare-tab active" data-panel="mviz-11">
+              <span class="tab-dot mviz"></span> MathViz
+            </button>
+            <button class="code-compare-tab" data-panel="python-11">
+              <span class="tab-dot python"></span> Compiled Python
+            </button>
+          </div>
+          <div class="code-compare-panel active" id="mviz-11">
+            <pre><code class="language-mviz">// Advanced: Pythagorean Theorem Visualization
+// Combines shapes, text, transforms, and layout
+
+from manim import Square, Text, MathTex, VGroup, Create, Write
+from manim import FadeIn, FadeOut, Transform, BLUE, RED, GREEN, YELLOW
+from manim import UP, DOWN, LEFT, RIGHT
+
+scene PythagoreanTheorem {
+    fn construct(self) {
+        // Title
+        let title = Text("Pythagorean Theorem", color: BLUE)
+        title.scale(0.9)
+        title.to_edge(UP)
+        self.play(Write(title))
+
+        // Show the formula
+        let formula = MathTex("a^2 + b^2 = c^2")
+        formula.scale(1.5)
+        self.play(Write(formula))
+        self.wait(1.0)
+
+        // Create visual squares
+        let sq_a = Square(side_length: 1.0, color: RED)
+        sq_a.set_fill(RED, opacity: 0.3)
+        let label_a = MathTex("a^2", color: RED)
+        label_a.scale(0.7)
+
+        let sq_b = Square(side_length: 1.5, color: GREEN)
+        sq_b.set_fill(GREEN, opacity: 0.3)
+        let label_b = MathTex("b^2", color: GREEN)
+        label_b.scale(0.7)
+
+        let sq_c = Square(side_length: 2.0, color: YELLOW)
+        sq_c.set_fill(YELLOW, opacity: 0.3)
+        let label_c = MathTex("c^2", color: YELLOW)
+        label_c.scale(0.7)
+
+        // Position squares
+        sq_a.shift(LEFT * 3 + DOWN * 1)
+        label_a.next_to(sq_a, DOWN)
+        sq_b.shift(DOWN * 1)
+        label_b.next_to(sq_b, DOWN)
+        sq_c.shift(RIGHT * 3 + DOWN * 1)
+        label_c.next_to(sq_c, DOWN)
+
+        // Animate the visualization
+        self.play(FadeOut(formula))
+        self.play(Create(sq_a), Write(label_a))
+        self.play(Create(sq_b), Write(label_b))
+        self.play(Create(sq_c), Write(label_c))
+        self.wait(1.0)
+
+        // Final formula
+        let final_eq = MathTex("a^2", "+", "b^2", "=", "c^2")
+        final_eq.scale(1.3)
+        final_eq.next_to(title, DOWN, buff: 0.5)
+        self.play(Write(final_eq))
+        self.wait(2.0)
+
+        // Clean up
+        let all_objs = VGroup(
+            title, sq_a, sq_b, sq_c,
+            label_a, label_b, label_c, final_eq
+        )
+        self.play(FadeOut(all_objs))
+    }
+}</code></pre>
+          </div>
+          <div class="code-compare-panel" id="python-11">
+            <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+from manim import *
+from manim import Square, Text, MathTex, VGroup, Create, Write
+from manim import FadeIn, FadeOut, Transform, BLUE, RED, GREEN, YELLOW
+from manim import UP, DOWN, LEFT, RIGHT
+
+class PythagoreanTheorem(Scene):
+    def construct(self):
+        title = Text('Pythagorean Theorem', color=BLUE)
+        title.scale(0.9)
+        title.to_edge(UP)
+        self.play(Write(title))
+        formula = MathTex('a^2 + b^2 = c^2')
+        formula.scale(1.5)
+        self.play(Write(formula))
+        self.wait(1.0)
+        sq_a = Square(side_length=1.0, color=RED)
+        sq_a.set_fill(RED, opacity=0.3)
+        label_a = MathTex('a^2', color=RED)
+        label_a.scale(0.7)
+        sq_b = Square(side_length=1.5, color=GREEN)
+        sq_b.set_fill(GREEN, opacity=0.3)
+        label_b = MathTex('b^2', color=GREEN)
+        label_b.scale(0.7)
+        sq_c = Square(side_length=2.0, color=YELLOW)
+        sq_c.set_fill(YELLOW, opacity=0.3)
+        label_c = MathTex('c^2', color=YELLOW)
+        label_c.scale(0.7)
+        sq_a.shift((LEFT * 3 + DOWN * 1))
+        label_a.next_to(sq_a, DOWN)
+        sq_b.shift((DOWN * 1))
+        label_b.next_to(sq_b, DOWN)
+        sq_c.shift((RIGHT * 3 + DOWN * 1))
+        label_c.next_to(sq_c, DOWN)
+        self.play(FadeOut(formula))
+        self.play(Create(sq_a), Write(label_a))
+        self.play(Create(sq_b), Write(label_b))
+        self.play(Create(sq_c), Write(label_c))
+        self.wait(1.0)
+        final_eq = MathTex('a^2', '+', 'b^2', '=', 'c^2')
+        final_eq.scale(1.3)
+        final_eq.next_to(title, DOWN, buff=0.5)
+        self.play(Write(final_eq))
+        self.wait(2.0)
+        all_objs = VGroup(title, sq_a, sq_b, sq_c, label_a, label_b, label_c, final_eq)
+        self.play(FadeOut(all_objs))</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================
+           Next Steps
+           ======================================== -->
       <h2>Next Steps</h2>
-      <ul>
-        <li><a href="../docs/scenes.html">Scenes & Manim Guide</a> - Learn all Manim integration features</li>
-        <li><a href="index.html">Code Examples</a> - More code snippets</li>
-        <li><a href="../docs/cli.html">CLI Reference</a> - Render options and commands</li>
-      </ul>
+      <div class="tutorial-explain">
+        <h4>Where to go from here</h4>
+        <ul>
+          <li><a href="../docs/scenes.html">Scenes &amp; Manim Guide</a> - Deep dive into all Manim integration features</li>
+          <li><a href="../docs/language-reference.html">Language Reference</a> - Complete MathViz syntax and types</li>
+          <li><a href="index.html">Code Examples</a> - Browse more code patterns</li>
+          <li><a href="../docs/cli.html">CLI Reference</a> - Compile, render, and format commands</li>
+          <li><a href="https://github.com/CyberSnakeH/MathViz" target="_blank" rel="noopener">GitHub Repository</a> - Contribute and explore the source</li>
+        </ul>
+      </div>
 
     </main>
   </div>
+
+  <!-- Sidebar mobile toggle -->
+  <button class="sidebar-mobile-toggle" id="sidebar-toggle" aria-label="Toggle tutorial navigation">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
 
   <!-- Footer -->
   <footer class="footer">
@@ -363,5 +1190,112 @@
   <script src="../assets/app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="../assets/prism-mviz.js"></script>
+  <script>
+    // ============================================
+    // Tutorial Tab Switching
+    // ============================================
+    document.querySelectorAll('.code-compare-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var panelId = this.getAttribute('data-panel');
+        var container = this.closest('.code-compare');
+        container.querySelectorAll('.code-compare-tab').forEach(function(t) {
+          t.classList.remove('active');
+        });
+        container.querySelectorAll('.code-compare-panel').forEach(function(p) {
+          p.classList.remove('active');
+        });
+        this.classList.add('active');
+        var panel = document.getElementById(panelId);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // ============================================
+    // Tutorial Sidebar Scroll Spy
+    // ============================================
+    (function() {
+      var sections = document.querySelectorAll('.tutorial-section');
+      var navLinks = document.querySelectorAll('#tutorial-nav .sidebar-link');
+      var progressFill = document.getElementById('progress-fill');
+      var progressText = document.getElementById('progress-text');
+      var totalSteps = sections.length;
+
+      function updateProgress() {
+        var viewportH = window.innerHeight;
+        var activeIndex = 0;
+
+        for (var i = 0; i < sections.length; i++) {
+          var rect = sections[i].getBoundingClientRect();
+          if (rect.top <= viewportH * 0.4) {
+            activeIndex = i;
+          }
+        }
+
+        navLinks.forEach(function(link) { link.classList.remove('active'); });
+        if (navLinks[activeIndex]) {
+          navLinks[activeIndex].classList.add('active');
+        }
+
+        var percent = Math.round(((activeIndex + 1) / totalSteps) * 100);
+        if (progressFill) progressFill.style.width = percent + '%';
+        if (progressText) progressText.textContent = 'Step ' + (activeIndex + 1) + ' / ' + totalSteps;
+      }
+
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            updateProgress();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      updateProgress();
+    })();
+
+    // ============================================
+    // Mobile Sidebar Toggle
+    // ============================================
+    (function() {
+      var toggleBtn = document.getElementById('sidebar-toggle');
+      var sidebar = document.getElementById('tutorial-sidebar');
+      var mobileToggle = document.querySelector('.nav-mobile-toggle');
+      var menuIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+      var closeIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', function() {
+          var isOpen = sidebar.classList.toggle('open');
+          toggleBtn.setAttribute('aria-expanded', isOpen);
+          toggleBtn.textContent = '';
+          var template = document.createElement('template');
+          template.innerHTML = isOpen ? closeIcon : menuIcon;
+          toggleBtn.appendChild(template.content);
+        });
+
+        sidebar.querySelectorAll('.sidebar-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+              sidebar.classList.remove('open');
+              toggleBtn.setAttribute('aria-expanded', 'false');
+              toggleBtn.textContent = '';
+              var template = document.createElement('template');
+              template.innerHTML = menuIcon;
+              toggleBtn.appendChild(template.content);
+            }
+          });
+        });
+      }
+
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', function() {
+          var navLinks = document.querySelector('.nav-links');
+          if (navLinks) navLinks.classList.toggle('open');
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
