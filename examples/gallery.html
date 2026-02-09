@@ -26,7 +26,7 @@
       <div class="nav-actions">
         <a href="https://github.com/CyberSnakeH/MathViz" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">GitHub</a>
       </div>
-      <button class="nav-mobile-toggle" id="nav-mobile-btn" aria-label="Toggle menu" onclick="document.getElementById('nav-mobile-menu').classList.toggle('open'); document.getElementById('tutorial-sidebar').classList.remove('open');">
+      <button class="nav-mobile-toggle" id="nav-mobile-btn" aria-label="Toggle menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -39,17 +39,24 @@
       <a href="../docs/language-reference.html" class="nav-link">Language</a>
       <a href="../docs/scenes.html" class="nav-link">Manim</a>
       <a href="../docs/cli.html" class="nav-link">CLI</a>
+      <div class="nav-divider"></div>
       <a href="index.html" class="nav-link">Examples</a>
       <a href="gallery.html" class="nav-link active">Tutorials</a>
       <a href="advanced.html" class="nav-link">Advanced Modules</a>
+      <div class="nav-divider"></div>
       <a href="https://github.com/CyberSnakeH/MathViz" class="nav-link" target="_blank" rel="noopener">GitHub</a>
-      <button class="btn btn-primary" style="margin-top: var(--space-md);" onclick="document.getElementById('nav-mobile-menu').classList.remove('open'); document.getElementById('tutorial-sidebar').classList.toggle('open');">Toggle Sidebar</button>
     </div>
   </header>
 
   <div class="docs-layout">
+    <!-- Sidebar Backdrop (mobile) -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
     <!-- Sidebar -->
     <aside class="docs-sidebar" id="tutorial-sidebar">
+      <button class="sidebar-close-btn" id="sidebar-close" aria-label="Close sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
       <div class="sidebar-section">
         <div class="sidebar-title">Examples</div>
         <nav class="sidebar-nav">
@@ -1755,6 +1762,11 @@ class AdvancedAnimation(Scene):
     </main>
   </div>
 
+  <!-- Floating Sidebar Button (mobile) -->
+  <button class="sidebar-fab" id="sidebar-fab" aria-label="Open tutorial index">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg>
+  </button>
+
   <!-- Back to Top Button -->
   <button class="back-to-top" id="back-to-top" aria-label="Back to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1840,22 +1852,77 @@ class AdvancedAnimation(Scene):
         });
       }
 
-      // Mobile sidebar toggle
-      var toggle = document.querySelector('.nav-mobile-toggle');
+      // === Mobile Navigation ===
+      var navBtn = document.getElementById('nav-mobile-btn');
+      var navMenu = document.getElementById('nav-mobile-menu');
       var sidebar = document.getElementById('tutorial-sidebar');
-      if (toggle && sidebar) {
-        toggle.addEventListener('click', function() {
-          sidebar.classList.toggle('open');
-        });
-        // Close sidebar when clicking a nav link on mobile
-        navLinks.forEach(function(link) {
-          link.addEventListener('click', function() {
-            if (window.innerWidth < 1024) {
-              sidebar.classList.remove('open');
-            }
-          });
+      var backdrop = document.getElementById('sidebar-backdrop');
+      var sidebarFab = document.getElementById('sidebar-fab');
+      var sidebarClose = document.getElementById('sidebar-close');
+
+      function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('visible');
+      }
+
+      function openSidebar() {
+        if (sidebar) sidebar.classList.add('open');
+        if (backdrop) backdrop.classList.add('visible');
+        if (navMenu) navMenu.classList.remove('open');
+      }
+
+      function closeNav() {
+        if (navMenu) navMenu.classList.remove('open');
+      }
+
+      // Hamburger toggles nav menu
+      if (navBtn) {
+        navBtn.addEventListener('click', function() {
+          navMenu.classList.toggle('open');
+          closeSidebar();
         });
       }
+
+      // FAB opens sidebar
+      if (sidebarFab) {
+        sidebarFab.addEventListener('click', function() {
+          openSidebar();
+        });
+      }
+
+      // Close button closes sidebar
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeSidebar);
+      }
+
+      // Backdrop closes sidebar
+      if (backdrop) {
+        backdrop.addEventListener('click', closeSidebar);
+      }
+
+      // Clicking sidebar link closes sidebar on mobile
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (window.innerWidth <= 900) {
+            closeSidebar();
+          }
+        });
+      });
+
+      // Close nav menu when clicking a link
+      if (navMenu) {
+        navMenu.querySelectorAll('.nav-link').forEach(function(link) {
+          link.addEventListener('click', closeNav);
+        });
+      }
+
+      // Close everything on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeSidebar();
+          closeNav();
+        }
+      });
     })();
   </script>
 </body>
