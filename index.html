@@ -54,13 +54,23 @@
         </a>
       </div>
 
-      <button class="nav-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button class="nav-mobile-toggle" aria-label="Toggle menu" aria-expanded="false" onclick="document.getElementById('nav-mobile-menu').classList.toggle('open');">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
+    </div>
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+      <a href="docs/getting-started.html" class="nav-link">Docs</a>
+      <a href="docs/language-reference.html" class="nav-link">Language</a>
+      <a href="docs/scenes.html" class="nav-link">Manim</a>
+      <a href="docs/cli.html" class="nav-link">CLI</a>
+      <a href="examples/index.html" class="nav-link">Examples</a>
+      <a href="examples/gallery.html" class="nav-link">Tutorials</a>
+      <a href="examples/advanced.html" class="nav-link">Advanced Modules</a>
+      <a href="https://github.com/CyberSnakeH/MathViz" class="nav-link" target="_blank" rel="noopener">GitHub</a>
     </div>
   </header>
 
