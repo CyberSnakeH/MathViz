@@ -2211,3 +2211,339 @@ pre[class*="language-"] {
     padding: var(--space-xl) 0;
   }
 }
+
+/* ============================================
+   Tutorial Level Headers
+   ============================================ */
+.tutorial-level-header {
+  margin: var(--space-3xl) 0 var(--space-xl);
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--accent-blue);
+}
+
+.tutorial-level-badge {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.tutorial-level-badge.beginner {
+  background: rgba(158, 206, 106, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(158, 206, 106, 0.3);
+}
+
+.tutorial-level-badge.intermediate {
+  background: rgba(224, 175, 104, 0.15);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(224, 175, 104, 0.3);
+}
+
+.tutorial-level-badge.advanced {
+  background: rgba(247, 118, 142, 0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(247, 118, 142, 0.3);
+}
+
+.tutorial-level-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: var(--space-xs) 0;
+}
+
+.tutorial-level-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Tutorial subtitle */
+.tutorial-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+}
+
+/* ============================================
+   Tutorial Completion Section
+   ============================================ */
+.tutorial-completion {
+  margin-top: var(--space-3xl);
+  padding: var(--space-2xl);
+  background: linear-gradient(135deg, rgba(122, 162, 247, 0.08), rgba(187, 154, 247, 0.08));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+
+.tutorial-completion h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  margin-bottom: var(--space-md);
+}
+
+.tutorial-completion p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+.tutorial-completion ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto var(--space-xl);
+  max-width: 600px;
+  text-align: left;
+}
+
+.tutorial-completion li {
+  padding: var(--space-xs) 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.tutorial-completion li::before {
+  content: '\2713';
+  color: var(--accent-green);
+  font-weight: 700;
+  margin-right: var(--space-sm);
+}
+
+.tutorial-next-steps {
+  margin-top: var(--space-xl);
+}
+
+.tutorial-next-steps h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.tutorial-next-links {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   Back to Top Button
+   ============================================ */
+.back-to-top {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  z-index: var(--z-sticky);
+  width: 44px;
+  height: 44px;
+  background: var(--accent-blue);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--transition-normal), transform var(--transition-normal), background var(--transition-fast);
+  pointer-events: none;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: var(--accent-primary-hover);
+  transform: translateY(-2px);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   Enhanced Mobile Styles - Fluid Typography
+   ============================================ */
+@media (max-width: 1024px) {
+  .tutorial-level-header {
+    margin: var(--space-xl) 0 var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .tutorial-level-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Fluid typography with clamp */
+  .docs-content h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .docs-content h2 {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+  }
+
+  .tutorial-subtitle {
+    font-size: clamp(0.85rem, 3vw, 1.1rem);
+  }
+
+  /* Touch-friendly tab buttons */
+  .code-compare-tab {
+    min-height: 44px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.85rem;
+  }
+
+  /* Sidebar as overlay on mobile */
+  .docs-sidebar.open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Tutorial video responsive */
+  .tutorial-video {
+    margin-left: calc(-1 * var(--space-md));
+    margin-right: calc(-1 * var(--space-md));
+    border-radius: 0;
+  }
+
+  .tutorial-video video {
+    border-radius: 0;
+  }
+
+  /* Level headers on mobile */
+  .tutorial-level-header {
+    margin: var(--space-lg) 0 var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .tutorial-level-title {
+    font-size: 1.1rem;
+  }
+
+  .tutorial-level-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Completion section mobile */
+  .tutorial-completion {
+    padding: var(--space-lg);
+  }
+
+  .tutorial-completion h2 {
+    font-size: 1.5rem;
+  }
+
+  .tutorial-next-links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tutorial-next-links .btn {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Back to top on mobile - larger touch target */
+  .back-to-top {
+    width: 48px;
+    height: 48px;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+  }
+
+  /* Progress bar touch-friendly */
+  .tutorial-progress {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+@media (max-width: 640px) {
+  /* Extra small screen adjustments */
+  .code-compare-tab {
+    min-height: 48px;
+    font-size: 0.8rem;
+    padding: var(--space-sm);
+  }
+
+  .tutorial-section {
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .tutorial-explain {
+    padding: var(--space-sm);
+  }
+
+  .tutorial-explain h4 {
+    font-size: 0.9rem;
+  }
+
+  .tutorial-explain li {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  /* Code blocks horizontal scroll */
+  .code-compare-panel pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-3) transparent;
+  }
+
+  .code-compare-panel pre code {
+    font-size: 0.6875rem;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  .tutorial-step-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+
+  .tutorial-section-title {
+    font-size: 1rem;
+  }
+
+  .docs-content {
+    padding: var(--space-sm);
+  }
+
+  .callout {
+    padding: var(--space-sm);
+  }
+
+  .callout-text {
+    font-size: 0.8rem;
+  }
+
+  .back-to-top {
+    bottom: var(--space-md);
+    right: var(--space-md);
+  }
+}

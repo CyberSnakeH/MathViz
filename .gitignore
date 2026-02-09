@@ -26,7 +26,8 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Manim output
+# Manim output (except tutorial videos)
 *.mp4
+!examples/videos/tutorials/*.mp4
 *.png
 *.svg
