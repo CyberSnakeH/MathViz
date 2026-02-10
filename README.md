@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/CyberSnakeH/MathViz/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/CyberSnakeH/MathViz/ci.yml?style=flat-square&label=CI" alt="CI"></a>
+  <a href="https://pypi.org/project/mathviz/"><img src="https://img.shields.io/pypi/v/mathviz?style=flat-square&color=7aa2f7" alt="PyPI"></a>
   <a href="https://github.com/CyberSnakeH/MathViz/releases"><img src="https://img.shields.io/github/v/release/CyberSnakeH/MathViz?style=flat-square&color=7aa2f7" alt="Release"></a>
   <a href="https://github.com/CyberSnakeH/MathViz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/CyberSnakeH/MathViz?style=flat-square&color=9ece6a" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12+-bb9af7?style=flat-square" alt="Python"></a>
@@ -38,6 +39,8 @@ MathViz is a modern programming language designed specifically for creating math
 - **Static Analysis** — Built-in `check`, `analyze`, `typecheck`, `lint`, and `fmt` commands
 - **Module System** — Multi-file projects with `use` imports
 - **Desktop Editor** — Cross-platform editor with live preview (Tauri + React)
+- **VS Code Extension** — Syntax highlighting, snippets, and bracket matching for VS Code
+- **Auto-update** — Automatic update detection with PyPI version check
 - **Fast Iteration** — REPL mode and file watcher for rapid development
 
 ## Installation
@@ -45,23 +48,21 @@ MathViz is a modern programming language designed specifically for creating math
 ### Using pipx (Recommended)
 
 ```bash
-pipx install git+https://github.com/CyberSnakeH/MathViz.git
-```
-
-### Using uv
-
-```bash
-git clone https://github.com/CyberSnakeH/MathViz.git
-cd MathViz
-uv sync --dev
+pipx install mathviz
 ```
 
 ### Using pip
 
 ```bash
+pip install mathviz
+```
+
+### From source
+
+```bash
 git clone https://github.com/CyberSnakeH/MathViz.git
 cd MathViz
-pip install -e ".[dev]"
+uv sync --dev
 ```
 
 ### Prerequisites
@@ -177,6 +178,18 @@ mathviz build                # Build project
 mathviz test                 # Run tests
 ```
 
+## VS Code Extension
+
+Install the MathViz extension for VS Code with syntax highlighting, 18 code snippets, and smart bracket matching.
+
+```bash
+cd vscode-mathviz
+npx @vscode/vsce package
+code --install-extension mathviz-0.1.0.vsix
+```
+
+Open any `.mviz` or `.mvz` file and the extension activates automatically.
+
 ## Editor
 
 MathViz includes a cross-platform desktop editor built with Tauri and React.
@@ -228,6 +241,9 @@ MathViz/
 ├── editor/               # Desktop editor (Tauri)
 │   ├── src/              # React frontend
 │   └── src-tauri/        # Rust backend
+├── vscode-mathviz/       # VS Code extension
+│   ├── syntaxes/         # TextMate grammar
+│   └── snippets/         # Code snippets
 ├── examples/             # Example programs
 ├── tests/                # Test suite
 └── docs/                 # Documentation
