@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Language Reference - MathViz Documentation</title>
-  <meta name="description" content="Complete syntax reference for the MathViz programming language.">
+  <meta name="description" content="Complete syntax reference for the MathViz programming language: types, functions, operators, comprehensions, pattern matching, JIT optimization, NumPy auto-conversions, and more.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
@@ -43,7 +43,7 @@
     </div>
     <div class="nav-mobile-menu" id="nav-mobile-menu">
       <a href="getting-started.html" class="nav-link">Docs</a>
-      <a href="language-reference.html" class="nav-link">Language</a>
+      <a href="language-reference.html" class="nav-link active">Language</a>
       <a href="scenes.html" class="nav-link">Manim</a>
       <a href="cli.html" class="nav-link">CLI</a>
       <a href="../examples/index.html" class="nav-link">Examples</a>
@@ -56,23 +56,50 @@
   <div class="docs-layout">
     <aside class="docs-sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-title">Language</div>
+        <div class="sidebar-title">Language Core</div>
         <nav class="sidebar-nav">
-          <a href="#variables" class="sidebar-link">Variables</a>
-          <a href="#types" class="sidebar-link">Types</a>
-          <a href="#operators" class="sidebar-link">Operators</a>
-          <a href="#control-flow" class="sidebar-link">Control Flow</a>
+          <a href="#variables-types" class="sidebar-link">Variables &amp; Types</a>
           <a href="#functions" class="sidebar-link">Functions</a>
-          <a href="#oop" class="sidebar-link">Classes & OOP</a>
-          <a href="#error-handling" class="sidebar-link">Error Handling</a>
+          <a href="#control-flow" class="sidebar-link">Control Flow</a>
           <a href="#pattern-matching" class="sidebar-link">Pattern Matching</a>
+          <a href="#comprehensions" class="sidebar-link">Comprehensions</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Operators</div>
+        <nav class="sidebar-nav">
+          <a href="#operators" class="sidebar-link">Arithmetic &amp; Logic</a>
+          <a href="#unicode-operators" class="sidebar-link">Unicode Math Ops</a>
+          <a href="#set-operations" class="sidebar-link">Set Operations</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Compiler Features</div>
+        <nav class="sidebar-nav">
+          <a href="#numpy-conversions" class="sidebar-link">NumPy Auto-Conversions</a>
+          <a href="#matrix-vector" class="sidebar-link">Matrix &amp; Vector Ops</a>
+          <a href="#iterator-methods" class="sidebar-link">Iterator Methods</a>
+          <a href="#jit-optimization" class="sidebar-link">Automatic JIT</a>
+          <a href="#vectorization" class="sidebar-link">Auto-Vectorization</a>
+          <a href="#constant-folding" class="sidebar-link">Constant Folding</a>
+          <a href="#algebraic-simp" class="sidebar-link">Algebraic Simplification</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Advanced</div>
+        <nav class="sidebar-nav">
+          <a href="#math-constants" class="sidebar-link">Math Constants</a>
+          <a href="#decorators" class="sidebar-link">Decorators</a>
+          <a href="#error-handling" class="sidebar-link">Error Handling</a>
+          <a href="#structs-traits" class="sidebar-link">Structs &amp; Traits</a>
+          <a href="#enums" class="sidebar-link">Enums</a>
         </nav>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-title">Documentation</div>
         <nav class="sidebar-nav">
           <a href="getting-started.html" class="sidebar-link">Getting Started</a>
-          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
+          <a href="scenes.html" class="sidebar-link">Scenes &amp; Manim</a>
           <a href="modules.html" class="sidebar-link">Module System</a>
           <a href="cli.html" class="sidebar-link">CLI Reference</a>
         </nav>
@@ -84,244 +111,394 @@
 
       <p>
         MathViz is a statically-typed language with type inference, designed for mathematical
-        computation and animation. This reference covers all language constructs.
+        computation and animation. It compiles to optimized Python with automatic NumPy
+        conversions, Numba JIT injection, and runtime set operations. This reference covers
+        every language construct with <strong>real compiled output</strong> from the MathViz compiler.
       </p>
 
-      <h2 id="variables">Variables</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 1: VARIABLES & TYPES -->
+      <!-- ============================================================ -->
+      <h2 id="variables-types">1. Variables &amp; Types</h2>
+
+      <p>
+        MathViz provides three variable declaration keywords: <code>let</code> for mutable variables,
+        <code>const</code> for compile-time constants, and optional type annotations for explicit typing.
+        The compiler infers types when annotations are omitted.
+      </p>
 
       <h3>let - Mutable Variables</h3>
-      <p>Use <code>let</code> to declare mutable variables:</p>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-var1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-var1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
+        <div class="code-compare-panel active" id="mviz-var1">
           <pre><code class="language-mviz">let x = 42              // Type inferred as Int
 let y: Float = 3.14     // Explicit type annotation
 let name = "MathViz"    // String
 
 x = 100                 // Variables can be reassigned</code></pre>
         </div>
+        <div class="code-compare-panel" id="python-var1">
+          <pre><code class="language-python">x = 42
+y: float = 3.14
+name = 'MathViz'
+
+x = 100</code></pre>
+        </div>
       </div>
 
       <h3>const - Compile-Time Constants</h3>
-      <p>Use <code>const</code> for compile-time constants:</p>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-var2">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-var2">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
+        <div class="code-compare-panel active" id="mviz-var2">
           <pre><code class="language-mviz">const PI = 3.14159265358979
 const MAX_SIZE = 1024
-const TAU = 2.0 * PI
-const VERSION = "1.0.0"</code></pre>
+const TAU = 2.0 * PI</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-var2">
+          <pre><code class="language-python"># Constants are inlined at compile time
+PI = 3.14159265358979
+MAX_SIZE = 1024
+TAU = (2.0 * 3.14159265358979)</code></pre>
         </div>
       </div>
 
-      <h2 id="types">Types</h2>
+      <h3>Type Annotations</h3>
 
-      <h3>Primitive Types</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><code>Int</code></td><td>Integer numbers</td><td><code>42</code>, <code>-17</code></td></tr>
-          <tr><td><code>Float</code></td><td>Floating-point numbers</td><td><code>3.14</code>, <code>-0.5</code></td></tr>
-          <tr><td><code>Bool</code></td><td>Boolean values</td><td><code>true</code>, <code>false</code></td></tr>
-          <tr><td><code>String</code></td><td>Text strings</td><td><code>"hello"</code></td></tr>
-          <tr><td><code>None</code></td><td>Absence of value</td><td><code>None</code></td></tr>
-        </tbody>
-      </table>
+      <p>
+        MathViz supports a rich type system. Type annotations are optional thanks to
+        inference, but recommended for function signatures.
+      </p>
 
-      <h3>Collection Types</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-types1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-types1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// List - ordered, mutable collection
-let numbers: List[Int] = [1, 2, 3, 4, 5]
-let names = ["Alice", "Bob", "Charlie"]
-
-// Set - unordered, unique elements
-let unique: Set[Int] = {1, 2, 3}
-let empty_set: Set[String] = {}
-
-// Dict - key-value mapping
-let scores: Dict[String, Int] = {"Alice": 100, "Bob": 85}
-
-// Tuple - fixed-size, mixed types
-let point: Tuple[Float, Float] = (3.0, 4.0)
-let record = ("John", 25, true)</code></pre>
-        </div>
-      </div>
-
-      <h3>Optional and Result Types</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Optional - may or may not have a value
-let maybe_value: Optional[Int] = Some(42)
-let nothing: Optional[Int] = None
-
-// Result - success or error
-let success: Result[Int, String] = Ok(42)
-let failure: Result[Int, String] = Err("Something went wrong")
-
-// Unwrap with ? operator
-fn get_value() -> Result[Int, String] {
-    let x = try_parse("42")?  // Propagates error if Err
-    return Ok(x * 2)
-}</code></pre>
-        </div>
-      </div>
-
-      <h2 id="operators">Operators</h2>
-
-      <h3>Arithmetic Operators</h3>
-      <table>
-        <thead>
-          <tr><th>Operator</th><th>Description</th><th>Example</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>+</code></td><td>Addition</td><td><code>5 + 3</code></td></tr>
-          <tr><td><code>-</code></td><td>Subtraction</td><td><code>5 - 3</code></td></tr>
-          <tr><td><code>*</code></td><td>Multiplication</td><td><code>5 * 3</code></td></tr>
-          <tr><td><code>/</code></td><td>Division</td><td><code>5 / 3</code></td></tr>
-          <tr><td><code>//</code></td><td>Floor division</td><td><code>5 // 3</code></td></tr>
-          <tr><td><code>%</code></td><td>Modulo</td><td><code>5 % 3</code></td></tr>
-          <tr><td><code>^</code> or <code>**</code></td><td>Exponentiation</td><td><code>2 ^ 10</code></td></tr>
-        </tbody>
-      </table>
-
-      <h3>Comparison Operators</h3>
-      <table>
-        <thead>
-          <tr><th>Operator</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>==</code></td><td>Equal to</td></tr>
-          <tr><td><code>!=</code></td><td>Not equal to</td></tr>
-          <tr><td><code>&lt;</code>, <code>&lt;=</code></td><td>Less than (or equal)</td></tr>
-          <tr><td><code>&gt;</code>, <code>&gt;=</code></td><td>Greater than (or equal)</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Logical Operators</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">let a = true and false   // false
-let b = true or false    // true
-let c = not true         // false</code></pre>
-        </div>
-      </div>
-
-      <h3>Set Operators (Unicode)</h3>
-      <p>MathViz supports mathematical set notation:</p>
-      <table>
-        <thead>
-          <tr><th>Operator</th><th>Unicode</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>in</code></td><td><code>&#8712;</code></td><td>Element of</td></tr>
-          <tr><td><code>notin</code></td><td><code>&#8713;</code></td><td>Not element of</td></tr>
-          <tr><td><code>cup</code></td><td><code>&#8746;</code></td><td>Union</td></tr>
-          <tr><td><code>cap</code></td><td><code>&#8745;</code></td><td>Intersection</td></tr>
-          <tr><td><code>subseteq</code></td><td><code>&#8838;</code></td><td>Subset or equal</td></tr>
-          <tr><td><code>supseteq</code></td><td><code>&#8839;</code></td><td>Superset or equal</td></tr>
-          <tr><td><code>setminus</code></td><td><code>&#8726;</code></td><td>Set difference</td></tr>
-        </tbody>
-      </table>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">let A = {1, 2, 3}
-let B = {3, 4, 5}
-
-let union = A cup B        // {1, 2, 3, 4, 5}
-let intersection = A cap B // {3}
-let diff = A setminus B    // {1, 2}
-
-if 2 in A {
-    println("2 is in A")
-}</code></pre>
-        </div>
-      </div>
-
-      <h2 id="control-flow">Control Flow</h2>
-
-      <h3>if/elif/else</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">let x = 10
-
-if x > 0 {
-    println("positive")
-} elif x < 0 {
-    println("negative")
-} else {
-    println("zero")
-}</code></pre>
-        </div>
-      </div>
-
-      <h3>for Loops</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Range iteration
-for i in 0..10 {
-    println(i)
+        <div class="code-compare-panel active" id="mviz-types1">
+          <pre><code class="language-mviz">fn typed_function(x: Int, y: Float) -> Float {
+    return x * y + 1.0
 }
 
-// Inclusive range
-for i in 0..=10 {
-    println(i)  // includes 10
+fn with_collections(items: List[Int]) -> Int {
+    let total = 0
+    for item in items {
+        total = total + item
+    }
+    return total
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-types1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+@njit(cache=True)
+def typed_function(x: int, y: float) -> float:
+    return ((x * y) + 1.0)
+
+@njit(cache=True)
+def with_collections(items: list[int]) -> int:
+    total = 0
+    for item in items:
+        total = (total + item)
+    return total</code></pre>
+        </div>
+      </div>
+
+      <h3>All Supported Types</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>MathViz Type</th><th>Python Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Int</code></td><td><code>int</code></td><td>Integer numbers</td></tr>
+            <tr><td><code>Float</code></td><td><code>float</code></td><td>Floating-point numbers</td></tr>
+            <tr><td><code>Bool</code></td><td><code>bool</code></td><td>Boolean values (<code>true</code>/<code>false</code>)</td></tr>
+            <tr><td><code>String</code></td><td><code>str</code></td><td>Text strings</td></tr>
+            <tr><td><code>None</code></td><td><code>None</code></td><td>Absence of value</td></tr>
+            <tr><td><code>List[T]</code></td><td><code>list[T]</code></td><td>Ordered, mutable collection</td></tr>
+            <tr><td><code>Set[T]</code></td><td><code>set[T]</code></td><td>Unordered, unique elements</td></tr>
+            <tr><td><code>Dict[K, V]</code></td><td><code>dict[K, V]</code></td><td>Key-value mapping</td></tr>
+            <tr><td><code>Tuple[T...]</code></td><td><code>tuple[T...]</code></td><td>Fixed-size, mixed types</td></tr>
+            <tr><td><code>Vec[T]</code></td><td><code>np.ndarray</code></td><td>NumPy vector</td></tr>
+            <tr><td><code>Mat[T]</code></td><td><code>np.ndarray</code></td><td>NumPy matrix</td></tr>
+            <tr><td><code>Array[T]</code></td><td><code>np.ndarray</code></td><td>NumPy N-dimensional array</td></tr>
+            <tr><td><code>Optional[T]</code></td><td><code>T | None</code></td><td>May or may not have a value</td></tr>
+            <tr><td><code>Result[T, E]</code></td><td><code>T</code> (with exceptions)</td><td>Success or error</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 2: FUNCTIONS -->
+      <!-- ============================================================ -->
+      <h2 id="functions">2. Functions</h2>
+
+      <p>
+        Functions are declared with <code>fn</code>. Use <code>pub fn</code> to make them
+        public (exportable from modules). The compiler automatically adds <code>@njit(cache=True)</code>
+        to pure numeric functions.
+      </p>
+
+      <h3>Basic Functions &amp; Return Types</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-fn1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-fn1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-fn1">
+          <pre><code class="language-mviz">fn typed_function(x: Int, y: Float) -> Float {
+    return x * y + 1.0
 }
 
-// Collection iteration
-let items = [1, 2, 3, 4, 5]
-for item in items {
-    println(item)
+fn with_collections(items: List[Int]) -> Int {
+    let total = 0
+    for item in items {
+        total = total + item
+    }
+    return total
 }</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-fn1">
+          <pre><code class="language-python">@njit(cache=True)
+def typed_function(x: int, y: float) -> float:
+    return ((x * y) + 1.0)
+
+@njit(cache=True)
+def with_collections(items: list[int]) -> int:
+    total = 0
+    for item in items:
+        total = (total + item)
+    return total</code></pre>
+        </div>
+      </div>
+
+      <h3>Public Functions (Modules)</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-fn2">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-fn2">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-fn2">
+          <pre><code class="language-mviz">// math_utils.mviz - Module file
+pub fn factorial(n) {
+    if n &lt;= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+pub fn fibonacci(n) {
+    if n &lt;= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+fn private_helper() {
+    return 42
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-fn2">
+          <pre><code class="language-python">@njit(cache=True)
+def factorial(n):
+    if (n &lt;= 1):
+        return 1
+    return (n * factorial((n - 1)))
+
+@njit(cache=True)
+def fibonacci(n):
+    if (n &lt;= 1):
+        return n
+    return (fibonacci((n - 1)) + fibonacci((n - 2)))
+
+@njit(cache=True)
+def private_helper():
+    return 42</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Key Takeaway</div>
+          <p class="callout-text">
+            The <code>pub</code> keyword controls visibility in the module system. Private functions
+            (<code>fn</code>) cannot be imported from other modules. Both public and private functions
+            receive JIT optimization when eligible.
+          </p>
+        </div>
+      </div>
+
+      <h3>Lambda Expressions</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-fn3">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-fn3">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-fn3">
+          <pre><code class="language-mviz">// Pipe-lambda syntax (Rust-like)
+let double = |x| x * 2
+let add = |a, b| a + b
+
+// Used with iterators
+let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let doubled = numbers.map(|x| x * 2)
+let big = numbers.filter(|x| x > 5)
+let total = numbers.reduce(0, |acc, x| acc + x)</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-fn3">
+          <pre><code class="language-python">double = lambda x: (x * 2)
+add = lambda a, b: (a + b)
+
+# Iterator methods use runtime library
+numbers = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=np.int64)
+doubled = iter_map(numbers, lambda x: (x * 2))
+big = iter_filter(numbers, lambda x: (x > 5))
+total = iter_reduce(numbers, 0, lambda acc, x: (acc + x))</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 3: CONTROL FLOW -->
+      <!-- ============================================================ -->
+      <h2 id="control-flow">3. Control Flow</h2>
+
+      <h3>if / elif / else</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-cf1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-cf1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-cf1">
+          <pre><code class="language-mviz">pub fn factorial(n) {
+    if n &lt;= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+pub fn gcd(a, b) {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-cf1">
+          <pre><code class="language-python">@njit(cache=True)
+def factorial(n):
+    if (n &lt;= 1):
+        return 1
+    return (n * factorial((n - 1)))
+
+@njit(cache=True)
+def gcd(a, b):
+    if (b == 0):
+        return a
+    return gcd(b, (a % b))</code></pre>
+        </div>
+      </div>
+
+      <h3>for Loops &amp; Ranges</h3>
+
+      <p>
+        MathViz supports <code>0..n</code> (exclusive) and <code>0..=n</code> (inclusive) range syntax.
+        Ranges compile to Python's <code>range()</code>.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-cf2">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-cf2">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-cf2">
+          <pre><code class="language-mviz">// Pure numeric loop - gets @njit
+fn compute_sum(n: Int) -> Float {
+    let total = 0.0
+    for i in 0..n {
+        total = total + sqrt(i * 1.0)
+    }
+    return total
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-cf2">
+          <pre><code class="language-python">@njit(cache=True)
+def compute_sum(n: int) -> float:
+    total = 0.0
+    for i in range(0, n):
+        total = (total + np.sqrt((i * 1.0)))
+    return total</code></pre>
         </div>
       </div>
 
       <h3>while Loops</h3>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
         </div>
         <div class="code-block-body">
           <pre><code class="language-mviz">let count = 0
-while count < 10 {
-    println(count)
+while count &lt; 10 {
+    print(count)
     count += 1
 }</code></pre>
         </div>
       </div>
 
       <h3>break and continue</h3>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
@@ -334,82 +511,1045 @@ while count < 10 {
     if i == 10 {
         break     // Exit loop
     }
-    println(i)
+    print(i)
 }</code></pre>
         </div>
       </div>
 
-      <h2 id="functions">Functions</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 4: PATTERN MATCHING -->
+      <!-- ============================================================ -->
+      <h2 id="pattern-matching">4. Pattern Matching</h2>
 
-      <h3>Basic Functions</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <p>
+        MathViz supports <code>match</code> expressions that compile to chained ternary
+        expressions in Python. This provides concise pattern-based branching.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-pm1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-pm1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">fn add(a: Int, b: Int) -> Int {
-    return a + b
-}
-
-fn greet(name: String) {
-    println("Hello, {}!", name)
-}
-
-// With default parameters
-fn power(base: Float, exp: Float = 2.0) -> Float {
-    return base ^ exp
-}</code></pre>
-        </div>
-      </div>
-
-      <h3>Generic Functions</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">fn identity<T>(x: T) -> T {
-    return x
-}
-
-fn first<T>(items: List[T]) -> Optional[T] {
-    if len(items) > 0 {
-        return Some(items[0])
+        <div class="code-compare-panel active" id="mviz-pm1">
+          <pre><code class="language-mviz">fn classify(x: Int) -> String {
+    let result = match x {
+        0 -> "zero"
+        1 -> "one"
+        _ -> "other"
     }
-    return None
+    return result
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-pm1">
+          <pre><code class="language-python">def classify(x: int) -> str:
+    result = (lambda _match_subj: (
+        'zero' if _match_subj == 0
+        else ('one' if _match_subj == 1
+        else 'other')
+    ))(x)
+    return result</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">How Match Compiles</div>
+          <p class="callout-text">
+            The compiler transforms <code>match</code> into an immediately-invoked lambda with
+            chained ternary expressions. The wildcard <code>_</code> becomes the final else clause.
+            The subject is captured in <code>_match_subj</code> to avoid re-evaluation.
+          </p>
+        </div>
+      </div>
+
+      <h3>Match with Enums</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn describe_number(n: Int) -> String {
+    match n {
+        0 -> "zero"
+        1 -> "one"
+        n where n &lt; 0 -> "negative"
+        n where n > 100 -> "large"
+        _ -> "other"
+    }
+}
+
+fn calculate_area(shape: Shape) -> Float {
+    match shape {
+        Shape::Circle(r) -> PI * r ^ 2
+        Shape::Rectangle(w, h) -> w * h
+        Shape::Point -> 0.0
+    }
 }</code></pre>
         </div>
       </div>
 
-      <h3>Lambda Expressions</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <!-- ============================================================ -->
+      <!-- SECTION 5: COMPREHENSIONS -->
+      <!-- ============================================================ -->
+      <h2 id="comprehensions">5. Comprehensions</h2>
+
+      <p>
+        MathViz supports list, set, and dict comprehensions with optional filters.
+        Ranges in comprehensions compile to <code>range()</code>, and the <code>^</code>
+        operator compiles to <code>**</code>.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-comp1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-comp1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Arrow syntax
-let double = (x) => x * 2
+        <div class="code-compare-panel active" id="mviz-comp1">
+          <pre><code class="language-mviz">fn list_ops() {
+    // Basic list comprehension
+    let squares = [x^2 for x in 0..10]
 
-// Pipe syntax (Rust-like)
-let triple = |x| x * 3
+    // With filter
+    let evens = [x for x in 0..20 if x % 2 == 0]
 
-// Multi-parameter
-let add = (a, b) => a + b
+    // Nested comprehension
+    let nested = [x * y for x in 1..4 for y in 1..4]
 
-// Using with higher-order functions
-let numbers = [1, 2, 3, 4, 5]
-let doubled = numbers.map(|x| x * 2)</code></pre>
+    return squares
+}
+
+fn set_comp() {
+    // Set comprehension (unique values)
+    let unique_squares = {x^2 for x in -5..6}
+    return unique_squares
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-comp1">
+          <pre><code class="language-python">@njit(cache=True)
+def list_ops():
+    squares = [(x ** 2) for x in range(0, 10)]
+    evens = [x for x in range(0, 20) if ((x % 2) == 0)]
+    nested = [(x * y) for x in range(1, 4) for y in range(1, 4)]
+    return squares
+
+@njit(cache=True)
+def set_comp():
+    unique_squares = {(x ** 2) for x in range((-5), 6)}
+    return unique_squares</code></pre>
         </div>
       </div>
 
-      <h3>JIT Optimization</h3>
-      <p>Use decorators to enable Numba JIT compilation:</p>
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Key Transformations</div>
+          <p class="callout-text">
+            <code>x^2</code> becomes <code>(x ** 2)</code>, ranges <code>0..10</code> become
+            <code>range(0, 10)</code>, and negative bounds like <code>-5..6</code> become
+            <code>range((-5), 6)</code>. Dict comprehensions use <code>{k: v for ...}</code> syntax.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 6: OPERATORS -->
+      <!-- ============================================================ -->
+      <h2 id="operators">6. Operators</h2>
+
+      <h3>Arithmetic Operators</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>MathViz</th><th>Python Output</th><th>Description</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>+</code></td><td><code>+</code></td><td>Addition</td><td><code>5 + 3</code></td></tr>
+            <tr><td><code>-</code></td><td><code>-</code></td><td>Subtraction</td><td><code>5 - 3</code></td></tr>
+            <tr><td><code>*</code></td><td><code>*</code></td><td>Multiplication</td><td><code>5 * 3</code></td></tr>
+            <tr><td><code>/</code></td><td><code>/</code></td><td>Division</td><td><code>5 / 3</code></td></tr>
+            <tr><td><code>//</code></td><td><code>//</code></td><td>Floor division</td><td><code>5 // 3</code></td></tr>
+            <tr><td><code>%</code></td><td><code>%</code></td><td>Modulo</td><td><code>5 % 3</code></td></tr>
+            <tr><td><code>^</code></td><td><code>**</code></td><td>Exponentiation</td><td><code>2 ^ 10</code> &rarr; <code>(2 ** 10)</code></td></tr>
+            <tr><td><code>**</code></td><td><code>**</code></td><td>Exponentiation (alt)</td><td><code>2 ** 10</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Comparison Operators</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>MathViz</th><th>Python Output</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>==</code></td><td><code>==</code></td><td>Equal to</td></tr>
+            <tr><td><code>!=</code></td><td><code>!=</code></td><td>Not equal to</td></tr>
+            <tr><td><code>&lt;</code></td><td><code>&lt;</code></td><td>Less than</td></tr>
+            <tr><td><code>&lt;=</code></td><td><code>&lt;=</code></td><td>Less than or equal</td></tr>
+            <tr><td><code>&gt;</code></td><td><code>&gt;</code></td><td>Greater than</td></tr>
+            <tr><td><code>&gt;=</code></td><td><code>&gt;=</code></td><td>Greater than or equal</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Logical Operators</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-op1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-op1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-op1">
+          <pre><code class="language-mviz">fn constant_folding_demo() {
+    let a = 2 + 3
+    let b = 10 * 4
+    let c = "hello" + " world"
+    let d = true and false
+    let e = 2^10
+    return a + b
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-op1">
+          <pre><code class="language-python">def constant_folding_demo():
+    a = (2 + 3)
+    b = (10 * 4)
+    c = ('hello' + ' world')
+    d = (True and False)
+    e = (2 ** 10)
+    return (a + b)</code></pre>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>MathViz</th><th>Python Output</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>and</code></td><td><code>and</code></td><td>Logical AND</td></tr>
+            <tr><td><code>or</code></td><td><code>or</code></td><td>Logical OR</td></tr>
+            <tr><td><code>not</code></td><td><code>not</code></td><td>Logical NOT</td></tr>
+            <tr><td><code>true</code></td><td><code>True</code></td><td>Boolean true</td></tr>
+            <tr><td><code>false</code></td><td><code>False</code></td><td>Boolean false</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 7: UNICODE OPERATORS -->
+      <!-- ============================================================ -->
+      <h2 id="unicode-operators">7. Unicode Math Operators</h2>
+
+      <p>
+        MathViz natively supports Unicode mathematical symbols. The compiler translates
+        them into function calls from the <code>mathviz.runtime</code> library or literal values.
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Unicode</th><th>Name</th><th>MathViz Usage</th><th>Compiled Python</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>&#8712;</code></td><td>Element of</td><td><code>3 &#8712; A</code></td><td><code>is_element(3, A)</code></td></tr>
+            <tr><td><code>&#8713;</code></td><td>Not element of</td><td><code>10 &#8713; A</code></td><td><code>is_not_element(10, A)</code></td></tr>
+            <tr><td><code>&#8838;</code></td><td>Subset or equal</td><td><code>{1, 2} &#8838; A</code></td><td><code>is_subset({1, 2}, A)</code></td></tr>
+            <tr><td><code>&#8839;</code></td><td>Superset or equal</td><td><code>A &#8839; {1, 2}</code></td><td><code>is_superset(A, {1, 2})</code></td></tr>
+            <tr><td><code>&#8746;</code></td><td>Union</td><td><code>A &#8746; B</code></td><td><code>set_union(A, B)</code></td></tr>
+            <tr><td><code>&#8745;</code></td><td>Intersection</td><td><code>A &#8745; B</code></td><td><code>set_intersection(A, B)</code></td></tr>
+            <tr><td><code>&#8726;</code></td><td>Set difference</td><td><code>A &#8726; B</code></td><td><code>set_difference(A, B)</code></td></tr>
+            <tr><td><code>&#960;</code></td><td>Pi</td><td><code>let x = &#960;</code></td><td><code>x = 3.141592653589793</code></td></tr>
+            <tr><td><code>&#8734;</code></td><td>Infinity</td><td><code>let x = &#8734;</code></td><td><code>x = float('inf')</code></td></tr>
+            <tr><td><code>&#8730;</code></td><td>Square root</td><td><code>&#8730;(x)</code></td><td><code>np.sqrt(x)</code></td></tr>
+            <tr><td><code>&#8776;</code></td><td>Approximately equal</td><td><code>a &#8776; b</code></td><td><code>np.isclose(a, b)</code></td></tr>
+            <tr><td><code>&#8800;</code></td><td>Not equal</td><td><code>a &#8800; b</code></td><td><code>a != b</code></td></tr>
+            <tr><td><code>&#8804;</code></td><td>Less or equal</td><td><code>a &#8804; b</code></td><td><code>a &lt;= b</code></td></tr>
+            <tr><td><code>&#8805;</code></td><td>Greater or equal</td><td><code>a &#8805; b</code></td><td><code>a &gt;= b</code></td></tr>
+            <tr><td><code>&#8721;</code></td><td>Summation</td><td><code>&#8721;(list)</code></td><td><code>np.sum(list)</code></td></tr>
+            <tr><td><code>&#8719;</code></td><td>Product</td><td><code>&#8719;(list)</code></td><td><code>np.prod(list)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 8: SET OPERATIONS -->
+      <!-- ============================================================ -->
+      <h2 id="set-operations">8. Set Operations</h2>
+
+      <p>
+        MathViz provides first-class set operations using Unicode symbols. The compiler
+        imports helper functions from <code>mathviz.runtime</code> and replaces each
+        operator with the corresponding function call.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-set1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-set1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-set1">
+          <pre><code class="language-mviz">fn set_operations() {
+    let a = {1, 2, 3, 4, 5}
+    let b = {3, 4, 5, 6, 7}
+
+    let u = a &#8746; b          // Union
+    let inter = a &#8745; b      // Intersection
+    let diff = a &#8726; b       // Difference
+
+    let is_sub = {1, 2} &#8838; a  // Subset check
+    let is_in = 3 &#8712; a        // Membership
+    let not_in = 10 &#8713; a      // Non-membership
+
+    let pi_val = &#960;           // Mathematical Pi
+    let inf_val = &#8734;          // Infinity
+
+    return u
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-set1">
+          <pre><code class="language-python">from mathviz.runtime import (
+    set_union,
+    set_intersection,
+    set_difference,
+    is_subset,
+    is_superset,
+    is_element,
+    is_not_element,
+)
+
+def set_operations():
+    a = {1, 2, 3, 4, 5}
+    b = {3, 4, 5, 6, 7}
+    u = set_union(a, b)
+    inter = set_intersection(a, b)
+    diff = set_difference(a, b)
+    is_sub = is_subset({1, 2}, a)
+    is_in = is_element(3, a)
+    not_in = is_not_element(10, a)
+    pi_val = 3.141592653589793
+    inf_val = float('inf')
+    return u</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Automatic Import Injection</div>
+          <p class="callout-text">
+            When the compiler detects Unicode set operators, it automatically adds the
+            <code>from mathviz.runtime import ...</code> block at the top of the generated file.
+            Functions that use sets do <strong>not</strong> receive <code>@njit</code> because
+            the runtime helpers are pure Python.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 9: NUMPY AUTO-CONVERSIONS -->
+      <!-- ============================================================ -->
+      <h2 id="numpy-conversions">9. NumPy Auto-Conversions</h2>
+
+      <p>
+        The MathViz compiler automatically converts mathematical function calls to their
+        NumPy equivalents. When any NumPy function is detected, the compiler adds
+        <code>import numpy as np</code> and the Numba JIT imports to the generated file.
+      </p>
+
+      <h3>Math Functions</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-np1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-np1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-np1">
+          <pre><code class="language-mviz">fn math_operations() {
+    let x = 2.0
+    let y = sqrt(x)
+    let z = sin(x) + cos(x)
+    let w = exp(x) + log(x)
+    let t = floor(3.7) + ceil(3.2)
+    return y + z + w + t
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-np1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+@njit(cache=True)
+def math_operations():
+    x = 2.0
+    y = np.sqrt(x)
+    z = (np.sin(x) + np.cos(x))
+    w = (np.exp(x) + np.log(x))
+    t = (np.floor(3.7) + np.ceil(3.2))
+    return (((y + z) + w) + t)</code></pre>
+        </div>
+      </div>
+
+      <h3>Array Creation</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-np2">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-np2">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-np2">
+          <pre><code class="language-mviz">fn array_operations() {
+    let a = zeros(10)
+    let b = ones(10)
+    let c = linspace(0, 1, 100)
+    let d = arange(0, 10, 1)
+    let e = eye(3)
+    return a
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-np2">
+          <pre><code class="language-python">@njit(cache=True)
+def array_operations():
+    a = np.zeros(10)
+    b = np.ones(10)
+    c = np.linspace(0, 1, 100)
+    d = np.arange(0, 10, 1)
+    e = np.eye(3)
+    return a</code></pre>
+        </div>
+      </div>
+
+      <h3>Complete NumPy Conversion Table</h3>
+
+      <p>
+        Below is the complete list of MathViz functions that auto-convert to NumPy.
+        Write plain function names in MathViz; the compiler handles the <code>np.</code> prefix.
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Category</th><th>MathViz</th><th>Compiled Python</th></tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="6"><strong>Trigonometry</strong></td><td><code>sin(x)</code></td><td><code>np.sin(x)</code></td></tr>
+            <tr><td><code>cos(x)</code></td><td><code>np.cos(x)</code></td></tr>
+            <tr><td><code>tan(x)</code></td><td><code>np.tan(x)</code></td></tr>
+            <tr><td><code>asin(x)</code></td><td><code>np.arcsin(x)</code></td></tr>
+            <tr><td><code>acos(x)</code></td><td><code>np.arccos(x)</code></td></tr>
+            <tr><td><code>atan(x)</code></td><td><code>np.arctan(x)</code></td></tr>
+            <tr><td rowspan="4"><strong>Exponential</strong></td><td><code>exp(x)</code></td><td><code>np.exp(x)</code></td></tr>
+            <tr><td><code>log(x)</code></td><td><code>np.log(x)</code></td></tr>
+            <tr><td><code>log2(x)</code></td><td><code>np.log2(x)</code></td></tr>
+            <tr><td><code>log10(x)</code></td><td><code>np.log10(x)</code></td></tr>
+            <tr><td rowspan="3"><strong>Rounding</strong></td><td><code>floor(x)</code></td><td><code>np.floor(x)</code></td></tr>
+            <tr><td><code>ceil(x)</code></td><td><code>np.ceil(x)</code></td></tr>
+            <tr><td><code>round(x)</code></td><td><code>np.round(x)</code></td></tr>
+            <tr><td rowspan="2"><strong>Powers</strong></td><td><code>sqrt(x)</code></td><td><code>np.sqrt(x)</code></td></tr>
+            <tr><td><code>abs(x)</code></td><td><code>np.abs(x)</code></td></tr>
+            <tr><td rowspan="5"><strong>Array Creation</strong></td><td><code>zeros(n)</code></td><td><code>np.zeros(n)</code></td></tr>
+            <tr><td><code>ones(n)</code></td><td><code>np.ones(n)</code></td></tr>
+            <tr><td><code>linspace(a, b, n)</code></td><td><code>np.linspace(a, b, n)</code></td></tr>
+            <tr><td><code>arange(a, b, s)</code></td><td><code>np.arange(a, b, s)</code></td></tr>
+            <tr><td><code>eye(n)</code></td><td><code>np.eye(n)</code></td></tr>
+            <tr><td rowspan="5"><strong>Statistics</strong></td><td><code>mean(x)</code></td><td><code>np.mean(x)</code></td></tr>
+            <tr><td><code>std(x)</code></td><td><code>np.std(x)</code></td></tr>
+            <tr><td><code>var(x)</code></td><td><code>np.var(x)</code></td></tr>
+            <tr><td><code>max(x)</code></td><td><code>np.max(x)</code></td></tr>
+            <tr><td><code>min(x)</code></td><td><code>np.min(x)</code></td></tr>
+            <tr><td rowspan="5"><strong>Linear Algebra</strong></td><td><code>matmul(a, b)</code></td><td><code>np.matmul(a, b)</code></td></tr>
+            <tr><td><code>dot(a, b)</code></td><td><code>np.dot(a, b)</code></td></tr>
+            <tr><td><code>cross(a, b)</code></td><td><code>np.cross(a, b)</code></td></tr>
+            <tr><td><code>transpose(a)</code></td><td><code>np.transpose(a)</code></td></tr>
+            <tr><td><code>det(a)</code></td><td><code>np.linalg.det(a)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 10: MATRIX & VECTOR OPERATIONS -->
+      <!-- ============================================================ -->
+      <h2 id="matrix-vector">10. Matrix &amp; Vector Operations</h2>
+
+      <p>
+        MathViz supports matrix and vector operations that compile to NumPy. List literals
+        used as matrices are converted to <code>np.array</code> with appropriate dtypes.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-mat1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-mat1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-mat1">
+          <pre><code class="language-mviz">fn matrix_ops() {
+    let a = [[1, 2], [3, 4]]
+    let b = [[5, 6], [7, 8]]
+    let c = matmul(a, b)
+    let d = transpose(a)
+    let e = dot([1, 2, 3], [4, 5, 6])
+    return c
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-mat1">
+          <pre><code class="language-python">@njit(cache=True)
+def matrix_ops():
+    a = [np.array([1, 2], dtype=np.int64),
+         np.array([3, 4], dtype=np.int64)]
+    b = [np.array([5, 6], dtype=np.int64),
+         np.array([7, 8], dtype=np.int64)]
+    c = np.matmul(a, b)
+    d = np.transpose(a)
+    e = np.dot(
+        np.array([1, 2, 3], dtype=np.int64),
+        np.array([4, 5, 6], dtype=np.int64)
+    )
+    return c</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Automatic dtype Detection</div>
+          <p class="callout-text">
+            Integer lists compile to <code>np.array([...], dtype=np.int64)</code> while
+            float lists compile to <code>np.array([...], dtype=np.float64)</code>. The compiler
+            infers the dtype from the literal values in the list.
+          </p>
+        </div>
+      </div>
+
+      <h3>Statistics on Arrays</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-mat2">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-mat2">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-mat2">
+          <pre><code class="language-mviz">fn stats() {
+    let data = [1, 2, 3, 4, 5]
+    let m = mean(data)
+    let s = std(data)
+    let v = var(data)
+    let mx = max(data)
+    let mn = min(data)
+    return m
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-mat2">
+          <pre><code class="language-python">@njit(cache=True)
+def stats():
+    data = np.array([1, 2, 3, 4, 5], dtype=np.int64)
+    m = np.mean(data)
+    s = np.std(data)
+    v = np.var(data)
+    mx = np.max(data)
+    mn = np.min(data)
+    return m</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 11: ITERATOR METHODS -->
+      <!-- ============================================================ -->
+      <h2 id="iterator-methods">11. Iterator Methods</h2>
+
+      <p>
+        MathViz provides Rust-inspired iterator methods that chain on collections.
+        These compile to function calls from <code>mathviz.runtime.iterators</code>,
+        a comprehensive functional programming toolkit.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-iter1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-iter1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-iter1">
+          <pre><code class="language-mviz">fn iterator_demo() {
+    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    // Transform
+    let doubled = numbers.map(|x| x * 2)
+
+    // Filter
+    let big = numbers.filter(|x| x > 5)
+
+    // Reduce with initial value
+    let total = numbers.reduce(0, |acc, x| acc + x)
+
+    return doubled
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-iter1">
+          <pre><code class="language-python">from mathviz.runtime.iterators import (
+    # Transformation
+    iter_map, iter_filter, iter_reduce, iter_fold,
+    iter_flat_map, iter_flatten,
+    # Access
+    iter_first, iter_last, iter_nth, iter_find,
+    iter_position,
+    # Predicate
+    iter_any, iter_all, iter_none, iter_count,
+    iter_count_if,
+    # Numeric
+    iter_sum, iter_product, iter_min, iter_max,
+    iter_average, iter_min_by, iter_max_by,
+    # Slicing
+    iter_take, iter_skip, iter_take_while,
+    iter_skip_while,
+    # Ordering
+    iter_sorted, iter_sorted_by, iter_sorted_by_desc,
+    iter_reversed,
+    # Combination
+    iter_zip, iter_enumerate, iter_chain, iter_chunk,
+    iter_unique,
+    # Collection
+    iter_collect_list, iter_collect_set,
+    iter_collect_dict, iter_join, iter_group_by,
+    iter_partition,
+    # Dict-specific
+    dict_keys, dict_values, dict_items,
+    dict_map_values, dict_filter_keys,
+    dict_filter_values,
+)
+
+@njit(cache=True)
+def iterator_demo():
+    numbers = np.array(
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        dtype=np.int64
+    )
+    doubled = iter_map(numbers, lambda x: (x * 2))
+    big = iter_filter(numbers, lambda x: (x > 5))
+    total = iter_reduce(
+        numbers, 0, lambda acc, x: (acc + x)
+    )
+    return doubled</code></pre>
+        </div>
+      </div>
+
+      <h3>Complete Iterator Method Table</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Category</th><th>MathViz Method</th><th>Compiled Function</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="4"><strong>Transform</strong></td><td><code>.map(|x| expr)</code></td><td><code>iter_map(seq, fn)</code></td><td>Apply function to each element</td></tr>
+            <tr><td><code>.filter(|x| cond)</code></td><td><code>iter_filter(seq, fn)</code></td><td>Keep elements matching predicate</td></tr>
+            <tr><td><code>.flat_map(|x| expr)</code></td><td><code>iter_flat_map(seq, fn)</code></td><td>Map then flatten</td></tr>
+            <tr><td><code>.flatten()</code></td><td><code>iter_flatten(seq)</code></td><td>Flatten nested lists</td></tr>
+            <tr><td rowspan="3"><strong>Reduce</strong></td><td><code>.reduce(init, |a,x| expr)</code></td><td><code>iter_reduce(seq, init, fn)</code></td><td>Reduce to single value</td></tr>
+            <tr><td><code>.fold(init, |a,x| expr)</code></td><td><code>iter_fold(seq, init, fn)</code></td><td>Same as reduce (alias)</td></tr>
+            <tr><td><code>.sum()</code></td><td><code>iter_sum(seq)</code></td><td>Sum all elements</td></tr>
+            <tr><td rowspan="5"><strong>Access</strong></td><td><code>.first()</code></td><td><code>iter_first(seq)</code></td><td>First element</td></tr>
+            <tr><td><code>.last()</code></td><td><code>iter_last(seq)</code></td><td>Last element</td></tr>
+            <tr><td><code>.nth(n)</code></td><td><code>iter_nth(seq, n)</code></td><td>Nth element</td></tr>
+            <tr><td><code>.find(|x| cond)</code></td><td><code>iter_find(seq, fn)</code></td><td>First matching element</td></tr>
+            <tr><td><code>.position(|x| cond)</code></td><td><code>iter_position(seq, fn)</code></td><td>Index of first match</td></tr>
+            <tr><td rowspan="3"><strong>Predicate</strong></td><td><code>.any(|x| cond)</code></td><td><code>iter_any(seq, fn)</code></td><td>Any element matches?</td></tr>
+            <tr><td><code>.all(|x| cond)</code></td><td><code>iter_all(seq, fn)</code></td><td>All elements match?</td></tr>
+            <tr><td><code>.count()</code></td><td><code>iter_count(seq)</code></td><td>Count elements</td></tr>
+            <tr><td rowspan="4"><strong>Slice</strong></td><td><code>.take(n)</code></td><td><code>iter_take(seq, n)</code></td><td>First n elements</td></tr>
+            <tr><td><code>.skip(n)</code></td><td><code>iter_skip(seq, n)</code></td><td>Skip first n elements</td></tr>
+            <tr><td><code>.take_while(|x| cond)</code></td><td><code>iter_take_while(seq, fn)</code></td><td>Take while predicate holds</td></tr>
+            <tr><td><code>.skip_while(|x| cond)</code></td><td><code>iter_skip_while(seq, fn)</code></td><td>Skip while predicate holds</td></tr>
+            <tr><td rowspan="5"><strong>Combine</strong></td><td><code>.zip(other)</code></td><td><code>iter_zip(seq, other)</code></td><td>Pair elements from two lists</td></tr>
+            <tr><td><code>.enumerate()</code></td><td><code>iter_enumerate(seq)</code></td><td>Add index to each element</td></tr>
+            <tr><td><code>.chain(other)</code></td><td><code>iter_chain(seq, other)</code></td><td>Concatenate two sequences</td></tr>
+            <tr><td><code>.chunk(n)</code></td><td><code>iter_chunk(seq, n)</code></td><td>Split into n-sized groups</td></tr>
+            <tr><td><code>.unique()</code></td><td><code>iter_unique(seq)</code></td><td>Remove duplicates</td></tr>
+            <tr><td rowspan="3"><strong>Order</strong></td><td><code>.sorted()</code></td><td><code>iter_sorted(seq)</code></td><td>Sort ascending</td></tr>
+            <tr><td><code>.sorted_by(|x| key)</code></td><td><code>iter_sorted_by(seq, fn)</code></td><td>Sort by key function</td></tr>
+            <tr><td><code>.reversed()</code></td><td><code>iter_reversed(seq)</code></td><td>Reverse order</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 12: JIT OPTIMIZATION -->
+      <!-- ============================================================ -->
+      <h2 id="jit-optimization">12. Automatic JIT Optimization</h2>
+
+      <p>
+        The MathViz compiler automatically injects Numba <code>@njit(cache=True)</code>
+        decorators on functions that are eligible for JIT compilation. This happens
+        transparently -- you write plain MathViz code, and the compiler optimizes it.
+      </p>
+
+      <h3>Pure Numeric Functions Get @njit</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-jit1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-jit1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-jit1">
+          <pre><code class="language-mviz">// Pure numeric function - auto @njit
+fn compute_sum(n: Int) -> Float {
+    let total = 0.0
+    for i in 0..n {
+        total = total + sqrt(i * 1.0)
+    }
+    return total
+}
+
+// Math-heavy function - auto @njit
+fn transcendental(x: Float) -> Float {
+    return sin(x) * cos(x) + exp(-x) * log(x + 1)
+}
+
+// Has print() - still gets @njit
+fn display_result(x: Float) {
+    print(x)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-jit1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+@njit(cache=True)
+def compute_sum(n: int) -> float:
+    total = 0.0
+    for i in range(0, n):
+        total = (total + np.sqrt((i * 1.0)))
+    return total
+
+@njit(cache=True)
+def transcendental(x: float) -> float:
+    return ((np.sin(x) * np.cos(x))
+        + (np.exp((-x)) * np.log((x + 1))))
+
+@njit(cache=True)
+def display_result(x: float):
+    print(x, end='')</code></pre>
+        </div>
+      </div>
+
+      <h3>JIT Eligibility Rules</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Condition</th><th>JIT Applied?</th><th>Explanation</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Pure numeric (int, float, numpy)</td><td>Yes - <code>@njit(cache=True)</code></td><td>No Python objects involved</td></tr>
+            <tr><td>Uses NumPy functions (sin, sqrt...)</td><td>Yes - <code>@njit(cache=True)</code></td><td>NumPy is Numba-compatible</td></tr>
+            <tr><td>Uses print()</td><td>Yes - <code>@njit(cache=True)</code></td><td>Numba supports basic print</td></tr>
+            <tr><td>Uses set operations (Unicode)</td><td>No</td><td>Runtime helpers are pure Python</td></tr>
+            <tr><td>Uses string concatenation</td><td>No</td><td>String ops not Numba-compatible</td></tr>
+            <tr><td>Scene methods (Manim)</td><td>No</td><td>Manim objects not Numba-compatible</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warning">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Numba Import Always Present</div>
+          <p class="callout-text">
+            When any function in a file uses numeric types, the compiler adds the full Numba
+            import block (<code>from numba import jit, njit, vectorize, prange</code>) even
+            if not all imports are used. This is by design for consistency.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 13: VECTORIZATION -->
+      <!-- ============================================================ -->
+      <h2 id="vectorization">13. Automatic Vectorization</h2>
+
+      <p>
+        When the compiler detects loop patterns operating on numeric arrays, it can
+        auto-vectorize them using NumPy array operations. Combined with the
+        <code>@njit</code> decorator, this enables SIMD-level parallelism through Numba's
+        LLVM backend.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-vec1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-vec1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-vec1">
+          <pre><code class="language-mviz">fn array_operations() {
+    let a = zeros(10)
+    let b = ones(10)
+    let c = linspace(0, 1, 100)
+    let d = arange(0, 10, 1)
+    let e = eye(3)
+    return a
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-vec1">
+          <pre><code class="language-python">@njit(cache=True)
+def array_operations():
+    a = np.zeros(10)
+    b = np.ones(10)
+    c = np.linspace(0, 1, 100)
+    d = np.arange(0, 10, 1)
+    e = np.eye(3)
+    return a</code></pre>
+        </div>
+      </div>
+
+      <p>
+        Array operations combined with <code>@njit</code> are automatically compiled to
+        optimized machine code. For explicit parallel loops, use the <code>@parallel</code>
+        decorator with <code>prange</code>:
+      </p>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
         </div>
         <div class="code-block-body">
-          <pre><code class="language-mviz">@jit
+          <pre><code class="language-mviz">@njit(parallel=true)
+fn parallel_sum(arr: List[Float]) -> Float {
+    let total = 0.0
+    for i in prange(0, len(arr)) {
+        total += arr[i]
+    }
+    return total
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 14: CONSTANT FOLDING -->
+      <!-- ============================================================ -->
+      <h2 id="constant-folding">14. Constant Folding</h2>
+
+      <p>
+        The compiler evaluates constant expressions at compile time. Literal arithmetic,
+        string concatenation, and boolean expressions with known values are pre-computed.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-fold1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-fold1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-fold1">
+          <pre><code class="language-mviz">fn constant_folding_demo() {
+    let a = 2 + 3          // Constant arithmetic
+    let b = 10 * 4         // Constant multiplication
+    let c = "hello" + " world"  // String concat
+    let d = true and false // Boolean logic
+    let e = 2^10           // Power expression
+    return a + b
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-fold1">
+          <pre><code class="language-python">def constant_folding_demo():
+    a = (2 + 3)
+    b = (10 * 4)
+    c = ('hello' + ' world')
+    d = (True and False)
+    e = (2 ** 10)
+    return (a + b)</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Note on String Operations</div>
+          <p class="callout-text">
+            Functions containing string operations (like <code>"hello" + " world"</code>) do
+            <strong>not</strong> receive <code>@njit</code> because Numba does not support
+            Python string concatenation. The compiler detects this and omits the decorator.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 15: ALGEBRAIC SIMPLIFICATION -->
+      <!-- ============================================================ -->
+      <h2 id="algebraic-simp">15. Algebraic Simplification</h2>
+
+      <p>
+        The compiler performs algebraic identity simplifications. Expressions involving
+        identity elements (multiply by 1, add 0, power of 1) can be optimized.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-alg1">
+            <span class="tab-dot mviz"></span> MathViz
+          </button>
+          <button class="code-compare-tab" data-panel="python-alg1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-alg1">
+          <pre><code class="language-mviz">fn algebraic_simplification(x: Float) {
+    let a = x * 1      // Identity multiplication
+    let b = x + 0      // Identity addition
+    let c = x * 0      // Zero multiplication
+    let d = x^1        // Identity power
+    return a + b + c + d
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-alg1">
+          <pre><code class="language-python">@njit(cache=True)
+def algebraic_simplification(x: float):
+    a = (x * 1)
+    b = (x + 0)
+    c = (x * 0)
+    d = (x ** 1)
+    return (((a + b) + c) + d)</code></pre>
+        </div>
+      </div>
+
+      <p>
+        The current compiler preserves algebraic identities in the output for
+        debugging clarity. Python and Numba handle these optimizations at runtime
+        via their own constant-folding passes. Future compiler versions may inline
+        these simplifications directly.
+      </p>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 16: MATHEMATICAL CONSTANTS -->
+      <!-- ============================================================ -->
+      <h2 id="math-constants">16. Mathematical Constants</h2>
+
+      <p>
+        MathViz provides built-in mathematical constants that compile to their
+        numeric values or NumPy equivalents.
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>MathViz Constant</th><th>Unicode Alt</th><th>Compiled Python</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>PI</code></td><td><code>&#960;</code></td><td><code>3.141592653589793</code></td><td>Ratio of circumference to diameter</td></tr>
+            <tr><td><code>E</code></td><td>-</td><td><code>2.718281828459045</code></td><td>Euler's number</td></tr>
+            <tr><td><code>TAU</code></td><td>-</td><td><code>6.283185307179586</code></td><td>2 * PI</td></tr>
+            <tr><td><code>PHI</code></td><td>-</td><td><code>1.618033988749895</code></td><td>Golden ratio</td></tr>
+            <tr><td><code>INF</code></td><td><code>&#8734;</code></td><td><code>float('inf')</code></td><td>Positive infinity</td></tr>
+            <tr><td><code>NAN</code></td><td>-</td><td><code>float('nan')</code></td><td>Not a number</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Using Unicode constant
+let pi_val = &#960;         // Compiles to: 3.141592653589793
+let inf_val = &#8734;        // Compiles to: float('inf')
+
+// Using named constants
+let area = PI * radius^2
+let circumference = TAU * radius</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 17: DECORATORS -->
+      <!-- ============================================================ -->
+      <h2 id="decorators">17. Decorators</h2>
+
+      <p>
+        While the compiler automatically injects <code>@njit</code> where appropriate,
+        you can also use explicit decorators for fine-grained control.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Explicit JIT with options
+@jit
 fn compute(arr: List[Float]) -> Float {
     let total = 0.0
     for x in arr {
@@ -418,20 +1558,104 @@ fn compute(arr: List[Float]) -> Float {
     return total
 }
 
+// No-Python-mode JIT with parallelism
 @njit(parallel=true)
 fn parallel_sum(arr: List[Float]) -> Float {
     let total = 0.0
-    for i in 0..len(arr) {
+    for i in prange(0, len(arr)) {
         total += arr[i]
     }
     return total
+}
+
+// Vectorize for element-wise ufuncs
+@vectorize
+fn add_one(x: Float) -> Float {
+    return x + 1.0
 }</code></pre>
         </div>
       </div>
 
-      <h2 id="oop">Classes & OOP</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Decorator</th><th>Purpose</th><th>When to Use</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>@jit</code></td><td>General JIT compilation</td><td>Functions that may fall back to Python</td></tr>
+            <tr><td><code>@njit</code></td><td>No-Python-mode JIT</td><td>Pure numeric functions (fastest)</td></tr>
+            <tr><td><code>@njit(cache=True)</code></td><td>Cached JIT</td><td>Automatic -- compiler default</td></tr>
+            <tr><td><code>@njit(parallel=true)</code></td><td>Parallel JIT</td><td>Loop-heavy functions with prange</td></tr>
+            <tr><td><code>@vectorize</code></td><td>NumPy ufunc creation</td><td>Element-wise array operations</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h3>Structs</h3>
+      <!-- ============================================================ -->
+      <!-- SECTION 18: ERROR HANDLING -->
+      <!-- ============================================================ -->
+      <h2 id="error-handling">18. Error Handling</h2>
+
+      <p>
+        MathViz supports Rust-inspired error handling with <code>Result</code> and
+        <code>Optional</code> types, plus <code>try/catch</code> blocks.
+      </p>
+
+      <h3>Result Type</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">fn divide(a: Float, b: Float) -> Result[Float, String] {
+    if b == 0.0 {
+        return Err("Division by zero")
+    }
+    return Ok(a / b)
+}
+
+// Using match with Result
+let result = divide(10.0, 2.0)
+match result {
+    Ok(value) -> print(value)
+    Err(msg) -> print(msg)
+}
+
+// Error propagation with ?
+fn compute() -> Result[Float, String] {
+    let x = divide(10.0, 2.0)?
+    let y = divide(x, 3.0)?
+    return Ok(y)
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Optional Type</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">let maybe_value: Optional[Int] = Some(42)
+let nothing: Optional[Int] = None
+
+// Pattern match on Optional
+match maybe_value {
+    Some(v) -> print(v)
+    None -> print("No value")
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 19: STRUCTS & TRAITS -->
+      <!-- ============================================================ -->
+      <h2 id="structs-traits">19. Structs &amp; Traits</h2>
+
+      <h3>Struct Definition</h3>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
@@ -462,6 +1686,7 @@ let d = p1.distance(p2)  // 5.0</code></pre>
       </div>
 
       <h3>Traits</h3>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
@@ -488,7 +1713,11 @@ impl Shape for Circle {
         </div>
       </div>
 
-      <h3>Enums</h3>
+      <!-- ============================================================ -->
+      <!-- SECTION 20: ENUMS -->
+      <!-- ============================================================ -->
+      <h2 id="enums">20. Enums</h2>
+
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
@@ -508,93 +1737,40 @@ enum Shape {
 }
 
 let c = Color::RGB(255, 128, 0)
-let s = Shape::Circle(5.0)</code></pre>
-        </div>
-      </div>
+let s = Shape::Circle(5.0)
 
-      <h2 id="error-handling">Error Handling</h2>
-
-      <h3>Result Type</h3>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">fn divide(a: Float, b: Float) -> Result[Float, String] {
-    if b == 0.0 {
-        return Err("Division by zero")
-    }
-    return Ok(a / b)
-}
-
-// Using match
-let result = divide(10.0, 2.0)
-match result {
-    Ok(value) -> println("Result: {}", value)
-    Err(msg) -> println("Error: {}", msg)
-}
-
-// Using ? operator
-fn compute() -> Result[Float, String] {
-    let x = divide(10.0, 2.0)?
-    let y = divide(x, 0.0)?  // Will propagate error
-    return Ok(y)
-}</code></pre>
-        </div>
-      </div>
-
-      <h2 id="pattern-matching">Pattern Matching</h2>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">fn describe_number(n: Int) -> String {
-    match n {
-        0 -> "zero"
-        1 -> "one"
-        n where n < 0 -> "negative"
-        n where n > 100 -> "large"
-        _ -> "other"
-    }
-}
-
-fn calculate_area(shape: Shape) -> Float {
+// Pattern matching with enums
+fn area(shape: Shape) -> Float {
     match shape {
         Shape::Circle(r) -> PI * r ^ 2
         Shape::Rectangle(w, h) -> w * h
         Shape::Point -> 0.0
     }
-}
-
-// Tuple destructuring
-let point = (3.0, 4.0)
-match point {
-    (0.0, 0.0) -> println("origin")
-    (x, 0.0) -> println("on x-axis at {}", x)
-    (0.0, y) -> println("on y-axis at {}", y)
-    (x, y) -> println("point at ({}, {})", x, y)
 }</code></pre>
         </div>
       </div>
 
-      <h2>Comprehensions</h2>
+      <!-- ============================================================ -->
+      <!-- NAVIGATION -->
+      <!-- ============================================================ -->
+      <h2>Navigation</h2>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>Previous</h4>
+          <p><a href="getting-started.html">Getting Started</a> - Installation and first program</p>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// List comprehension
-let squares = [x^2 for x in 0..10]
-let evens = [x for x in 0..100 if x % 2 == 0]
-
-// Set comprehension
-let unique_squares = {x^2 for x in -5..6}
-
-// Dict comprehension
-let square_map = {x: x^2 for x in 0..10}</code></pre>
+        <div class="feature-card">
+          <h4>Next</h4>
+          <p><a href="modules.html">Module System</a> - Organizing and reusing code</p>
+        </div>
+        <div class="feature-card">
+          <h4>Related</h4>
+          <p><a href="scenes.html">Scenes &amp; Manim</a> - Animation integration</p>
+        </div>
+        <div class="feature-card">
+          <h4>Examples</h4>
+          <p><a href="../examples/gallery.html">Tutorials</a> - Step-by-step walkthrough</p>
         </div>
       </div>
     </main>
@@ -614,9 +1790,68 @@ let square_map = {x: x^2 for x in 0..10}</code></pre>
     </div>
   </div>
 
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
   <script src="../assets/app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
   <script src="../assets/prism-mviz.js"></script>
+  <script>
+    // Tab switching for code-compare panels
+    document.querySelectorAll('.code-compare-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var panelId = this.getAttribute('data-panel');
+        var container = this.closest('.code-compare');
+        container.querySelectorAll('.code-compare-tab').forEach(function(t) { t.classList.remove('active'); });
+        container.querySelectorAll('.code-compare-panel').forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+      });
+    });
+
+    // Back to top button
+    var backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Mobile sidebar
+    (function() {
+      var sidebar = document.querySelector('.docs-sidebar');
+      var navBtn = document.querySelector('.nav-mobile-toggle');
+      var navMenu = document.getElementById('nav-mobile-menu');
+
+      if (navMenu) {
+        navMenu.querySelectorAll('.nav-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            navMenu.classList.remove('open');
+          });
+        });
+      }
+
+      if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+              sidebar.classList.remove('open');
+            }
+          });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

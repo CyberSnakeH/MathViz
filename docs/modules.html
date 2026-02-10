@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Module System - MathViz Documentation</title>
-  <meta name="description" content="Learn about MathViz's module system for organizing and reusing code.">
+  <meta name="description" content="Complete guide to MathViz's module system: creating modules, public/private visibility, module resolution, multi-file projects, and compiled output.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237aa2f7' rx='15' width='100' height='100'/><text x='50' y='70' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif' font-weight='bold'>M</text></svg>">
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body>
-  <!-- Navigation -->
   <header class="nav-header">
     <div class="nav-inner">
       <a href="../index.html" class="nav-brand">
@@ -55,125 +54,206 @@
   </header>
 
   <div class="docs-layout">
-    <!-- Sidebar -->
     <aside class="docs-sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-title">Getting Started</div>
+        <div class="sidebar-title">Module System</div>
         <nav class="sidebar-nav">
-          <a href="getting-started.html" class="sidebar-link">Introduction</a>
-          <a href="getting-started.html#installation" class="sidebar-link">Installation</a>
-          <a href="getting-started.html#first-program" class="sidebar-link">First Program</a>
-          <a href="getting-started.html#running" class="sidebar-link">Running Code</a>
+          <a href="#module-basics" class="sidebar-link">Module Basics</a>
+          <a href="#pub-private" class="sidebar-link">Public / Private</a>
+          <a href="#importing" class="sidebar-link">Importing Modules</a>
+          <a href="#resolution" class="sidebar-link">Module Resolution</a>
+          <a href="#multi-module" class="sidebar-link">Multi-Module Projects</a>
+          <a href="#compiled-output" class="sidebar-link">Compiled Output</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Advanced Topics</div>
+        <nav class="sidebar-nav">
+          <a href="#transitive" class="sidebar-link">Transitive Dependencies</a>
+          <a href="#diamond" class="sidebar-link">Diamond Dependencies</a>
+          <a href="#circular" class="sidebar-link">Circular Detection</a>
+          <a href="#python-interop" class="sidebar-link">Python Interop</a>
+          <a href="#complete-example" class="sidebar-link">Complete Example</a>
+          <a href="#best-practices" class="sidebar-link">Best Practices</a>
         </nav>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-title">Documentation</div>
         <nav class="sidebar-nav">
+          <a href="getting-started.html" class="sidebar-link">Getting Started</a>
           <a href="language-reference.html" class="sidebar-link">Language Reference</a>
-          <a href="scenes.html" class="sidebar-link">Scenes & Manim</a>
-          <a href="modules.html" class="sidebar-link active">Module System</a>
+          <a href="scenes.html" class="sidebar-link">Scenes &amp; Manim</a>
           <a href="cli.html" class="sidebar-link">CLI Reference</a>
-          <a href="editor.html" class="sidebar-link">Desktop Editor</a>
-        </nav>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-title">On This Page</div>
-        <nav class="sidebar-nav">
-          <a href="#overview" class="sidebar-link">Overview</a>
-          <a href="#use-statements" class="sidebar-link">Use Statements</a>
-          <a href="#pub-keyword" class="sidebar-link">Public Exports</a>
-          <a href="#module-resolution" class="sidebar-link">Module Resolution</a>
-          <a href="#multi-file" class="sidebar-link">Multi-File Projects</a>
-          <a href="#best-practices" class="sidebar-link">Best Practices</a>
         </nav>
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="docs-content">
       <h1>Module System</h1>
 
       <p>
-        MathViz provides a powerful module system for organizing code into reusable,
-        maintainable components. The module system supports importing from the standard
-        library, external packages, and your own project files.
+        MathViz provides a module system for organizing code into reusable,
+        maintainable components. Modules compile to Python files with functions
+        becoming top-level definitions or <code>@staticmethod</code> methods in classes.
+        This guide covers everything from basic module creation to advanced dependency
+        patterns, with <strong>real compiled output</strong> from the MathViz compiler.
       </p>
 
-      <h2 id="overview">Overview</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 1: MODULE BASICS -->
+      <!-- ============================================================ -->
+      <h2 id="module-basics">1. Module Basics</h2>
 
-      <p>The module system is built around three core concepts:</p>
+      <p>
+        A module in MathViz is simply a <code>.mviz</code> file containing functions,
+        constants, and types. Any <code>.mviz</code> file can serve as a module that
+        other files import from.
+      </p>
 
-      <ul>
-        <li><strong>use</strong> - Import items from other modules</li>
-        <li><strong>mod</strong> - Declare a submodule</li>
-        <li><strong>pub</strong> - Export items for external use</li>
-      </ul>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-mod1">
+            <span class="tab-dot mviz"></span> math_utils.mviz
+          </button>
+          <button class="code-compare-tab" data-panel="python-mod1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Import specific items
-use math::{sin, cos, PI}
-use collections::HashMap
+        <div class="code-compare-panel active" id="mviz-mod1">
+          <pre><code class="language-mviz">// math_utils.mviz - A reusable module
 
-// Import everything from a module
-use geometry::*
+pub fn factorial(n) {
+    if n &lt;= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
 
-// Import with alias
-use statistics::mean as average
+pub fn fibonacci(n) {
+    if n &lt;= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
 
-// Declare a submodule
-mod helpers
+pub fn gcd(a, b) {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}
 
-fn main() {
-    let angle = PI / 4.0
-    println("sin({}) = {}", angle, sin(angle))
+fn private_helper() {
+    return 42
 }</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-mod1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+@njit(cache=True)
+def factorial(n):
+    if (n &lt;= 1):
+        return 1
+    return (n * factorial((n - 1)))
+
+@njit(cache=True)
+def fibonacci(n):
+    if (n &lt;= 1):
+        return n
+    return (fibonacci((n - 1)) + fibonacci((n - 2)))
+
+@njit(cache=True)
+def gcd(a, b):
+    if (b == 0):
+        return a
+    return gcd(b, (a % b))
+
+@njit(cache=True)
+def private_helper():
+    return 42</code></pre>
         </div>
       </div>
 
-      <h2 id="use-statements">Use Statements</h2>
-
-      <h3>Basic Imports</h3>
-
-      <p>Import specific items from a module using the <code>use</code> keyword:</p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Import a single item
-use math::sqrt
-
-// Import multiple items with braces
-use math::{sin, cos, tan, PI, E}
-
-// Import from nested modules
-use graphics::shapes::Circle
-use graphics::colors::{RED, BLUE, GREEN}</code></pre>
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Module = File</div>
+          <p class="callout-text">
+            Each <code>.mviz</code> file is a module. The module name is derived from the filename
+            (without extension). A file named <code>math_utils.mviz</code> creates a module
+            named <code>math_utils</code>.
+          </p>
         </div>
       </div>
 
-      <h3>Glob Imports</h3>
+      <!-- ============================================================ -->
+      <!-- SECTION 2: PUBLIC / PRIVATE -->
+      <!-- ============================================================ -->
+      <h2 id="pub-private">2. Public / Private Visibility</h2>
 
-      <p>Import all public items from a module using <code>*</code>:</p>
+      <p>
+        By default, all items in a module are <strong>private</strong>. Use the <code>pub</code>
+        keyword to make functions, constants, structs, and traits available for import.
+      </p>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Declaration</th><th>Visibility</th><th>Importable?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>pub fn name()</code></td><td>Public</td><td>Yes - other modules can import it</td></tr>
+            <tr><td><code>fn name()</code></td><td>Private</td><td>No - only accessible within the file</td></tr>
+            <tr><td><code>pub const X = 42</code></td><td>Public</td><td>Yes</td></tr>
+            <tr><td><code>const X = 42</code></td><td>Private</td><td>No</td></tr>
+            <tr><td><code>pub struct Point</code></td><td>Public</td><td>Yes</td></tr>
+            <tr><td><code>struct Point</code></td><td>Private</td><td>No</td></tr>
+            <tr><td><code>pub trait Shape</code></td><td>Public</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Visibility Example</h3>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-vis1">
+            <span class="tab-dot mviz"></span> math_utils.mviz
+          </button>
+          <button class="code-compare-tab" data-panel="python-vis1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Import everything from the math module
-use math::*
+        <div class="code-compare-panel active" id="mviz-vis1">
+          <pre><code class="language-mviz">// Public - can be imported by other modules
+pub fn factorial(n) {
+    if n &lt;= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
 
-// Now you can use sin, cos, sqrt, etc. directly
-fn main() {
-    let result = sqrt(16.0) + sin(PI / 2.0)
-    println("Result: {}", result)
+// Private - internal implementation detail
+fn private_helper() {
+    return 42
 }</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-vis1">
+          <pre><code class="language-python">@njit(cache=True)
+def factorial(n):
+    if (n &lt;= 1):
+        return 1
+    return (n * factorial((n - 1)))
+
+@njit(cache=True)
+def private_helper():
+    return 42</code></pre>
         </div>
       </div>
 
@@ -184,261 +264,155 @@ fn main() {
           <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
         <div class="callout-content">
-          <div class="callout-title">Use Glob Imports Sparingly</div>
+          <div class="callout-title">Compiled Output Note</div>
           <p class="callout-text">
-            Glob imports can make it unclear where names come from. Prefer explicit imports
-            for clarity, except for prelude-like modules designed for glob import.
+            In the compiled Python, both <code>pub fn</code> and <code>fn</code> produce
+            identical function definitions. The visibility distinction is enforced at
+            compile time by the MathViz type checker, not at runtime.
           </p>
         </div>
       </div>
 
-      <h3>Aliased Imports</h3>
-
-      <p>Rename imports to avoid conflicts or improve readability:</p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Rename to avoid conflicts
-use graphics::Circle as GraphicsCircle
-use geometry::Circle as GeoCircle
-
-// Rename for brevity
-use collections::HashMap as Map
-use statistics::standard_deviation as std_dev
-
-fn main() {
-    let visual = GraphicsCircle(radius: 2.0)
-    let mathematical = GeoCircle::unit()
-
-    let data = Map::new()
-    let deviation = std_dev([1.0, 2.0, 3.0, 4.0, 5.0])
-}</code></pre>
-        </div>
-      </div>
-
-      <h3>Standard Library Imports</h3>
-
-      <p>MathViz includes a standard library with common functionality:</p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Math functions and constants
-use math::{sin, cos, tan, sqrt, abs, floor, ceil, PI, E, TAU}
-
-// Collection types
-use collections::{HashMap, HashSet, Vec, Deque}
-
-// String utilities
-use strings::{split, join, trim, replace}
-
-// File I/O
-use io::{read_file, write_file, File}
-
-// Random numbers
-use random::{rand, randint, choice, shuffle}
-
-// Date and time
-use datetime::{now, Date, Time, Duration}</code></pre>
-        </div>
-      </div>
-
-      <h2 id="pub-keyword">Public Exports (pub)</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 3: IMPORTING MODULES -->
+      <!-- ============================================================ -->
+      <h2 id="importing">3. Importing Modules</h2>
 
       <p>
-        By default, all items in a module are private. Use the <code>pub</code> keyword
-        to make items available for import by other modules.
+        Use the <code>use</code> keyword to import a module. Functions are then accessed
+        via qualified names (<code>module_name.function_name</code>).
       </p>
 
-      <h3>Exporting Functions</h3>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">math_utils.mviz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-imp1">
+            <span class="tab-dot mviz"></span> main.mviz
+          </button>
+          <button class="code-compare-tab" data-panel="python-imp1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Public function - can be imported
-pub fn factorial(n: Int) -> Int {
-    if n <= 1 {
-        return 1
-    }
-    return n * factorial(n - 1)
-}
+        <div class="code-compare-panel active" id="mviz-imp1">
+          <pre><code class="language-mviz">use math_utils
 
-// Public function
-pub fn fibonacci(n: Int) -> Int {
-    if n <= 1 {
-        return n
-    }
-    return fibonacci(n - 1) + fibonacci(n - 2)
-}
-
-// Private helper - cannot be imported
-fn validate_positive(n: Int) -> Bool {
-    return n >= 0
+fn main() {
+    let f = math_utils.factorial(10)
+    let fib = math_utils.fibonacci(20)
+    let g = math_utils.gcd(48, 18)
+    print(f)
+    print(fib)
+    print(g)
 }</code></pre>
         </div>
+        <div class="code-compare-panel" id="python-imp1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+import math_utils
+
+@njit(cache=True)
+def main():
+    f = math_utils.factorial(10)
+    fib = math_utils.fibonacci(20)
+    g = math_utils.gcd(48, 18)
+    print(f, end='')
+    print(fib, end='')
+    print(g, end='')
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
       </div>
 
-      <h3>Exporting Types</h3>
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">CLI vs Pipeline Compilation</div>
+          <p class="callout-text">
+            The CLI command <code>uv run mathviz compile main.mviz</code> generates
+            <code>import math_utils</code> (Python-style import). For full module inlining
+            (where the module code is embedded in the output), use the
+            <code>CompilationPipeline</code> API programmatically.
+          </p>
+        </div>
+      </div>
+
+      <h3>Import Patterns</h3>
 
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">geometry.mviz</span>
         </div>
         <div class="code-block-body">
-          <pre><code class="language-mviz">// Public struct
-pub struct Point {
-    x: Float,
-    y: Float
-}
+          <pre><code class="language-mviz">// Basic module import
+use math_utils
 
-// Public enum
-pub enum Shape {
-    Circle(radius: Float),
-    Rectangle(width: Float, height: Float),
-    Triangle(a: Float, b: Float, c: Float)
-}
+// Import specific items
+use math::{sin, cos, PI}
 
-// Public trait
-pub trait Drawable {
-    fn draw(self)
-    fn bounds(self) -> (Float, Float, Float, Float)
-}
+// Import everything (glob)
+use geometry::*
 
-// Implementation can also be public
-pub impl Point {
-    pub fn new(x: Float, y: Float) -> Point {
-        return Point { x, y }
-    }
+// Import with alias
+use statistics::mean as average
 
-    pub fn distance_to(self, other: Point) -> Float {
-        let dx = self.x - other.x
-        let dy = self.y - other.y
-        return sqrt(dx^2 + dy^2)
-    }
-
-    // Private method
-    fn validate(self) -> Bool {
-        return true
-    }
-}</code></pre>
+// Declare a submodule
+mod helpers</code></pre>
         </div>
       </div>
 
-      <h3>Exporting Constants</h3>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">constants.mviz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Public constants
-pub const MAX_ITERATIONS: Int = 1000
-pub const TOLERANCE: Float = 1e-10
-pub const DEFAULT_COLOR: String = "#7aa2f7"
-
-// Public list of colors
-pub const PALETTE: [String] = [
-    "#f7768e",  // Red
-    "#9ece6a",  // Green
-    "#7aa2f7",  // Blue
-    "#bb9af7",  // Purple
-    "#e0af68"   // Yellow
-]</code></pre>
-        </div>
-      </div>
-
-      <h2 id="module-resolution">Module Resolution</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 4: MODULE RESOLUTION -->
+      <!-- ============================================================ -->
+      <h2 id="resolution">4. Module Resolution</h2>
 
       <p>
-        MathViz resolves module paths in a specific order, allowing flexibility
-        in how you organize your code.
+        When the compiler encounters a <code>use</code> statement, it searches for the
+        module file in a specific order.
       </p>
 
       <h3>Resolution Order</h3>
 
       <ol>
-        <li><strong>Standard Library</strong> - Built-in modules like <code>math</code>, <code>collections</code></li>
-        <li><strong>Project Root</strong> - Modules in your project's root directory</li>
-        <li><strong>Relative Path</strong> - Modules relative to the current file</li>
-        <li><strong>Installed Packages</strong> - External packages installed via package manager</li>
+        <li><strong>Same directory</strong> - Look for <code>module_name.mviz</code> in the same directory as the importing file</li>
+        <li><strong>Project root</strong> - Look in the project's root directory</li>
+        <li><strong>Standard library</strong> - Built-in modules (<code>math</code>, <code>collections</code>)</li>
+        <li><strong>Installed packages</strong> - External packages</li>
       </ol>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Standard library (always available)
-use math::sqrt
-
-// From project root (src/utils.mviz)
-use utils::helper_function
-
-// Relative import (./local_module.mviz)
-use self::local_module::LocalType
-
-// Parent directory (../shared/common.mviz)
-use super::shared::common::SharedType
-
-// External package
-use external_pkg::feature</code></pre>
-        </div>
-      </div>
-
       <h3>File to Module Mapping</h3>
-
-      <p>MathViz maps file paths to module paths:</p>
 
       <div class="table-container">
         <table>
           <thead>
-            <tr>
-              <th>File Path</th>
-              <th>Module Path</th>
-            </tr>
+            <tr><th>File Path</th><th>Module Name</th><th>Usage</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td><code>src/main.mviz</code></td>
-              <td>Root module</td>
-            </tr>
-            <tr>
-              <td><code>src/utils.mviz</code></td>
-              <td><code>utils</code></td>
-            </tr>
-            <tr>
-              <td><code>src/math/vector.mviz</code></td>
-              <td><code>math::vector</code></td>
-            </tr>
-            <tr>
-              <td><code>src/math/mod.mviz</code></td>
-              <td><code>math</code> (module root)</td>
-            </tr>
+            <tr><td><code>math_utils.mviz</code></td><td><code>math_utils</code></td><td><code>use math_utils</code></td></tr>
+            <tr><td><code>graph/bfs.mviz</code></td><td><code>graph::bfs</code></td><td><code>use graph::bfs</code></td></tr>
+            <tr><td><code>graph/mod.mviz</code></td><td><code>graph</code></td><td><code>use graph</code></td></tr>
+            <tr><td><code>sorting/tri_bulles.mviz</code></td><td><code>sorting::tri_bulles</code></td><td><code>use sorting::tri_bulles</code></td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>The mod.mviz File</h3>
+      <h3>The mod.mviz Convention</h3>
 
       <p>
-        For directories containing multiple modules, create a <code>mod.mviz</code> file
-        to define the module's public interface:
+        For directories with multiple modules, create a <code>mod.mviz</code> file
+        that serves as the entry point and re-exports items:
       </p>
 
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/geometry/mod.mviz</span>
+          <span class="code-block-filename">geometry/mod.mviz</span>
         </div>
         <div class="code-block-body">
           <pre><code class="language-mviz">// Declare submodules
@@ -449,169 +423,678 @@ mod shapes
 // Re-export commonly used items
 pub use point::Point
 pub use vector::Vector
-pub use shapes::{Circle, Rectangle, Triangle}
-
-// Module-level documentation and shared code
-pub const ORIGIN: Point = Point { x: 0.0, y: 0.0 }</code></pre>
+pub use shapes::{Circle, Rectangle, Triangle}</code></pre>
         </div>
       </div>
 
-      <h2 id="multi-file">Multi-File Projects</h2>
+      <!-- ============================================================ -->
+      <!-- SECTION 5: MULTI-MODULE PROJECTS -->
+      <!-- ============================================================ -->
+      <h2 id="multi-module">5. Multi-Module Projects</h2>
 
       <h3>Project Structure</h3>
 
-      <p>A typical MathViz project structure:</p>
-
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-block-lang">Text</span>
+          <span class="code-block-lang">Directory Structure</span>
         </div>
         <div class="code-block-body">
           <pre><code>my_project/
-├── mathviz.toml           # Project configuration
-├── src/
-│   ├── main.mviz          # Entry point
-│   ├── config.mviz        # Configuration
-│   ├── utils.mviz         # Utility functions
-│   ├── models/
-│   │   ├── mod.mviz       # Module declaration
-│   │   ├── user.mviz
-│   │   └── data.mviz
-│   ├── services/
-│   │   ├── mod.mviz
-│   │   ├── auth.mviz
-│   │   └── api.mviz
-│   └── scenes/
-│       ├── mod.mviz
-│       ├── intro.mviz
-│       └── main_animation.mviz
-└── tests/
-    ├── test_utils.mviz
-    └── test_models.mviz</code></pre>
+├── main.mviz              # Entry point
+├── math_utils.mviz        # Math utility module
+├── graph/
+│   ├── mod.mviz           # Graph module entry
+│   ├── bfs.mviz           # BFS algorithm
+│   ├── dfs.mviz           # DFS algorithm
+│   └── dijkstra.mviz      # Dijkstra's algorithm
+├── sorting/
+│   ├── tri_bulles.mviz    # Bubble sort
+│   └── tri_rapide.mviz    # Quick sort
+└── scenes/
+    ├── mod.mviz           # Scene module entry
+    ├── intro.mviz         # Intro animation
+    └── demo.mviz          # Demo animation</code></pre>
         </div>
       </div>
 
-      <h3>Example: Multi-File Animation Project</h3>
+      <h3>Multi-File Example</h3>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/main.mviz</span>
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-multi1">
+            <span class="tab-dot mviz"></span> math_utils.mviz
+          </button>
+          <button class="code-compare-tab" data-panel="mviz-multi2">
+            <span class="tab-dot mviz"></span> main.mviz
+          </button>
+          <button class="code-compare-tab" data-panel="python-multi1">
+            <span class="tab-dot python"></span> main.py (Compiled)
+          </button>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Main entry point
-use scenes::IntroScene
-use scenes::MainAnimation
-use config::SETTINGS
-
-fn main() {
-    println("Starting animation project...")
-    println("Quality: {}", SETTINGS.quality)
-}</code></pre>
-        </div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/config.mviz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">pub struct Settings {
-    quality: String,
-    frame_rate: Int,
-    output_dir: String
+        <div class="code-compare-panel active" id="mviz-multi1">
+          <pre><code class="language-mviz">// math_utils.mviz
+pub fn factorial(n) {
+    if n &lt;= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
 }
 
-pub const SETTINGS: Settings = Settings {
-    quality: "high",
-    frame_rate: 60,
-    output_dir: "./output"
-}</code></pre>
-        </div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/scenes/mod.mviz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Declare scene modules
-mod intro
-mod main_animation
-
-// Re-export scene classes
-pub use intro::IntroScene
-pub use main_animation::MainAnimation
-
-// Shared utilities for all scenes
-pub fn create_title(text: String) -> Text {
-    let title = Text(text)
-    title.scale(1.5)
-    title.to_edge(UP)
-    return title
-}</code></pre>
-        </div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/scenes/intro.mviz</span>
-        </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">use super::create_title
-
-pub scene IntroScene {
-    fn construct(self) {
-        let title = create_title("Welcome to MathViz")
-
-        play(Write(title))
-        wait(2.0)
-        play(FadeOut(title))
+pub fn fibonacci(n) {
+    if n &lt;= 1 {
+        return n
     }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+pub fn gcd(a, b) {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="mviz-multi2">
+          <pre><code class="language-mviz">// main.mviz
+use math_utils
+
+fn main() {
+    let f = math_utils.factorial(10)
+    let fib = math_utils.fibonacci(20)
+    let g = math_utils.gcd(48, 18)
+    print(f)
+    print(fib)
+    print(g)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-multi1">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+import math_utils
+
+@njit(cache=True)
+def main():
+    f = math_utils.factorial(10)
+    fib = math_utils.fibonacci(20)
+    g = math_utils.gcd(48, 18)
+    print(f, end='')
+    print(fib, end='')
+    print(g, end='')
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 6: COMPILED OUTPUT -->
+      <!-- ============================================================ -->
+      <h2 id="compiled-output">6. Compiled Output</h2>
+
+      <p>
+        Understanding how modules compile to Python is essential for debugging and
+        interoperability. The compiler uses two strategies depending on the compilation
+        mode.
+      </p>
+
+      <h3>CLI Compilation (import statement)</h3>
+
+      <p>
+        When compiling with <code>uv run mathviz compile main.mviz</code>, the compiler
+        generates a standard Python <code>import</code> statement:
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-out1">
+            <span class="tab-dot mviz"></span> MathViz Source
+          </button>
+          <button class="code-compare-tab" data-panel="python-out1">
+            <span class="tab-dot python"></span> CLI Output
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-out1">
+          <pre><code class="language-mviz">use math_utils
+
+fn main() {
+    let f = math_utils.factorial(10)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-out1">
+          <pre><code class="language-python">import math_utils
+
+@njit(cache=True)
+def main():
+    f = math_utils.factorial(10)</code></pre>
+        </div>
+      </div>
+
+      <h3>Pipeline Compilation (inlined module)</h3>
+
+      <p>
+        When using the <code>CompilationPipeline</code> API, the module code is
+        inlined directly into the output file as a Python class with
+        <code>@staticmethod</code> methods:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Compiled Python (Pipeline mode)</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+# Inlined module: math_utils
+class math_utils:
+    @staticmethod
+    @njit(cache=True)
+    def factorial(n):
+        if (n &lt;= 1):
+            return 1
+        return (n * math_utils.factorial((n - 1)))
+
+    @staticmethod
+    @njit(cache=True)
+    def fibonacci(n):
+        if (n &lt;= 1):
+            return n
+        return (math_utils.fibonacci((n - 1))
+            + math_utils.fibonacci((n - 2)))
+
+    @staticmethod
+    @njit(cache=True)
+    def gcd(a, b):
+        if (b == 0):
+            return a
+        return math_utils.gcd(b, (a % b))
+
+
+def main():
+    f = math_utils.factorial(10)
+    fib = math_utils.fibonacci(20)
+    g = math_utils.gcd(48, 18)
+    print(f)
+    print(fib)
+    print(g)
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Recursive Calls in Inlined Modules</div>
+          <p class="callout-text">
+            When modules are inlined as classes, recursive function calls must use the
+            fully qualified class name (e.g., <code>math_utils.factorial(n-1)</code>).
+            The compiler handles this automatically when inlining. If you edit the
+            generated Python, ensure recursive calls use the class prefix.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 7: TRANSITIVE DEPENDENCIES -->
+      <!-- ============================================================ -->
+      <h2 id="transitive">7. Transitive Dependencies</h2>
+
+      <p>
+        When module A imports module B, and module B imports module C, this creates
+        a transitive dependency chain. The compiler resolves these by processing
+        modules in dependency order.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Dependency Chain</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>main.mviz  -->  graph.mviz  -->  queue.mviz
+    |                                |
+    +-------->  sorting.mviz         |
+                    |                |
+                    +-- uses queue --+</code></pre>
+        </div>
+      </div>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-trans1">
+            <span class="tab-dot mviz"></span> queue.mviz (base)
+          </button>
+          <button class="code-compare-tab" data-panel="mviz-trans2">
+            <span class="tab-dot mviz"></span> graph.mviz (uses queue)
+          </button>
+          <button class="code-compare-tab" data-panel="mviz-trans3">
+            <span class="tab-dot mviz"></span> main.mviz (uses graph)
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-trans1">
+          <pre><code class="language-mviz">// queue.mviz - Base module
+pub fn create_queue() {
+    return []
+}
+
+pub fn enqueue(queue, item) {
+    queue.append(item)
+    return queue
+}
+
+pub fn dequeue(queue) {
+    return queue.pop(0)
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="mviz-trans2">
+          <pre><code class="language-mviz">// graph.mviz - Uses queue
+use queue
+
+pub fn bfs(graph, start) {
+    let visited = {}
+    let q = queue.create_queue()
+    queue.enqueue(q, start)
+    // ... BFS algorithm
+    return visited
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="mviz-trans3">
+          <pre><code class="language-mviz">// main.mviz - Uses graph (and transitively, queue)
+use graph
+
+fn main() {
+    let g = [[1, 2], [0, 3], [0], [1]]
+    let result = graph.bfs(g, 0)
+    print(result)
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">Current Limitation</div>
+          <p class="callout-text">
+            The <code>CompilationPipeline</code> currently handles one level of module
+            inlining. For transitive dependencies (A uses B uses C), B is inlined but
+            C may need to be manually resolved. The CLI command always generates Python
+            <code>import</code> statements, which Python resolves at runtime.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 8: DIAMOND DEPENDENCIES -->
+      <!-- ============================================================ -->
+      <h2 id="diamond">8. Diamond Dependencies</h2>
+
+      <p>
+        A diamond dependency occurs when two modules both depend on a common third module:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Diamond Pattern</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>        main.mviz
+       /          \
+  graph.mviz    sorting.mviz
+       \          /
+       queue.mviz</code></pre>
+        </div>
+      </div>
+
+      <p>
+        The compiler handles diamond dependencies correctly by ensuring each module
+        is only compiled and inlined once. In CLI mode, Python's import system
+        naturally deduplicates imports (each module is loaded once into
+        <code>sys.modules</code>).
+      </p>
+
+      <p>
+        In pipeline mode, the compiler tracks which modules have been inlined and
+        skips duplicates, ensuring the generated output contains only one definition
+        of each class.
+      </p>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 9: CIRCULAR DEPENDENCY DETECTION -->
+      <!-- ============================================================ -->
+      <h2 id="circular">9. Circular Dependency Detection</h2>
+
+      <p>
+        Circular dependencies (A uses B, B uses A) are detected at compile time
+        and produce a clear error message:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// module_a.mviz
+use module_b
+
+pub fn func_a() {
+    return module_b.func_b()
+}
+
+// module_b.mviz
+use module_a     // ERROR: circular dependency!
+
+pub fn func_b() {
+    return module_a.func_a()
 }</code></pre>
         </div>
       </div>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/scenes/main_animation.mviz</span>
+          <span class="code-block-lang">Compiler Error</span>
         </div>
         <div class="code-block-body">
-          <pre><code class="language-mviz">use super::create_title
-use config::SETTINGS
+          <pre><code>error[E0200]: circular dependency detected
+  --> module_b.mviz:1:1
+   |
+ 1 | use module_a
+   | ^^^^^^^^^^^^
+   |
+   = help: module_a -> module_b -> module_a
+   = help: break the cycle by extracting shared code into a third module</code></pre>
+        </div>
+      </div>
 
-pub scene MainAnimation {
-    fn construct(self) {
-        let title = create_title("Main Content")
+      <h3>How to Fix Circular Dependencies</h3>
 
-        // Create shapes
-        let circle = Circle(radius: 1.0)
-        circle.set_color(BLUE)
+      <p>
+        Extract the shared functionality into a new module that both can import:
+      </p>
 
-        let square = Square(side_length: 2.0)
-        square.set_color(RED)
-        square.next_to(circle, RIGHT, buff: 1.0)
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Solution</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>// Before (circular):
+// module_a -> module_b -> module_a
 
-        // Animate
-        play(Write(title))
-        play(Create(circle), Create(square))
-        wait(1.0)
+// After (fixed):
+// module_a -> shared
+// module_b -> shared
 
-        // Transform
-        play(Transform(circle, square.copy()))
-        wait(2.0)
+shared/
+├── shared.mviz      # Common functionality
+├── module_a.mviz    # Uses shared
+└── module_b.mviz    # Uses shared</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 10: PYTHON INTEROP -->
+      <!-- ============================================================ -->
+      <h2 id="python-interop">10. Mixing Python and MathViz Imports</h2>
+
+      <p>
+        MathViz modules can coexist with Python packages. When the compiler encounters
+        a <code>use</code> statement it cannot resolve as a <code>.mviz</code> file, it
+        falls back to generating a Python <code>import</code> statement.
+      </p>
+
+      <div class="code-compare">
+        <div class="code-compare-tabs">
+          <button class="code-compare-tab active" data-panel="mviz-py1">
+            <span class="tab-dot mviz"></span> MathViz Source
+          </button>
+          <button class="code-compare-tab" data-panel="python-py1">
+            <span class="tab-dot python"></span> Compiled Python
+          </button>
+        </div>
+        <div class="code-compare-panel active" id="mviz-py1">
+          <pre><code class="language-mviz">// MathViz module (resolved as .mviz)
+use math_utils
+
+// Python packages (passed through as imports)
+use numpy
+use scipy
+
+fn main() {
+    let f = math_utils.factorial(5)
+    let arr = numpy.array([1, 2, 3])
+}</code></pre>
+        </div>
+        <div class="code-compare-panel" id="python-py1">
+          <pre><code class="language-python">import math_utils
+import numpy
+import scipy
+
+def main():
+    f = math_utils.factorial(5)
+    arr = numpy.array([1, 2, 3])
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div class="callout-content">
+          <div class="callout-title">NumPy is Special</div>
+          <p class="callout-text">
+            You rarely need <code>use numpy</code> because the compiler automatically
+            converts math functions (sin, cos, sqrt, etc.) to <code>np.xxx</code> and
+            adds the <code>import numpy as np</code> import. Direct <code>use numpy</code>
+            is only needed for functions the compiler does not auto-convert.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 11: COMPLETE EXAMPLE -->
+      <!-- ============================================================ -->
+      <h2 id="complete-example">11. Complete Multi-File Example</h2>
+
+      <p>
+        Here is a complete multi-file project demonstrating the module system end-to-end:
+        a graph theory module with a BFS algorithm, used by a main file.
+      </p>
+
+      <h3>Project Structure</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Directory Layout</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>graph_project/
+├── graphe.mviz         # Graph data structure module
+├── graphe_bfs.mviz     # BFS algorithm (uses graphe)
+└── main.mviz           # Entry point (uses both)</code></pre>
+        </div>
+      </div>
+
+      <h3>Module: graphe.mviz</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">graphe.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">// Graph utilities module
+pub fn create_adj_list(num_vertices) {
+    let adj = []
+    for i in 0..num_vertices {
+        adj.append([])
     }
+    return adj
+}
+
+pub fn add_edge(adj, u, v) {
+    adj[u].append(v)
+    adj[v].append(u)
+    return adj
+}
+
+pub fn vertex_count(adj) {
+    return len(adj)
+}
+
+pub fn edge_list(adj) {
+    let edges = []
+    for u in 0..len(adj) {
+        for v in adj[u] {
+            if u &lt; v {
+                edges.append([u, v])
+            }
+        }
+    }
+    return edges
 }</code></pre>
         </div>
       </div>
 
-      <h2 id="best-practices">Best Practices</h2>
+      <h3>Module: graphe_bfs.mviz</h3>
 
-      <h3>Module Organization</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">graphe_bfs.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">use graphe
+
+pub fn bfs(adj, start) {
+    let n = graphe.vertex_count(adj)
+    let visited = [false for _ in 0..n]
+    let order = []
+    let queue = [start]
+    visited[start] = true
+
+    while len(queue) > 0 {
+        let current = queue.pop(0)
+        order.append(current)
+        for neighbor in adj[current] {
+            if not visited[neighbor] {
+                visited[neighbor] = true
+                queue.append(neighbor)
+            }
+        }
+    }
+    return order
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Entry Point: main.mviz</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">MathViz</span>
+          <span class="code-block-filename">main.mviz</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-mviz">use graphe
+use graphe_bfs
+
+fn main() {
+    let adj = graphe.create_adj_list(6)
+    graphe.add_edge(adj, 0, 1)
+    graphe.add_edge(adj, 0, 2)
+    graphe.add_edge(adj, 1, 3)
+    graphe.add_edge(adj, 2, 4)
+    graphe.add_edge(adj, 3, 5)
+
+    let order = graphe_bfs.bfs(adj, 0)
+    print(order)
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Compiled Output (Pipeline mode, abbreviated)</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Compiled Python</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code class="language-python">import numpy as np
+from numba import jit, njit, vectorize, prange
+import numba
+
+class graphe:
+    @staticmethod
+    def create_adj_list(num_vertices):
+        adj = []
+        for i in range(0, num_vertices):
+            adj.append([])
+        return adj
+
+    @staticmethod
+    def add_edge(adj, u, v):
+        adj[u].append(v)
+        adj[v].append(u)
+        return adj
+
+    @staticmethod
+    def vertex_count(adj):
+        return len(adj)
+
+class graphe_bfs:
+    @staticmethod
+    def bfs(adj, start):
+        n = graphe.vertex_count(adj)
+        visited = [False for _ in range(0, n)]
+        order = []
+        queue = [start]
+        visited[start] = True
+        while (len(queue) > 0):
+            current = queue.pop(0)
+            order.append(current)
+            for neighbor in adj[current]:
+                if (not visited[neighbor]):
+                    visited[neighbor] = True
+                    queue.append(neighbor)
+        return order
+
+
+def main():
+    adj = graphe.create_adj_list(6)
+    graphe.add_edge(adj, 0, 1)
+    graphe.add_edge(adj, 0, 2)
+    graphe.add_edge(adj, 1, 3)
+    graphe.add_edge(adj, 2, 4)
+    graphe.add_edge(adj, 3, 5)
+    order = graphe_bfs.bfs(adj, 0)
+    print(order)
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 12: BEST PRACTICES -->
+      <!-- ============================================================ -->
+      <h2 id="best-practices">12. Best Practices</h2>
 
       <div class="feature-grid">
         <div class="feature-card">
@@ -622,7 +1105,7 @@ pub scene MainAnimation {
             </svg>
           </div>
           <h4>One Concept Per File</h4>
-          <p>Keep each file focused on a single struct, trait, or related set of functions.</p>
+          <p>Keep each module focused on a single domain: one struct, trait, or set of related functions. This makes code easier to find and maintain.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">
@@ -632,7 +1115,7 @@ pub scene MainAnimation {
             </svg>
           </div>
           <h4>Explicit Exports</h4>
-          <p>Only export what's needed. Use <code>pub</code> intentionally to create clean APIs.</p>
+          <p>Only mark items as <code>pub</code> that are intended for external use. Keep implementation details private to maintain a clean API surface.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">
@@ -641,8 +1124,8 @@ pub scene MainAnimation {
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
           </div>
-          <h4>Re-export at Module Root</h4>
-          <p>Use <code>mod.mviz</code> to create a clean public interface for module directories.</p>
+          <h4>Use mod.mviz for Directories</h4>
+          <p>Create a <code>mod.mviz</code> in module directories to serve as the public interface. Re-export commonly used items for convenience.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">
@@ -652,7 +1135,27 @@ pub scene MainAnimation {
             </svg>
           </div>
           <h4>Avoid Circular Dependencies</h4>
-          <p>Structure modules in a hierarchy where dependencies flow one direction.</p>
+          <p>Structure modules in a hierarchy where dependencies flow one direction. Extract shared code into a common module.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>Group Imports by Source</h4>
+          <p>Organize import statements: standard library first, then project modules, then local modules. Add blank lines between groups.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h4>Test Modules Independently</h4>
+          <p>Each module should be compilable and testable on its own. Avoid tight coupling between modules.</p>
         </div>
       </div>
 
@@ -684,55 +1187,32 @@ use math::cos</code></pre>
         </div>
       </div>
 
-      <h3>Prelude Pattern</h3>
+      <!-- ============================================================ -->
+      <!-- NAVIGATION -->
+      <!-- ============================================================ -->
+      <h2>Navigation</h2>
 
-      <p>
-        For commonly used items, create a prelude module that can be glob-imported:
-      </p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/prelude.mviz</span>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>Previous</h4>
+          <p><a href="language-reference.html">Language Reference</a> - Complete syntax documentation</p>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Re-export commonly used items
-pub use math::{PI, E, sqrt, sin, cos}
-pub use collections::{Vec, HashMap}
-pub use models::{Point, Vector}
-pub use traits::{Drawable, Animatable}
-pub use constants::{COLORS, DEFAULT_SETTINGS}</code></pre>
+        <div class="feature-card">
+          <h4>Next</h4>
+          <p><a href="cli.html">CLI Reference</a> - Command-line interface</p>
         </div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">MathViz</span>
-          <span class="code-block-filename">src/main.mviz</span>
+        <div class="feature-card">
+          <h4>Related</h4>
+          <p><a href="../examples/advanced.html">Advanced Examples</a> - Multi-module projects in action</p>
         </div>
-        <div class="code-block-body">
-          <pre><code class="language-mviz">// Import everything commonly needed
-use prelude::*
-
-fn main() {
-    let p = Point::new(cos(PI/4), sin(PI/4))
-    let v = Vector::from_point(p)
-    println("Vector: {:?}", v)
-}</code></pre>
+        <div class="feature-card">
+          <h4>Getting Started</h4>
+          <p><a href="getting-started.html">Getting Started</a> - Installation and first program</p>
         </div>
       </div>
-
-      <h2>Next Steps</h2>
-
-      <ul>
-        <li><a href="cli.html">CLI Reference</a> - Learn about the command-line interface</li>
-        <li><a href="language-reference.html">Language Reference</a> - Complete syntax documentation</li>
-        <li><a href="../examples/index.html">Examples</a> - See multi-file project examples</li>
-      </ul>
     </main>
   </div>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-bottom">
       <p class="footer-copyright">MathViz - Open Source under MIT License</p>
@@ -740,7 +1220,6 @@ fn main() {
     </div>
   </footer>
 
-  <!-- Search Modal -->
   <div id="search-modal" class="search-modal">
     <div class="search-modal-content">
       <input type="text" class="search-modal-input" placeholder="Search documentation...">
@@ -748,9 +1227,68 @@ fn main() {
     </div>
   </div>
 
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
   <script src="../assets/app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
   <script src="../assets/prism-mviz.js"></script>
+  <script>
+    // Tab switching for code-compare panels
+    document.querySelectorAll('.code-compare-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var panelId = this.getAttribute('data-panel');
+        var container = this.closest('.code-compare');
+        container.querySelectorAll('.code-compare-tab').forEach(function(t) { t.classList.remove('active'); });
+        container.querySelectorAll('.code-compare-panel').forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+      });
+    });
+
+    // Back to top button
+    var backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Mobile sidebar
+    (function() {
+      var sidebar = document.querySelector('.docs-sidebar');
+      var navBtn = document.querySelector('.nav-mobile-toggle');
+      var navMenu = document.getElementById('nav-mobile-menu');
+
+      if (navMenu) {
+        navMenu.querySelectorAll('.nav-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            navMenu.classList.remove('open');
+          });
+        });
+      }
+
+      if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-link').forEach(function(link) {
+          link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+              sidebar.classList.remove('open');
+            }
+          });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
