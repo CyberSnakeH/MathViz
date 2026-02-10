@@ -1,0 +1,125 @@
+{
+  "name": "mathviz",
+  "displayName": "MathViz Language Support",
+  "description": "Syntax highlighting, snippets, and language support for the MathViz DSL (.mviz/.mvz)",
+  "version": "0.1.0",
+  "publisher": "cybersnakeh",
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "mathviz",
+    "manim",
+    "math",
+    "visualization",
+    "dsl"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cybersnakeh/MathViz"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "mathviz",
+        "aliases": [
+          "MathViz",
+          "mathviz"
+        ],
+        "extensions": [
+          ".mviz",
+          ".mvz"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icon.png",
+          "dark": "./icon.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mathviz",
+        "scopeName": "source.mviz",
+        "path": "./syntaxes/mathviz.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "mathviz",
+        "path": "./snippets/mathviz.json"
+      }
+    ],
+    "configurationDefaults": {
+      "editor.tokenColorCustomizations": {
+        "[Tokyo Night]": {
+          "textMateRules": [
+            {
+              "scope": "keyword.declaration.mathviz",
+              "settings": {
+                "foreground": "#BB9AF7"
+              }
+            },
+            {
+              "scope": "entity.name.type.scene.mathviz",
+              "settings": {
+                "foreground": "#FF9E64",
+                "fontStyle": "bold"
+              }
+            },
+            {
+              "scope": "support.class.manim.mathviz",
+              "settings": {
+                "foreground": "#2AC3DE"
+              }
+            },
+            {
+              "scope": "support.function.manim.mathviz",
+              "settings": {
+                "foreground": "#7DCFFF"
+              }
+            },
+            {
+              "scope": "support.constant.manim.mathviz",
+              "settings": {
+                "foreground": "#FF9E64"
+              }
+            },
+            {
+              "scope": "keyword.operator.unicode.mathviz",
+              "settings": {
+                "foreground": "#89DDFF"
+              }
+            },
+            {
+              "scope": "constant.other.unicode.mathviz",
+              "settings": {
+                "foreground": "#FF9E64"
+              }
+            },
+            {
+              "scope": "entity.name.function.decorator.mathviz",
+              "settings": {
+                "foreground": "#E0AF68",
+                "fontStyle": "italic"
+              }
+            }
+          ]
+        }
+      },
+      "[mathviz]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.autoClosingBrackets": "always",
+        "editor.autoClosingQuotes": "always",
+        "editor.suggest.snippetsPreventQuickSuggestions": false
+      }
+    }
+  }
+}
