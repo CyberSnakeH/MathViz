@@ -11,7 +11,7 @@ from mathviz.compiler.codegen import CodeGenerator
 from mathviz.compiler.lexer import Lexer
 from mathviz.compiler.parser import Parser
 
-__version__ = "0.1.0"
+__version__ = "0.1.7"
 __all__ = [
     "compile_source",
     "compile_file",
