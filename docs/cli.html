@@ -87,6 +87,8 @@
           <a href="#fmt" class="sidebar-link">fmt</a>
           <a href="#lint" class="sidebar-link">lint</a>
           <a href="#watch" class="sidebar-link">watch</a>
+          <a href="#new" class="sidebar-link">new</a>
+          <a href="#build" class="sidebar-link">build</a>
           <a href="#info" class="sidebar-link">info</a>
         </nav>
       </div>
@@ -103,7 +105,7 @@
 
       <h2>Installation</h2>
 
-      <p>Install MathViz using pipx (recommended) or uv:</p>
+      <p>Install MathViz using pipx (recommended), pip, or uv:</p>
 
       <div class="code-block">
         <div class="code-block-header">
@@ -111,7 +113,10 @@
         </div>
         <div class="code-block-body">
           <pre><code># Using pipx (recommended for CLI tools)
-pipx install git+https://github.com/CyberSnakeH/MathViz.git
+pipx install mathviz
+
+# Using pip
+pip install mathviz
 
 # Using uv for development
 git clone https://github.com/CyberSnakeH/MathViz.git
@@ -832,6 +837,114 @@ mathviz watch src/ --debounce 500</code></pre>
         </div>
       </div>
 
+      <h2 id="new">mathviz new</h2>
+
+      <p>Create a new MathViz project with a complete directory structure.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz new &lt;name&gt; [options]</code></pre>
+        </div>
+      </div>
+
+      <h3>Options</h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--template &lt;type&gt;</code></td>
+              <td>Project template: <code>basic</code> (default), <code>manim</code>, <code>math</code>, <code>lib</code></td>
+            </tr>
+            <tr>
+              <td><code>--no-git</code></td>
+              <td>Don't initialize a git repository</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Generated Structure</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>$ mathviz new my-project
+Created MathViz project: my-project/
+  - src/main.mviz (template: basic)
+  - mathviz.toml
+  - .gitignore
+
+my-project/
+├── src/
+│   └── main.mviz       # Entry point
+├── tests/
+├── mathviz.toml         # Project configuration
+└── .gitignore</code></pre>
+        </div>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code># Create a basic project
+mathviz new my-project
+
+# Create an animation project
+mathviz new my-animation --template manim
+
+# Create a math project
+mathviz new my-math --template math
+
+# Create a library
+mathviz new my-lib --template lib
+
+# Create without git
+mathviz new my-project --no-git</code></pre>
+        </div>
+      </div>
+
+      <h2 id="build">mathviz build</h2>
+
+      <p>Build the current project. Reads configuration from <code>mathviz.toml</code> and compiles all <code>.mviz</code> files in <code>src/</code>.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>mathviz build</code></pre>
+        </div>
+      </div>
+
+      <h3>Example</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>$ cd my-project
+$ mathviz build
+Build successful: 3 file(s) compiled</code></pre>
+        </div>
+      </div>
+
       <h2 id="info">mathviz info</h2>
 
       <p>Display information about the MathViz installation and environment.</p>
@@ -893,6 +1006,32 @@ Dependencies:
   numba: 0.58.0 (JIT enabled)</code></pre>
         </div>
       </div>
+
+      <h2>Auto-Update</h2>
+
+      <p>
+        MathViz automatically checks <a href="https://pypi.org/project/mathviz/">PyPI</a> for new versions once per day.
+        The check runs in the background and never blocks your commands. When an update is available,
+        a message is displayed after the command output:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>$ mathviz build
+Build successful: 3 file(s) compiled
+
+Update available: 0.1.7 → 0.2.0
+Run: pipx upgrade mathviz</code></pre>
+        </div>
+      </div>
+
+      <p>
+        The version check result is cached in <code>~/.cache/mathviz/update_check.json</code> for 24 hours.
+        To force a fresh check, delete the cache file.
+      </p>
 
       <h2>Configuration File</h2>
 

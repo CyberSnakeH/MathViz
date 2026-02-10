@@ -113,7 +113,21 @@
           <span class="code-block-lang">Shell</span>
         </div>
         <div class="code-block-body">
-          <pre><code>pipx install git+https://github.com/CyberSnakeH/MathViz.git</code></pre>
+          <pre><code>pipx install mathviz</code></pre>
+        </div>
+      </div>
+
+      <h3>Using pip</h3>
+      <p>
+        You can also install MathViz directly from <a href="https://pypi.org/project/mathviz/">PyPI</a>:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>pip install mathviz</code></pre>
         </div>
       </div>
 
@@ -143,6 +157,41 @@ uv sync --dev</code></pre>
         <div class="code-block-body">
           <pre><code>mathviz --version
 mathviz info</code></pre>
+        </div>
+      </div>
+
+      <h3>VS Code Extension</h3>
+      <p>
+        MathViz includes a VS Code extension with syntax highlighting, 18 code snippets, and smart bracket matching.
+        Build and install the extension:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>cd vscode-mathviz
+npx @vscode/vsce package
+code --install-extension mathviz-0.1.0.vsix</code></pre>
+        </div>
+      </div>
+
+      <p>Open any <code>.mviz</code> or <code>.mvz</code> file in VS Code and the extension activates automatically.</p>
+
+      <h3>Auto-Update</h3>
+      <p>
+        MathViz automatically checks for updates via PyPI once per day. When a new version is available,
+        you'll see a notification in the terminal:
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">Shell</span>
+        </div>
+        <div class="code-block-body">
+          <pre><code>Update available: 0.1.7 → 0.2.0
+Run: pipx upgrade mathviz</code></pre>
         </div>
       </div>
 
