@@ -21,6 +21,8 @@ import argparse
 import json
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -276,9 +278,14 @@ def create_parser() -> argparse.ArgumentParser:
     )
     new_parser.add_argument(
         "--template",
-        choices=["basic", "manim", "math"],
+        choices=["basic", "manim", "math", "lib"],
         default="basic",
         help="Project template (default: basic)",
+    )
+    new_parser.add_argument(
+        "--no-git",
+        action="store_true",
+        help="Don't initialize git repository",
     )
 
     # Exec command (run without manim)
@@ -1095,15 +1102,21 @@ def cmd_ast(args: argparse.Namespace) -> int:
 
 def cmd_new(args: argparse.Namespace) -> int:
     """Handle the new command - create a new project."""
+    import subprocess
+
     name = args.name
     template = args.template
 
     project_dir = Path(name)
-    if project_dir.exists():
-        print(f"Error: Directory '{name}' already exists", file=sys.stderr)
+    if project_dir.exists() and any(project_dir.iterdir()):
+        print(f"Error: Directory '{name}' is not empty", file=sys.stderr)
         return 1
 
-    project_dir.mkdir(parents=True)
+    project_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create project structure
+    (project_dir / "src").mkdir(exist_ok=True)
+    (project_dir / "tests").mkdir(exist_ok=True)
 
     # Create main file based on template
     templates = {
@@ -1117,7 +1130,7 @@ fn main() {{
 use manim.*
 
 fn main() {{
-    println("Run with: mathviz run {name}/main.mviz")
+    println("Run with: mathviz run src/main.mviz")
 }}
 
 scene MainScene extends Scene {{
@@ -1131,31 +1144,101 @@ scene MainScene extends Scene {{
 """,
         "math": """# {name} - MathViz Math Project
 
-mod math_utils {{
-    fn factorial(n: Int) -> Int {{
-        if n <= 1 {{ return 1 }}
-        return n * factorial(n - 1)
-    }}
+@njit
+fn factorial(n: Int) -> Int {{
+    if n <= 1 {{ return 1 }}
+    return n * factorial(n - 1)
 }}
 
 fn main() {{
     println("=== {name} ===")
-    println("5! = {{}}", math_utils.factorial(5))
+    println("5! = {{}}", factorial(5))
 
     let arr = [1.0, 2.0, 3.0, 4.0, 5.0]
     println("sum = {{}}", sum(arr))
 }}
 """,
+        "lib": """# {name} - MathViz Library
+
+/// A simple math utilities library
+
+pub mod utils {{
+    /// Clamp a value between min and max
+    pub fn clamp(value: Float, min_val: Float, max_val: Float) -> Float {{
+        if value < min_val {{ return min_val }}
+        if value > max_val {{ return max_val }}
+        return value
+    }}
+
+    /// Linear interpolation between two values
+    pub fn lerp(a: Float, b: Float, t: Float) -> Float {{
+        return a + (b - a) * t
+    }}
+}}
+""",
     }
 
     main_content = templates[template].format(name=name)
-    main_file = project_dir / "main.mviz"
+    main_file = project_dir / "src" / "main.mviz"
     main_file.write_text(main_content, encoding="utf-8")
 
-    print(f"Created new MathViz project: {name}/")
-    print(f"  - main.mviz (template: {template})")
-    print(f"\nTo compile: mathviz compile {name}/main.mviz")
-    print(f"To run:     mathviz exec {name}/main.mviz")
+    # Create mathviz.toml configuration
+    config_content = f'''# MathViz Project Configuration
+
+[project]
+name = "{name}"
+version = "0.1.0"
+template = "{template}"
+
+[build]
+optimize = true
+parallel = true
+
+[lint]
+warn_all = false
+'''
+    (project_dir / "mathviz.toml").write_text(config_content, encoding="utf-8")
+
+    # Create .gitignore
+    gitignore_content = """# MathViz generated files
+*.py
+!tests/*.py
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+build/
+dist/
+
+# Media
+media/
+"""
+    (project_dir / ".gitignore").write_text(gitignore_content, encoding="utf-8")
+
+    # Initialize git if not disabled
+    if not args.no_git:
+        subprocess.run(
+            ["git", "init", "-q"],
+            cwd=str(project_dir),
+            capture_output=True,
+        )
+
+    print(f"{Colors.GREEN}Created MathViz project:{Colors.RESET} {project_dir}/")
+    print(f"  - src/main.mviz (template: {template})")
+    print("  - mathviz.toml")
+    print("  - .gitignore")
+    print()
+    print("Next steps:")
+    print(f"  cd {project_dir}")
+    print("  mathviz build     # Build the project")
+    print("  mathviz exec src/main.mviz  # Run")
 
     return 0
 
@@ -2141,6 +2224,68 @@ def _print_ast(node, indent: int = 0) -> None:
         print(f"{prefix}{node_name}")
 
 
+_UPDATE_CHECK_INTERVAL = 86400  # 24 hours in seconds
+_CACHE_DIR = Path.home() / ".cache" / "mathviz"
+_UPDATE_CACHE_FILE = _CACHE_DIR / "update_check.json"
+
+# Stores the result from the background update check thread
+_update_message: str | None = None
+
+
+def _parse_version(v: str) -> tuple[int, ...]:
+    """Parse a version string like '0.1.6' into a comparable tuple."""
+    return tuple(int(x) for x in v.strip().split("."))
+
+
+_GITHUB_REPO = "CyberSnakeH/MathViz"
+
+
+def _check_update_background() -> None:
+    """Check GitHub releases for a newer version (runs in a background thread)."""
+    global _update_message  # noqa: PLW0603
+    try:
+        # Check cache first
+        if _UPDATE_CACHE_FILE.exists():
+            cache = json.loads(_UPDATE_CACHE_FILE.read_text(encoding="utf-8"))
+            if time.time() - cache.get("timestamp", 0) < _UPDATE_CHECK_INTERVAL:
+                latest = cache.get("latest_version", "")
+                if latest and _parse_version(latest) > _parse_version(__version__):
+                    _update_message = (
+                        f"\n{Colors.YELLOW}Update available:{Colors.RESET} "
+                        f"{Colors.DIM}{__version__}{Colors.RESET} → "
+                        f"{Colors.GREEN}{latest}{Colors.RESET}\n"
+                        f"Run: {Colors.CYAN}pipx upgrade mathviz{Colors.RESET}\n"
+                    )
+                return
+
+        # Query GitHub releases API
+        from urllib.request import Request, urlopen
+
+        url = f"https://api.github.com/repos/{_GITHUB_REPO}/releases/latest"
+        req = Request(url, headers={"Accept": "application/vnd.github+json"})
+        with urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode())
+            tag = data.get("tag_name", "")
+            latest = tag.lstrip("v")
+
+        # Write cache
+        _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        _UPDATE_CACHE_FILE.write_text(
+            json.dumps({"latest_version": latest, "timestamp": time.time()}),
+            encoding="utf-8",
+        )
+
+        if _parse_version(latest) > _parse_version(__version__):
+            _update_message = (
+                f"\n{Colors.YELLOW}Update available:{Colors.RESET} "
+                f"{Colors.DIM}{__version__}{Colors.RESET} → "
+                f"{Colors.GREEN}{latest}{Colors.RESET}\n"
+                f"Run: {Colors.CYAN}pipx upgrade mathviz{Colors.RESET}\n"
+            )
+    except Exception:
+        pass  # Never block the CLI on update check failures
+
+
 def main(argv: list[str] | None = None) -> int:
     """Main entry point for the CLI."""
     parser = create_parser()
@@ -2149,6 +2294,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command is None:
         parser.print_help()
         return 0
+
+    # Start update check in background (non-blocking)
+    update_thread = threading.Thread(target=_check_update_background, daemon=True)
+    update_thread.start()
 
     command_handlers = {
         "compile": cmd_compile,
@@ -2185,10 +2334,17 @@ def main(argv: list[str] | None = None) -> int:
 
     handler = command_handlers.get(args.command)
     if handler:
-        return handler(args)
+        result = handler(args)
+    else:
+        parser.print_help()
+        result = 1
 
-    parser.print_help()
-    return 1
+    # Wait briefly for update check to finish, then show message
+    update_thread.join(timeout=2)
+    if _update_message:
+        print(_update_message, file=sys.stderr)
+
+    return result
 
 
 if __name__ == "__main__":
