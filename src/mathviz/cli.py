@@ -2237,11 +2237,8 @@ def _parse_version(v: str) -> tuple[int, ...]:
     return tuple(int(x) for x in v.strip().split("."))
 
 
-_GITHUB_REPO = "CyberSnakeH/MathViz"
-
-
 def _check_update_background() -> None:
-    """Check GitHub releases for a newer version (runs in a background thread)."""
+    """Check PyPI for a newer version (runs in a background thread)."""
     global _update_message  # noqa: PLW0603
     try:
         # Check cache first
@@ -2258,15 +2255,12 @@ def _check_update_background() -> None:
                     )
                 return
 
-        # Query GitHub releases API
-        from urllib.request import Request, urlopen
+        # Query PyPI API
+        from urllib.request import urlopen
 
-        url = f"https://api.github.com/repos/{_GITHUB_REPO}/releases/latest"
-        req = Request(url, headers={"Accept": "application/vnd.github+json"})
-        with urlopen(req, timeout=5) as resp:
+        with urlopen("https://pypi.org/pypi/mathviz/json", timeout=5) as resp:
             data = json.loads(resp.read().decode())
-            tag = data.get("tag_name", "")
-            latest = tag.lstrip("v")
+            latest = data["info"]["version"]
 
         # Write cache
         _CACHE_DIR.mkdir(parents=True, exist_ok=True)
